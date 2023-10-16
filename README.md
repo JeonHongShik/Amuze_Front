@@ -1,6 +1,6 @@
 # amuze
 
-A new Flutter project.
+무용플랫폼 출시 프로젝트의 프런트단
 
 ## Getting Started
 
