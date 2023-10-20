@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
-  WidgetsFlutterBinding.ensureInitialized;
+  WidgetsFlutterBinding.ensureInitialized();
 
   KakaoSdk.init(
     nativeAppKey: 'eabfebdd6a97136a8764ecfc05c8b8fe',
     javaScriptAppKey: '1405eb959f73904bf61cb1f7163e37d4',
   );
+
+  //print(await KakaoSdk.origin);
 
   runApp(
     //store를 한 개만 사용할 때는 ChangeNotifierProvider를 써야함. 두 개 이상은 노션에 정리해놨음
@@ -52,7 +54,7 @@ class MyApp extends StatelessWidget {
         color: Colors.white,
         child: Center(
           child: ElevatedButton(
-            child: Text('카카오 로그인'),
+            child: const Text('카카오 로그인'),
             onPressed: () async {
               if (await isKakaoTalkInstalled()) {
                 try {
@@ -72,8 +74,9 @@ class MyApp extends StatelessWidget {
                 }
               } else {
                 try {
+                  //아니면 여기서 안 주나?
                   await UserApi.instance.loginWithKakaoAccount();
-                  print('카카오계정으로 로그인 성공4');
+                  print('카카오계정으로 로그인 성공4'); //여기가 지금 안 먹는 것 같은데
                   get_user_info();
                 } catch (error) {
                   print('카카오 계정으로 로그인 실패4 $error');
