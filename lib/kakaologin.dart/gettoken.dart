@@ -1,3 +1,5 @@
+//이거 사용 안 하는데 혹시 몰라서 놔둠
+
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
