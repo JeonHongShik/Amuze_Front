@@ -42,6 +42,8 @@ dependencies:
   
   http: ^1.1.0
   provider: ^6.0.5
+  shared_preferences: ^2.2.2
+  kakao_flutter_sdk_common: ^1.6.1
   
   
   
