@@ -2,12 +2,15 @@ import 'package:amuze/homepage.dart';
 import 'package:amuze/loadingscreen.dart';
 import 'package:amuze/loginpage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
 
+  //우리 앱의 Key값
   KakaoSdk.init(
     nativeAppKey: 'eabfebdd6a97136a8764ecfc05c8b8fe',
     javaScriptAppKey: '1405eb959f73904bf61cb1f7163e37d4',
@@ -17,26 +20,33 @@ void main() async {
   //print(await KakaoSdk.origin);
 
   runApp(
-    // 멀티프로바이더를 모든 곳에서 사용하기 위해서는 MateriaApp의 상위에 있어야함.
-    MaterialApp(
-      home: FutureBuilder(
-        future: _checkTokenValidity(),
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            //토큰이 있으면 홈페이지
-            if (snapshot.data == true) {
-              return const HomePage();
+    //프로바이더 등록
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (c) => UserInfoProvider(),
+        )
+      ],
+      child: MaterialApp(
+        home: FutureBuilder(
+          future: _checkTokenValidity(),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              //토큰이 있으면 홈페이지
+              if (snapshot.data == true) {
+                return const HomePage();
+              }
+              //토큰이 만료 됐거나 없으면 로그인페이지
+              else {
+                return const LoginPage();
+              }
             }
-            //토큰이 만료 됐거나 없으면 로그인페이지
+            //아직 토큰 유효성 여부를 확인하고 있으면 로딩페이지
             else {
-              return const LoginPage();
+              return const LoadingScreen();
             }
-          }
-          //아직 토큰 유효성 여부를 확인하고 있으면 로딩페이지
-          else {
-            return const LoadingScreen();
-          }
-        },
+          },
+        ),
       ),
     ),
   );
@@ -53,4 +63,35 @@ Future<bool> _checkTokenValidity() async {
     }
   }
   return false;
+}
+
+//secure_storage를 쉽게 사용하기 위해 프로바이더에 넣어놈
+//프로바이더는 앱 모든 곳에서 사용 가능
+class UserInfoProvider extends ChangeNotifier {
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
+  String? kakaoid;
+  String? name;
+  String? profile;
+
+  UserInfoProvider() {
+    loadUserInfo();
+  }
+
+  Future<void> loadUserInfo() async {
+    kakaoid = await storage.read(key: 'kakaoid');
+    name = await storage.read(key: 'name');
+    profile = await storage.read(key: 'profile');
+
+    notifyListeners();
+  }
+}
+
+//이거는 사용 안하는데 test폴더의 widget_test.dart 파일에서의 오류 때문에 유지
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 //처음 로그인 하는 경우 서버에 유저 정보를 보내는 함수
 Future<void> postAccountInfo(
     String? kakaoid, String? name, String? profile) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool isFirstLogin = prefs.getBool('isFirstLogin') ?? true;
+  // SecureStorage는 안전한 로컬 저장소
+  FlutterSecureStorage storage = const FlutterSecureStorage();
+  bool isFirstLogin = await storage.read(key: 'isFirstLogin') == null;
 
   if (isFirstLogin) {
     final response = await http.post(
@@ -22,7 +23,12 @@ Future<void> postAccountInfo(
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('post 성공');
-      prefs.setBool('isFirstLogin', false);
+      await storage.write(key: 'isFirstLogin', value: 'false');
+
+      //
+      await storage.write(key: 'kakaoid', value: kakaoid);
+      await storage.write(key: 'name', value: name);
+      await storage.write(key: 'profile', value: profile);
     } else {
       throw Exception('서버 응답 오류 : ${response.statusCode}');
     }
