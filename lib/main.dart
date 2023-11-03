@@ -17,7 +17,7 @@ void main() async {
     javaScriptAppKey: '1405eb959f73904bf61cb1f7163e37d4',
   );
 
-  //KakaoSDK로 키 해시 값 받을 때 사용
+  //KakaoSDK로 키 해시 값 받을 때 사용, 키 해시 값 카카오디벨로퍼에 등록해야 함
   //print(await KakaoSdk.origin);
 
   //앱을 세로로 고정
