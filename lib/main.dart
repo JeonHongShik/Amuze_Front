@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
@@ -19,37 +20,41 @@ void main() async {
   //KakaoSDK로 키 해시 값 받을 때 사용
   //print(await KakaoSdk.origin);
 
-  runApp(
-    //프로바이더 등록
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (c) => UserInfoProvider(),
-        )
-      ],
-      child: MaterialApp(
-        home: FutureBuilder(
-          future: _checkTokenValidity(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              //토큰이 있으면 홈페이지
-              if (snapshot.data == true) {
-                return const HomePage();
+  //앱을 세로로 고정
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(
+      //프로바이더 등록
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (c) => UserInfoProvider(),
+          )
+        ],
+        child: MaterialApp(
+          home: FutureBuilder(
+            future: _checkTokenValidity(),
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                //토큰이 있으면 홈페이지
+                if (snapshot.data == true) {
+                  return const HomePage();
+                }
+                //토큰이 만료 됐거나 없으면 로그인페이지
+                else {
+                  return const LoginPage();
+                }
               }
-              //토큰이 만료 됐거나 없으면 로그인페이지
+              //아직 토큰 유효성 여부를 확인하고 있으면 로딩페이지
               else {
-                return const LoginPage();
+                return const LoadingScreen();
               }
-            }
-            //아직 토큰 유효성 여부를 확인하고 있으면 로딩페이지
-            else {
-              return const LoadingScreen();
-            }
-          },
+            },
+          ),
         ),
       ),
-    ),
-  );
+    );
+  });
 }
 
 //코드가 유효한지, 코드가 만료 됐거나 없는지 판단하는 함수
