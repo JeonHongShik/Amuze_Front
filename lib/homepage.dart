@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
               child: IconButton(
                 icon: const Icon(
                   Icons.home,
-                  color: SecondColors.basic,
+                  color: SecondaryColors.basic,
                 ),
                 onPressed: () => {},
               ),
@@ -40,7 +40,7 @@ class HomePage extends StatelessWidget {
               child: IconButton(
                 icon: const Icon(
                   Icons.notifications,
-                  color: SecondColors.basic,
+                  color: SecondaryColors.basic,
                 ),
                 onPressed: () => {},
               ),
@@ -50,7 +50,7 @@ class HomePage extends StatelessWidget {
               child: IconButton(
                 icon: const Icon(
                   Icons.chat_bubble,
-                  color: SecondColors.basic,
+                  color: SecondaryColors.basic,
                 ),
                 onPressed: () => {},
               ),
@@ -59,7 +59,7 @@ class HomePage extends StatelessWidget {
               child: IconButton(
                 icon: const Icon(
                   Icons.person,
-                  color: SecondColors.basic,
+                  color: SecondaryColors.basic,
                 ),
                 onPressed: () => {},
               ),
@@ -72,7 +72,7 @@ class HomePage extends StatelessWidget {
         child: const Icon(
           Icons.menu,
           size: 35,
-          color: SecondColors.basic,
+          color: SecondaryColors.basic,
         ),
         onPressed: () => (),
       ),
