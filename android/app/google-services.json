@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "818320655266",
+    "project_id": "amuze-a2601",
+    "storage_bucket": "amuze-a2601.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818320655266:android:c33cbb2e5a83730ab328fb",
+        "android_client_info": {
+          "package_name": "com.example.amuze"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgzEwI44yHapi6TGjgToe7plKIRZ6GpPw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
