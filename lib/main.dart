@@ -13,6 +13,7 @@ void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
 
+  //firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -35,16 +36,24 @@ void main() async {
         providers: [
           ChangeNotifierProvider(
             create: (c) => UserInfoProvider(),
-          )
+          ),
+          ChangeNotifierProvider(
+            create: (c) => BottomNavigationProvider(),
+          ),
         ],
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+          ),
           home: FutureBuilder(
             future: _checkTokenValidity(),
             builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 //토큰이 있으면 홈페이지
                 if (snapshot.data == true) {
-                  return const HomePage();
+                  return HomePage();
                 }
                 //토큰이 만료 됐거나 없으면 로그인페이지
                 else {
