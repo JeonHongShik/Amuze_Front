@@ -35,12 +35,12 @@ class MyPage extends StatelessWidget {
                 CircleAvatar(
                     radius: 30,
                     backgroundImage:
-                        NetworkImage(userInfoProvider.profile ?? '')),
+                        NetworkImage(userInfoProvider.photoURL ?? '')),
                 const SizedBox(
                   width: 15,
                 ),
                 Text(
-                  userInfoProvider.name ?? '',
+                  userInfoProvider.displayName ?? '',
                   style: const TextStyle(fontSize: 20, color: TextColors.high),
                 )
               ],

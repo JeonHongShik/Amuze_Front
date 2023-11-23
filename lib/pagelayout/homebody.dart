@@ -1,5 +1,8 @@
+import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:amuze/resume/resume_board.dart';
+import 'package:amuze/stage/stage_board.dart';
 import 'package:flutter/material.dart';
 
 class HomeBody extends StatelessWidget {
@@ -64,17 +67,17 @@ class TopBoard extends StatelessWidget {
         if (label == '공고 게시판') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const DummyPage()),
+            MaterialPageRoute(builder: (context) => const StageBoard()),
           );
         } else if (label == '이력서 게시판') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const DummyPage()),
+            MaterialPageRoute(builder: (context) => const ResumeBoard()),
           );
         } else if (label == '커뮤니티') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const DummyPage()),
+            MaterialPageRoute(builder: (context) => const CommunityBoard()),
           );
         }
       },

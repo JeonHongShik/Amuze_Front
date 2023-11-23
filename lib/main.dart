@@ -1,5 +1,4 @@
 import 'package:amuze/homepage.dart';
-import 'package:amuze/loadingscreen.dart';
 import 'package:amuze/loginpage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -8,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
@@ -42,29 +42,17 @@ void main() async {
           ),
         ],
         child: MaterialApp(
+          initialRoute: auth.FirebaseAuth.instance.currentUser == null
+              ? '/login'
+              : '/home',
+          routes: {
+            '/login': (context) => const LoginPage(),
+            '/home': (context) => HomePage(),
+          },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
-          ),
-          home: FutureBuilder(
-            future: _checkTokenValidity(),
-            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                //토큰이 있으면 홈페이지
-                if (snapshot.data == true) {
-                  return HomePage();
-                }
-                //토큰이 만료 됐거나 없으면 로그인페이지
-                else {
-                  return const LoginPage();
-                }
-              }
-              //아직 토큰 유효성 여부를 확인하고 있으면 로딩페이지
-              else {
-                return const LoadingScreen();
-              }
-            },
           ),
         ),
       ),
@@ -72,35 +60,24 @@ void main() async {
   });
 }
 
-//코드가 유효한지, 코드가 만료 됐거나 없는지 판단하는 함수
-Future<bool> _checkTokenValidity() async {
-  if (await AuthApi.instance.hasToken()) {
-    try {
-      await UserApi.instance.me();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  return false;
-}
-
 //secure_storage를 쉽게 사용하기 위해 프로바이더에 넣어놈
 //프로바이더는 앱 모든 곳에서 사용 가능
 class UserInfoProvider extends ChangeNotifier {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  String? kakaoid;
-  String? name;
-  String? profile;
+  String? uid;
+  String? displayName;
+  String? photoURL;
+  String? email;
 
   UserInfoProvider() {
     loadUserInfo();
   }
 
   Future<void> loadUserInfo() async {
-    kakaoid = await storage.read(key: 'kakaoid');
-    name = await storage.read(key: 'name');
-    profile = await storage.read(key: 'profile');
+    uid = await storage.read(key: 'uid');
+    displayName = await storage.read(key: 'displayName');
+    photoURL = await storage.read(key: 'photoURL');
+    email = await storage.read(key: 'email');
 
     notifyListeners();
   }

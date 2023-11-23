@@ -18,8 +18,6 @@ class PrimaryColors {
 class SecondaryColors {
   //기본
   static const Color basic = Color(0xFFF6C5D2);
-  //테스트
-  static const Color test = Color(0xFFF6C5D2);
   //선택 시
   static const Color hover = Color(0xFFF7CAD6);
   //눌렀을 때

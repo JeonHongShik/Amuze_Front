@@ -35,19 +35,6 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 25),
         ),
-        actions: [
-          IconButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DummyPage(),
-                  )),
-              icon: const Icon(
-                Icons.search,
-                size: 30,
-                color: PrimaryColors.basic,
-              ))
-        ],
       ),
       body: const [
         HomeBody(),
@@ -58,9 +45,9 @@ class HomePage extends StatelessWidget {
       ].elementAt(_bottomNavigationProvider.currentPage),
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
-        selectedItemColor: SecondaryColors.test,
+        selectedItemColor: SecondaryColors.basic,
         showUnselectedLabels: false,
-        unselectedItemColor: SecondaryColors.test,
+        unselectedItemColor: SecondaryColors.basic,
         type: BottomNavigationBarType.fixed,
         backgroundColor: TertiaryColors.basic,
         items: const [
@@ -89,7 +76,7 @@ class HomePage extends StatelessWidget {
         child: const Icon(
           Icons.menu,
           size: 30,
-          color: SecondaryColors.test,
+          color: SecondaryColors.basic,
         ),
         onPressed: () => (),
       ),
