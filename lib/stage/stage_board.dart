@@ -1,5 +1,8 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:amuze/resume/resume_post.dart';
+import 'package:amuze/resume/resumewrite/resumetitle.dart';
+import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:flutter/material.dart';
 
 class StageBoard extends StatelessWidget {
@@ -48,8 +51,23 @@ class StageBoard extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const DummyPage()),
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const Stagetitle(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin = const Offset(1.0, 0.0);
+                            var end = Offset.zero;
+                            var tween = Tween(begin: begin, end: end);
+                            var offsetAnimation = animation.drive(tween);
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                        ),
                       );
                     },
                     child: const Text(

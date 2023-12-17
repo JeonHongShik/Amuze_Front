@@ -1,6 +1,5 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/chatbody.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/pagelayout/homebody.dart';
 import 'package:amuze/pagelayout/mypage.dart';
 import 'package:amuze/pagelayout/notifybody.dart';
@@ -17,13 +16,25 @@ class BottomNavigationProvider extends ChangeNotifier {
   }
 }
 
+class IconChangeProvider extends ChangeNotifier {
+  bool _isDialogOpen = false;
+  bool get isDialogOpen => _isDialogOpen;
+
+  setDialogOpen(bool isOpen) {
+    _isDialogOpen = isOpen;
+    notifyListeners();
+  }
+}
+
 class HomePage extends StatelessWidget {
   HomePage({super.key});
   late BottomNavigationProvider _bottomNavigationProvider;
+  late IconChangeProvider _iconChangeProvider;
 
   @override
   Widget build(BuildContext context) {
     _bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context);
+    _iconChangeProvider = Provider.of<IconChangeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -73,15 +84,42 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: PrimaryColors.basic,
-        child: const Icon(
-          Icons.menu,
+        child: Icon(
+          _iconChangeProvider.isDialogOpen ? Icons.close : Icons.menu,
           size: 30,
           color: SecondaryColors.basic,
         ),
-        onPressed: () => (),
+        onPressed: () {
+          if (_iconChangeProvider.isDialogOpen) {
+            Navigator.pop(context);
+          } else {
+            menuPopup(context);
+          }
+          _iconChangeProvider.setDialogOpen(!_iconChangeProvider.isDialogOpen);
+        },
       ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
     );
   }
+}
+
+void menuPopup(context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.5,
+          height: 100,
+        ),
+      );
+    },
+    barrierColor: Colors.black26,
+  ).then(
+    (value) {
+      Provider.of<IconChangeProvider>(context, listen: false)
+          .setDialogOpen(false);
+    },
+  );
 }

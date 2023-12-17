@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 권한 설정 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+    android:name="android.permission.READ_EXTERNAL_STORAGE"
+    android:maxSdkVersion="32" />
+
     <application
         android:label="amuze"
         android:name="${applicationName}"
@@ -62,4 +69,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
 </manifest>

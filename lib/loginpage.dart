@@ -10,10 +10,10 @@ Future<void> saveFirebaseAccountInfo() async {
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  String ProviderId = user?.providerData[0].providerId ?? '';
+  String providerId = user?.providerData[0].providerId ?? '';
 
   FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
-    'providerId': ProviderId,
+    'providerId': providerId,
     'uid': user?.uid,
     'email': user?.email,
     'displayName': user?.displayName,

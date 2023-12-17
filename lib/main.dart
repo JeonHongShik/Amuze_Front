@@ -1,5 +1,7 @@
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
+import 'package:amuze/resume/resume_board.dart';
+import 'package:amuze/stage/stage_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -40,6 +42,9 @@ void main() async {
           ChangeNotifierProvider(
             create: (c) => BottomNavigationProvider(),
           ),
+          ChangeNotifierProvider(
+            create: (c) => IconChangeProvider(),
+          )
         ],
         child: MaterialApp(
           initialRoute: auth.FirebaseAuth.instance.currentUser == null
@@ -51,6 +56,7 @@ void main() async {
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
+            primaryColor: Colors.white,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
           ),
