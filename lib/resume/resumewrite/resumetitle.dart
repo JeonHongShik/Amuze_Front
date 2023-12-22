@@ -14,6 +14,18 @@ class Resumetitle extends StatefulWidget {
 
 class _ResumetitleState extends State<Resumetitle> {
   @override
+  void initState() {
+    super.initState();
+    // UserInfoProvider에서 uid 가져와서 ResumeWriteProvider에 설정
+    final userInfoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false);
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    resumeWriteProvider.uid = userInfoProvider.uid;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -111,6 +123,10 @@ class _ResumetitleState extends State<Resumetitle> {
             return ElevatedButton(
               onPressed: hasText
                   ? () {
+                      provider = Provider.of<ResumeWriteProvider>(context,
+                          listen: false);
+
+                      print('uid : ${provider.uid}');
                       Navigator.push(
                         context,
                         PageRouteBuilder(

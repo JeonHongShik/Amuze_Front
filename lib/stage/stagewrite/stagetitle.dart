@@ -16,6 +16,18 @@ class _StagetitleState extends State<Stagetitle> {
   final TextEditingController controller = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // UserInfoProvider에서 uid 가져와서 ResumeWriteProvider에 설정
+    final userInfoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false);
+    final stageWriteProvider =
+        Provider.of<StageWriteProvider>(context, listen: false);
+
+    stageWriteProvider.uid = userInfoProvider.uid;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -118,6 +130,7 @@ class _StagetitleState extends State<Stagetitle> {
                           listen: false);
 
                       print('Title: ${provider.title}');
+                      print('uid : ${provider.uid}');
 
                       ///////////////////////////////////////////////
                       Navigator.push(

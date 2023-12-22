@@ -618,7 +618,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 var provider =
                     Provider.of<ResumeWriteProvider>(context, listen: false);
 

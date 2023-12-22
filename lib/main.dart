@@ -101,15 +101,8 @@ class UserInfoProvider extends ChangeNotifier {
 
 //이력서 작성 Provider//////////////////////////////////////////////////////////
 class ResumeWriteProvider extends ChangeNotifier {
-  void loadUserInfo(BuildContext context) {
-    final userInfoProvider =
-        Provider.of<UserInfoProvider>(context, listen: false);
-    uid = userInfoProvider.uid; // uid 값을 설정
-    // 필요한 경우 notifyListeners() 호출
-  }
-
   String? uid;
-  String? id;
+  int? id;
   String _title = '';
   String _gender = '';
   String _age = '';
@@ -251,6 +244,8 @@ class ResumeWriteProvider extends ChangeNotifier {
   }
 
   void reset() {
+    uid = '';
+    id = null;
     _title = '';
     _gender = '';
     _age = '';
@@ -312,15 +307,8 @@ class ResumeWriteProvider extends ChangeNotifier {
 
 //공고 작성 Provider///////////////////////////////////////////////////////////
 class StageWriteProvider extends ChangeNotifier {
-  void loadUserInfo(BuildContext context) {
-    final userInfoProvider =
-        Provider.of<UserInfoProvider>(context, listen: false);
-    uid = userInfoProvider.uid; // uid 값을 설정
-    // 필요한 경우 notifyListeners() 호출
-  }
-
   String? uid;
-  String? id;
+  int? id;
   String _title = '';
   String _region = '';
   String _type = '';
@@ -467,6 +455,8 @@ class StageWriteProvider extends ChangeNotifier {
   }
 
   void reset() {
+    uid = '';
+    id = null;
     _title = '';
     _region = '';
     _type = '';
