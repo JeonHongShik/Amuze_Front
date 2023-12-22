@@ -182,7 +182,6 @@ class _ResumeRegionState extends State<ResumeRegion> {
                       width: MediaQuery.of(context).size.width * 0.75,
                       child: GestureDetector(
                         onTap: () {
-                          final currentContext = context;
                           if (regionController.text.isNotEmpty) {
                             showModalBottomSheet(
                                 context: context,

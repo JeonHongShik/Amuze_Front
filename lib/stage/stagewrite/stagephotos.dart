@@ -622,32 +622,35 @@ class _StagePhotosState extends State<StagePhotos> {
                 var provider =
                     Provider.of<StageWriteProvider>(context, listen: false);
 
-                print('assetmainimage: ${provider.assetmainimage}');
-                print('filemainimage: ${provider.filemainimage}');
+                // 서버 주소 지정
+                String serverEndpoint = '우리 서버 주소';
 
-                print('assetotherimages: ${provider.assetotherimages}');
-                print('fileotherimages: ${provider.fileotherimages}');
-                print('convertedimagenames: ${provider.convertedimagenames}');
+                // 데이터 전송
+                provider.postStageData(serverEndpoint).then((_) {
+                  // 성공적으로 데이터를 전송한 후 해야 할 작업 (예: 다음 페이지로 이동)
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const DummyPage(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        var begin = const Offset(1.0, 0.0);
+                        var end = Offset.zero;
+                        var tween = Tween(begin: begin, end: end);
+                        var offsetAnimation = animation.drive(tween);
 
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const DummyPage(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      var begin = const Offset(1.0, 0.0);
-                      var end = Offset.zero;
-                      var tween = Tween(begin: begin, end: end);
-                      var offsetAnimation = animation.drive(tween);
-
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                }).catchError((error) {
+                  // 에러 처리
+                  print('Error sending data: $error');
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: PrimaryColors.basic,

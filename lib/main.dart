@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
+import 'package:amuze/servercommunication/resumeserver.dart';
+import 'package:amuze/servercommunication/stageserver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:dio/dio.dart';
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
@@ -106,6 +109,7 @@ class ResumeWriteProvider extends ChangeNotifier {
   }
 
   String? uid;
+  String? id;
   String _title = '';
   String _gender = '';
   String _age = '';
@@ -264,6 +268,45 @@ class ResumeWriteProvider extends ChangeNotifier {
     _photos = [];
     notifyListeners();
   }
+
+  Future<void> mergeImages() async {
+    _photos.clear(); // 기존의 photos 리스트를 비웁니다.
+
+    if (_filemainimage.isNotEmpty) {
+      _photos.add(_filemainimage[0]); // filemainimage의 첫 번째 이미지를 추가합니다.
+    }
+    if (_fileotherimages.isNotEmpty) {
+      _photos.addAll(_fileotherimages);
+    } // fileotherimages의 모든 이미지를 추가합니다.
+
+    notifyListeners();
+  }
+
+  Future<void> postResumeData(String serverEndpoint) async {
+    Dio dio = Dio();
+    await mergeImages();
+    FormData formData = createResumeFormData(
+      uid: uid,
+      title: _title,
+      gender: _gender,
+      age: _age,
+      regions: _regions,
+      educations: _educations,
+      careers: _careers,
+      awards: _awards,
+      completions: _completions,
+      introduce: _introduce,
+      photos: _photos,
+    );
+
+    try {
+      // 서버에 POST 요청
+      Response response = await dio.post(serverEndpoint, data: formData);
+      print(response.data); // 응답 출력
+    } catch (e) {
+      print(e);
+    }
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -277,6 +320,7 @@ class StageWriteProvider extends ChangeNotifier {
   }
 
   String? uid;
+  String? id;
   String _title = '';
   String _region = '';
   String _type = '';
@@ -284,6 +328,7 @@ class StageWriteProvider extends ChangeNotifier {
   String _pay = '';
   String _deadline = '';
   String _date = '';
+  String _time = '';
   String _datetime = '';
   String _introduce = '';
 
@@ -303,6 +348,7 @@ class StageWriteProvider extends ChangeNotifier {
   String get pay => _pay;
   String get deadline => _deadline;
   String get date => _date;
+  String get time => _time;
   String get datetime => _datetime;
   String get introduce => _introduce;
 
@@ -347,6 +393,11 @@ class StageWriteProvider extends ChangeNotifier {
 
   void setDate(String date) {
     _date = date;
+    notifyListeners();
+  }
+
+  void setTime(String time) {
+    _time = time;
     notifyListeners();
   }
 
@@ -423,6 +474,7 @@ class StageWriteProvider extends ChangeNotifier {
     _pay = '';
     _deadline = '';
     _date = '';
+    _time = '';
     _datetime = '';
     _introduce = '';
     _filemainimage = [];
@@ -431,6 +483,41 @@ class StageWriteProvider extends ChangeNotifier {
     _assetotherimages = [];
     _convertedimagenames = [];
     _photos = [];
+  }
+
+  Future<void> mergeDateAndTimeAsync() async {
+    if (_date.isNotEmpty && _time.isNotEmpty) {
+      _datetime = '$_date $_time';
+    } else {
+      _datetime = '';
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> postStageData(String serverEndpoint) async {
+    Dio dio = Dio();
+    await mergeDateAndTimeAsync();
+    FormData formData = createStgaeFormData(
+      uid: uid,
+      title: _title,
+      region: _region,
+      type: _type,
+      wishtype: _wishtype,
+      pay: _pay,
+      deadline: _deadline,
+      datetime: _datetime,
+      introduce: _introduce,
+      photos: _photos,
+    );
+
+    try {
+      // 서버에 POST 요청
+      Response response = await dio.post(serverEndpoint, data: formData);
+      print(response.data); // 응답 출력
+    } catch (e) {
+      print(e);
+    }
   }
 }
 

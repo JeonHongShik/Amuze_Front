@@ -23,7 +23,7 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
     final provider = Provider.of<StageWriteProvider>(context, listen: false);
     deadlineController.text = provider.deadline;
     dateController.text = provider.date;
-    timeController.text = provider.datetime;
+    timeController.text = provider.time;
   }
 
   @override
@@ -201,7 +201,7 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                               timeController.text = formattedTime;
                               Provider.of<StageWriteProvider>(context,
                                       listen: false)
-                                  .setDatetime(formattedTime);
+                                  .setTime(formattedTime);
                             });
                           }
                         },
@@ -256,6 +256,7 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                           print('pay: ${provider.pay}');
                           print('Deadline: ${provider.deadline}');
                           print('Date: ${provider.date}');
+                          print('time: ${provider.time}');
                           print('Datetime: ${provider.datetime}');
                           ///////////////////////////////////////////////
                           Navigator.push(
