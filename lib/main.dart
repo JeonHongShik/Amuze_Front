@@ -485,6 +485,19 @@ class StageWriteProvider extends ChangeNotifier {
     _photos = [];
   }
 
+  Future<void> mergeImages() async {
+    _photos.clear(); // 기존의 photos 리스트를 비웁니다.
+
+    if (_filemainimage.isNotEmpty) {
+      _photos.add(_filemainimage[0]); // filemainimage의 첫 번째 이미지를 추가합니다.
+    }
+    if (_fileotherimages.isNotEmpty) {
+      _photos.addAll(_fileotherimages);
+    } // fileotherimages의 모든 이미지를 추가합니다.
+
+    notifyListeners();
+  }
+
   Future<void> mergeDateAndTimeAsync() async {
     if (_date.isNotEmpty && _time.isNotEmpty) {
       _datetime = '$_date $_time';
@@ -497,6 +510,7 @@ class StageWriteProvider extends ChangeNotifier {
 
   Future<void> postStageData(String serverEndpoint) async {
     Dio dio = Dio();
+    await mergeImages();
     await mergeDateAndTimeAsync();
     FormData formData = createStgaeFormData(
       uid: uid,
