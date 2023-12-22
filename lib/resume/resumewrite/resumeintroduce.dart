@@ -1,9 +1,9 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resumewrite/resumegenderage.dart';
 import 'package:amuze/resume/resumewrite/resumephotos.dart';
 
 import 'package:flutter/material.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class ResumeIntroduce extends StatefulWidget {
   const ResumeIntroduce({super.key});
@@ -39,6 +39,8 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<ResumeWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -89,7 +91,14 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 300),
                     child: TextField(
-                      controller: controller,
+                      controller: TextEditingController(
+                          text: Provider.of<ResumeWriteProvider>(context,
+                                  listen: false)
+                              .introduce),
+                      onChanged: (text) {
+                        Provider.of<ResumeWriteProvider>(context, listen: false)
+                            .setIntroduce(text);
+                      },
                       maxLines: 15,
                       maxLength: 3000,
                       decoration: const InputDecoration(
@@ -128,14 +137,28 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: controller,
-              builder: (context, value, child) {
-                final bool hasText = controller.text.isNotEmpty;
+            Consumer<ResumeWriteProvider>(
+              builder: (context, provider, child) {
+                final bool hasText = provider.introduce.isNotEmpty;
 
                 return ElevatedButton(
                   onPressed: hasText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<ResumeWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Gender: ${provider.gender}');
+                          print('Age: ${provider.age}');
+                          print('Regions : ${provider.regions}');
+                          print('Educations : ${provider.educations}');
+                          print('Careers : ${provider.careers}');
+                          print('Awards : ${provider.awards}');
+                          print('Completions : ${provider.completions}');
+                          print('Introduce : ${provider.introduce}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(

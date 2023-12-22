@@ -1,7 +1,8 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resumewrite/resumeintroduce.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:amuze/main.dart';
 
 class ResumeAwardsCompletions extends StatefulWidget {
   const ResumeAwardsCompletions({super.key});
@@ -16,11 +17,13 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
   final List<Widget> _completionsfields = [];
   final List<TextEditingController> _awardscontrollers = [];
   final List<TextEditingController> _completionscontrollers = [];
-  final TextEditingController awardsController = TextEditingController();
+  final TextEditingController awardController = TextEditingController();
   final TextEditingController completionController = TextEditingController();
 
   void _addNewawardsField() {
     TextEditingController newController = TextEditingController();
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
     _awardscontrollers.add(newController);
     setState(() {
       _awardsfields.add(
@@ -30,6 +33,24 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
             controller: newController,
             maxLines: null,
             maxLength: 50,
+            onChanged: (value) {
+              int index = _awardscontrollers.indexOf(newController) + 1;
+
+              if (value.isEmpty) {
+                // 값이 비어있으면 해당 위치의 항목 제거
+                if (index < resumeWriteProvider.awards.length) {
+                  resumeWriteProvider.awards.removeAt(index);
+                }
+              } else {
+                // 리스트의 길이가 인덱스보다 작다면, 리스트를 확장
+                while (resumeWriteProvider.awards.length <= index) {
+                  resumeWriteProvider.awards.add('');
+                }
+
+                // 새로운 값을 적절한 위치에 저장
+                resumeWriteProvider.awards[index] = value;
+              }
+            },
             decoration: const InputDecoration(
                 hintText: '수상',
                 enabledBorder: UnderlineInputBorder(
@@ -44,6 +65,8 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
 
   void _addNewcompletionsField() {
     TextEditingController newController = TextEditingController();
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
     _completionscontrollers.add(newController);
     setState(() {
       _completionsfields.add(
@@ -53,6 +76,24 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
             controller: newController,
             maxLines: null,
             maxLength: 50,
+            onChanged: (value) {
+              int index = _completionscontrollers.indexOf(newController) + 1;
+
+              if (value.isEmpty) {
+                // 값이 비어있으면 해당 위치의 항목 제거
+                if (index < resumeWriteProvider.completions.length) {
+                  resumeWriteProvider.completions.removeAt(index);
+                }
+              } else {
+                // 리스트의 길이가 인덱스보다 작다면, 리스트를 확장
+                while (resumeWriteProvider.completions.length <= index) {
+                  resumeWriteProvider.completions.add('');
+                }
+
+                // 새로운 값을 적절한 위치에 저장
+                resumeWriteProvider.completions[index] = value;
+              }
+            },
             decoration: const InputDecoration(
                 hintText: '수료',
                 enabledBorder: UnderlineInputBorder(
@@ -66,7 +107,144 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    if (resumeWriteProvider.awards.isNotEmpty) {
+      awardController.text = resumeWriteProvider.awards[0];
+    }
+
+    if (resumeWriteProvider.completions.isNotEmpty) {
+      completionController.text = resumeWriteProvider.completions[0];
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final width = MediaQuery.of(context).size.width;
+        // 세 번째 값부터 시작하여 추가 TextField 생성
+        for (int i = 1; i < resumeWriteProvider.awards.length; i++) {
+          _addAwardsExistingField(resumeWriteProvider.awards[i], i, width);
+        }
+      }
+
+      if (mounted) {
+        final width = MediaQuery.of(context).size.width;
+        // 세 번째 값부터 시작하여 추가 TextField 생성
+        for (int i = 1; i < resumeWriteProvider.completions.length; i++) {
+          _addCompletionsExistingField(
+              resumeWriteProvider.completions[i], i, width);
+        }
+      }
+    });
+  }
+
+  void _addAwardsExistingField(String initialValue, int index, double width) {
+    TextEditingController newController =
+        TextEditingController(text: initialValue);
+    _awardscontrollers.add(newController);
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    Widget newField = SizedBox(
+      width: width * 0.75,
+      child: TextField(
+        //focusNode: newFocusNode,
+        controller: newController,
+        maxLines: null,
+        maxLength: 50,
+        onChanged: (value) {
+          int index =
+              _awardscontrollers.indexOf(newController) + 1; // 인덱스 2부터 시작
+
+          if (value.isEmpty) {
+            // 값이 비어있으면 해당 위치의 항목 제거
+            if (index < resumeWriteProvider.awards.length) {
+              resumeWriteProvider.awards.removeAt(index);
+            }
+          } else {
+            // 리스트의 길이가 인덱스보다 작다면, 리스트를 확장
+            while (resumeWriteProvider.awards.length <= index) {
+              resumeWriteProvider.awards.add('');
+            }
+
+            // 새로운 값을 적절한 위치에 저장
+            resumeWriteProvider.awards[index] = value;
+          }
+        },
+        decoration: const InputDecoration(
+          hintText: '수상',
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+        ),
+      ),
+    );
+
+    setState(() {
+      _awardsfields.insert(index - 1, newField); // +버튼 위에 삽입
+    });
+  }
+
+  void _addCompletionsExistingField(
+      String initialValue, int index, double width) {
+    TextEditingController newController =
+        TextEditingController(text: initialValue);
+    _completionscontrollers.add(newController);
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    Widget newField = SizedBox(
+      width: width * 0.75,
+      child: TextField(
+        //focusNode: newFocusNode,
+        controller: newController,
+        maxLines: null,
+        maxLength: 50,
+        onChanged: (value) {
+          int index =
+              _completionscontrollers.indexOf(newController) + 1; // 인덱스 2부터 시작
+
+          if (value.isEmpty) {
+            // 값이 비어있으면 해당 위치의 항목 제거
+            if (index < resumeWriteProvider.completions.length) {
+              resumeWriteProvider.completions.removeAt(index);
+            }
+          } else {
+            // 리스트의 길이가 인덱스보다 작다면, 리스트를 확장
+            while (resumeWriteProvider.completions.length <= index) {
+              resumeWriteProvider.completions.add('');
+            }
+
+            // 새로운 값을 적절한 위치에 저장
+            resumeWriteProvider.completions[index] = value;
+          }
+        },
+        decoration: const InputDecoration(
+          hintText: '수료',
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+        ),
+      ),
+    );
+
+    setState(() {
+      _completionsfields.insert(index - 1, newField); // +버튼 위에 삽입
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
     return Scaffold(
       // 이전 코드를 유지하면서, 맨 아래에 새로운 TextField들(_fields)와 추가 버튼을 추가합니다.
       backgroundColor: Colors.white,
@@ -90,6 +268,9 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<ResumeWriteProvider>(context, listen: false)
+                          .reset();
+                      Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -135,9 +316,21 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: TextField(
-                      controller: awardsController, // 성별 입력을 위한 컨트롤러 사용
+                      controller: awardController, // 수상 입력을 위한 컨트롤러 사용
                       maxLines: null,
                       maxLength: 50,
+                      onChanged: (value) {
+                        if (value.isEmpty &&
+                            resumeWriteProvider.awards.isNotEmpty) {
+                          resumeWriteProvider.awards.removeAt(0); // 수상 제거
+                        } else {
+                          if (resumeWriteProvider.awards.isNotEmpty) {
+                            resumeWriteProvider.awards[0] = value; // 수상 업데이트
+                          } else {
+                            resumeWriteProvider.awards.add(value); // 수상 추가
+                          }
+                        }
+                      },
                       decoration: const InputDecoration(
                           hintText: '수상',
                           enabledBorder: UnderlineInputBorder(
@@ -214,6 +407,22 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                       controller: completionController,
                       maxLines: null,
                       maxLength: 50,
+                      onChanged: (value) {
+                        // 값이 비어있고, 리스트에 해당 인덱스가 존재하는 경우
+                        if (value.isEmpty &&
+                            resumeWriteProvider.completions.length > 1) {
+                          resumeWriteProvider.completions.removeAt(0);
+                        } else if (value.isNotEmpty) {
+                          // 값이 있을 때의 처리
+                          if (resumeWriteProvider.completions.length > 1) {
+                            resumeWriteProvider.completions[0] =
+                                value; // 부전공 업데이트
+                          } else {
+                            resumeWriteProvider.completions
+                                .add(value); // 부전공 추가
+                          }
+                        }
+                      },
                       decoration: const InputDecoration(
                           hintText: '수료',
                           enabledBorder: UnderlineInputBorder(
@@ -267,6 +476,19 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
             ),
             ElevatedButton(
               onPressed: () {
+                //provider 값 체크(추후 이 코드는 삭제)///////////
+                var provider =
+                    Provider.of<ResumeWriteProvider>(context, listen: false);
+
+                print('Title: ${provider.title}');
+                print('Gender: ${provider.gender}');
+                print('Age: ${provider.age}');
+                print('Regions : ${provider.regions}');
+                print('Educations : ${provider.educations}');
+                print('Careers : ${provider.careers}');
+                print('Awards : ${provider.awards}');
+                print('Completions : ${provider.completions}');
+                ///////////////////////////////////////////////
                 Navigator.push(
                   context,
                   PageRouteBuilder(

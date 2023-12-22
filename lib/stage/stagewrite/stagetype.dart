@@ -1,7 +1,9 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/resume/resumewrite/resumeregion.dart';
+
 import 'package:amuze/stage/stagewrite/stagewishtype.dart';
 import 'package:flutter/material.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class StageType extends StatefulWidget {
   const StageType({super.key});
@@ -38,6 +40,8 @@ class _StageTypeState extends State<StageType> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -81,7 +85,14 @@ class _StageTypeState extends State<StageType> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: TextField(
-                      controller: typeController, // 성별 입력을 위한 컨트롤러 사용
+                      controller: TextEditingController(
+                          text: Provider.of<StageWriteProvider>(context,
+                                  listen: false)
+                              .type),
+                      onChanged: (text) {
+                        Provider.of<StageWriteProvider>(context, listen: false)
+                            .setType(text);
+                      },
                       maxLines: null,
                       maxLength: 50,
                       decoration: const InputDecoration(
@@ -121,14 +132,22 @@ class _StageTypeState extends State<StageType> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: typeController,
-              builder: (context, value, child) {
-                final bool hasTypeText = typeController.text.isNotEmpty;
+            Consumer<StageWriteProvider>(
+              builder: (context, provider, child) {
+                final bool hasTypeText = provider.type.isNotEmpty;
 
                 return ElevatedButton(
                   onPressed: hasTypeText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<StageWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Region: ${provider.region}');
+                          print('type: ${provider.type}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(

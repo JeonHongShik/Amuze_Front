@@ -1,6 +1,8 @@
 import 'package:amuze/gathercolors.dart';
+import 'package:amuze/main.dart';
 import 'package:amuze/resume/resumewrite/resumeregion.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ResumeGenderAge extends StatefulWidget {
   const ResumeGenderAge({super.key});
@@ -10,10 +12,25 @@ class ResumeGenderAge extends StatefulWidget {
 }
 
 class _ResumeGenderAgeState extends State<ResumeGenderAge> {
-  final TextEditingController genderController =
-      TextEditingController(); // 성별 입력을 위한 컨트롤러
-  final TextEditingController ageController =
-      TextEditingController(); // 나이 입력을 위한 컨트롤러
+  late TextEditingController ageController;
+  late TextEditingController genderController;
+  late String _selectgender;
+
+  @override
+  void initState() {
+    super.initState();
+    ageController = TextEditingController(
+        text: Provider.of<ResumeWriteProvider>(context, listen: false).age);
+    genderController = TextEditingController(
+        text: Provider.of<ResumeWriteProvider>(context, listen: false).gender);
+  }
+
+  @override
+  void dispose() {
+    ageController.dispose();
+    genderController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +56,8 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<ResumeWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -67,7 +86,7 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
                       fontWeight: FontWeight.bold),
                   children: <TextSpan>[
                     TextSpan(text: '2. 성별과 나이를\n'),
-                    TextSpan(text: '     입력해주세요.'),
+                    TextSpan(text: '     선택해주세요.'),
                   ],
                 ),
               ),
@@ -78,41 +97,112 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
             Center(
               child: Column(
                 children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    child: TextField(
-                      controller: genderController, // 성별 입력을 위한 컨트롤러 사용
-                      maxLines: null,
-                      maxLength: 50,
-                      decoration: const InputDecoration(
-                          hintText: '성별',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.disabled)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.basic))),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Wrap(
+                              children: <Widget>[
+                                ListTile(
+                                  leading: const Icon(Icons.male),
+                                  title: const Text('남성'),
+                                  onTap: () {
+                                    _selectgender = '남성';
+                                    Provider.of<ResumeWriteProvider>(context,
+                                            listen: false)
+                                        .setGender('남성');
+                                    genderController.text = _selectgender;
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.female),
+                                  title: const Text('여성'),
+                                  onTap: () {
+                                    _selectgender = '여성';
+                                    Provider.of<ResumeWriteProvider>(context,
+                                            listen: false)
+                                        .setGender('여성');
+                                    genderController.text = _selectgender;
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                    child: AbsorbPointer(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: TextField(
+                          controller: genderController,
+                          maxLines: null,
+                          maxLength: null,
+                          decoration: const InputDecoration(
+                            hintText: '성별',
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.disabled)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.basic)),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(
-                    height: 50,
+                    height: 70,
                   ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    child: TextField(
-                      controller: ageController, // 나이 입력을 위한 컨트롤러 사용
-                      maxLines: null,
-                      maxLength: 50,
-                      decoration: const InputDecoration(
-                          hintText: '나이',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.disabled)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.basic))),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SizedBox(
+                              height: 200, // 하단 시트의 높이를 제한합니다.
+                              child: ListView.builder(
+                                itemCount: 101,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return ListTile(
+                                    title: Text('$index살'),
+                                    onTap: () {
+                                      final age = '$index살';
+                                      Provider.of<ResumeWriteProvider>(context,
+                                              listen: false)
+                                          .setAge(age);
+                                      ageController.text = age;
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                },
+                              ),
+                            );
+                          });
+                    },
+                    child: AbsorbPointer(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: TextField(
+                          controller:
+                              ageController, // 여기를 ageController로 변경했습니다.
+
+                          maxLines: null,
+                          maxLength: null,
+                          decoration: const InputDecoration(
+                            hintText: '나이',
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.disabled)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.basic)),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -140,54 +230,64 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: genderController,
-              builder: (context, value, child) {
-                final bool hasGenderText = genderController.text.isNotEmpty;
-                final bool hasAgeText = ageController.text.isNotEmpty;
+            Consumer<ResumeWriteProvider>(builder: (context, provider, child) {
+              final bool hasGenderText = provider.gender.isNotEmpty;
+              return Consumer<ResumeWriteProvider>(
+                builder: (context, provider, child) {
+                  final bool hasAgeText = provider.age.isNotEmpty;
 
-                return ElevatedButton(
-                  onPressed: hasGenderText && hasAgeText
-                      ? () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const ResumeRegion(),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                var begin = const Offset(1.0, 0.0);
-                                var end = Offset.zero;
-                                var tween = Tween(begin: begin, end: end);
-                                var offsetAnimation = animation.drive(tween);
+                  return ElevatedButton(
+                    onPressed: hasGenderText && hasAgeText
+                        ? () {
+                            //provider 값 체크(추후 이 코드는 삭제)///////////
+                            var provider = Provider.of<ResumeWriteProvider>(
+                                context,
+                                listen: false);
 
-                                return SlideTransition(
-                                  position: offsetAnimation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: hasGenderText && hasAgeText
-                        ? PrimaryColors.basic
-                        : PrimaryColors.disabled,
-                    foregroundColor: hasGenderText && hasAgeText
-                        ? Colors.white
-                        : TextColors.disabled,
-                    minimumSize:
-                        Size(MediaQuery.of(context).size.width * 0.5, 50),
-                  ),
-                  child: const Text(
-                    '다음',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                );
-              },
-            ),
+                            print('Title: ${provider.title}');
+                            print('Gender: ${provider.gender}');
+                            print('Age: ${provider.age}');
+                            ///////////////////////////////////////////////
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const ResumeRegion(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  var begin = const Offset(1.0, 0.0);
+                                  var end = Offset.zero;
+                                  var tween = Tween(begin: begin, end: end);
+                                  var offsetAnimation = animation.drive(tween);
+
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: hasGenderText && hasAgeText
+                          ? PrimaryColors.basic
+                          : PrimaryColors.disabled,
+                      foregroundColor: hasGenderText && hasAgeText
+                          ? Colors.white
+                          : TextColors.disabled,
+                      minimumSize:
+                          Size(MediaQuery.of(context).size.width * 0.5, 50),
+                    ),
+                    child: const Text(
+                      '다음',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  );
+                },
+              );
+            })
           ],
         ),
       ),

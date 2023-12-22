@@ -1,8 +1,8 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resumewrite/resumeawardscompletion.dart';
 import 'package:amuze/resume/resumewrite/resumecareers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:amuze/main.dart';
 
 class ResumeEducation extends StatefulWidget {
   const ResumeEducation({super.key});
@@ -19,21 +19,47 @@ class _ResumeEducationState extends State<ResumeEducation> {
 
   void _addNewField() {
     TextEditingController newController = TextEditingController();
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
     _controllers.add(newController);
+
     setState(() {
       _fields.add(
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.75,
           child: TextField(
+            //focusNode: newFocusNode, // 새로운 FocusNode 할당
             controller: newController,
             maxLines: null,
             maxLength: 50,
+            onChanged: (value) {
+              int index = _controllers.indexOf(newController) + 2; // 인덱스 2부터 시작
+
+              if (value.isEmpty) {
+                // 값이 비어있으면 해당 위치의 항목 제거
+                if (index < resumeWriteProvider.educations.length) {
+                  resumeWriteProvider.educations.removeAt(index);
+                }
+              } else {
+                // 리스트의 길이가 인덱스보다 작다면, 리스트를 확장
+                while (resumeWriteProvider.educations.length <= index) {
+                  resumeWriteProvider.educations.add('');
+                }
+
+                // 새로운 값을 적절한 위치에 저장
+                resumeWriteProvider.educations[index] = value;
+              }
+            },
+
             decoration: const InputDecoration(
-                hintText: '부전공',
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey)),
-                focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black))),
+              hintText: '부전공',
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+            ),
           ),
         ),
       );
@@ -41,7 +67,83 @@ class _ResumeEducationState extends State<ResumeEducation> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    // 첫 번째와 두 번째 값이 있는 경우, 이들을 각각의 컨트롤러에 할당
+    if (resumeWriteProvider.educations.isNotEmpty) {
+      educationController.text = resumeWriteProvider.educations[0];
+      if (resumeWriteProvider.educations.length > 1) {
+        educationplusController.text = resumeWriteProvider.educations[1];
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final width = MediaQuery.of(context).size.width;
+        // 세 번째 값부터 시작하여 추가 TextField 생성
+        for (int i = 2; i < resumeWriteProvider.educations.length; i++) {
+          _addExistingField(resumeWriteProvider.educations[i], i, width);
+        }
+      }
+    });
+  }
+
+  void _addExistingField(String initialValue, int index, double width) {
+    TextEditingController newController =
+        TextEditingController(text: initialValue);
+    _controllers.add(newController);
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    Widget newField = SizedBox(
+      width: width * 0.75,
+      child: TextField(
+        //focusNode: newFocusNode,
+        controller: newController,
+        maxLines: null,
+        maxLength: 50,
+        onChanged: (value) {
+          int index = _controllers.indexOf(newController) + 2; // 인덱스 2부터 시작
+
+          if (value.isEmpty) {
+            // 값이 비어있으면 해당 위치의 항목 제거
+            if (index < resumeWriteProvider.educations.length) {
+              resumeWriteProvider.educations.removeAt(index);
+            }
+          } else {
+            // 리스트의 길이가 인덱스보다 작다면, 리스트를 확장
+            while (resumeWriteProvider.educations.length <= index) {
+              resumeWriteProvider.educations.add('');
+            }
+
+            // 새로운 값을 적절한 위치에 저장
+            resumeWriteProvider.educations[index] = value;
+          }
+        },
+        decoration: const InputDecoration(
+          hintText: '부전공',
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+        ),
+      ),
+    );
+
+    setState(() {
+      _fields.insert(index - 2, newField); // +버튼 위에 삽입
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
     return Scaffold(
       // 이전 코드를 유지하면서, 맨 아래에 새로운 TextField들(_fields)와 추가 버튼을 추가합니다.
       backgroundColor: Colors.white,
@@ -65,6 +167,8 @@ class _ResumeEducationState extends State<ResumeEducation> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<ResumeWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -109,9 +213,23 @@ class _ResumeEducationState extends State<ResumeEducation> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: TextField(
-                      controller: educationController, // 성별 입력을 위한 컨트롤러 사용
+                      controller: educationController,
                       maxLines: null,
                       maxLength: 50,
+                      onChanged: (value) {
+                        if (value.isEmpty &&
+                            resumeWriteProvider.educations.isNotEmpty) {
+                          resumeWriteProvider.educations.removeAt(0); // 주 전공 제거
+                        } else {
+                          if (resumeWriteProvider.educations.isNotEmpty) {
+                            resumeWriteProvider.educations[0] =
+                                value; // 주 전공 업데이트
+                          } else {
+                            resumeWriteProvider.educations
+                                .add(value); // 주 전공 추가
+                          }
+                        }
+                      },
                       decoration: const InputDecoration(
                           hintText: '대표 학력 및 전공',
                           enabledBorder: UnderlineInputBorder(
@@ -168,6 +286,21 @@ class _ResumeEducationState extends State<ResumeEducation> {
                       controller: educationplusController,
                       maxLines: null,
                       maxLength: 50,
+                      onChanged: (value) {
+                        // 값이 비어있고, 리스트에 해당 인덱스가 존재하는 경우
+                        if (value.isEmpty &&
+                            resumeWriteProvider.educations.length > 1) {
+                          resumeWriteProvider.educations.removeAt(1);
+                        } else if (value.isNotEmpty) {
+                          // 값이 있을 때의 처리
+                          if (resumeWriteProvider.educations.length > 1) {
+                            resumeWriteProvider.educations[1] =
+                                value; // 부전공 업데이트
+                          } else {
+                            resumeWriteProvider.educations.add(value); // 부전공 추가
+                          }
+                        }
+                      },
                       decoration: const InputDecoration(
                           hintText: '부전공',
                           enabledBorder: UnderlineInputBorder(
@@ -206,6 +339,16 @@ class _ResumeEducationState extends State<ResumeEducation> {
           children: [
             ElevatedButton(
               onPressed: () {
+                //provider 값 체크(추후 이 코드는 삭제)///////////
+                var provider =
+                    Provider.of<ResumeWriteProvider>(context, listen: false);
+
+                print('Title: ${provider.title}');
+                print('Gender: ${provider.gender}');
+                print('Age: ${provider.age}');
+                print('Regions : ${provider.regions}');
+                print('Regions : ${provider.educations}');
+                ///////////////////////////////////////////////
                 Navigator.pop(context); // 이전 페이지로 이동
               },
               style: ElevatedButton.styleFrom(
@@ -228,6 +371,17 @@ class _ResumeEducationState extends State<ResumeEducation> {
                 return ElevatedButton(
                   onPressed: haseducationText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<ResumeWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Gender: ${provider.gender}');
+                          print('Age: ${provider.age}');
+                          print('Regions : ${provider.regions}');
+                          print('Regions : ${provider.educations}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(

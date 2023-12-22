@@ -1,7 +1,9 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/resume/resumewrite/resumeeducation.dart';
 import 'package:amuze/stage/stagewrite/stageintroduce.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class StageDeadlineDate extends StatefulWidget {
   const StageDeadlineDate({super.key});
@@ -13,6 +15,16 @@ class StageDeadlineDate extends StatefulWidget {
 class _StageDeadlineDateState extends State<StageDeadlineDate> {
   final TextEditingController deadlineController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final provider = Provider.of<StageWriteProvider>(context, listen: false);
+    deadlineController.text = provider.deadline;
+    dateController.text = provider.date;
+    timeController.text = provider.datetime;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +50,8 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -53,73 +67,151 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
           },
         ),
       ),
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 50),
-              child: RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
-                  children: <TextSpan>[
-                    TextSpan(text: '6. 공고 마감일과 공연 날짜를\n'),
-                    TextSpan(text: '     입력해주세요.'),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 50),
+                child: RichText(
+                  text: const TextSpan(
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold),
+                    children: <TextSpan>[
+                      TextSpan(text: '6. 공고 마감일과 공연 날짜를\n'),
+                      TextSpan(text: '     입력해주세요.'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 80,
+              ),
+              Center(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: TextField(
+                        controller: deadlineController, // 성별 입력을 위한 컨트롤러 사용
+                        maxLines: null,
+                        maxLength: null,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                            hintText: '공고 마감일',
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.disabled)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.basic))),
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2101),
+                          );
+
+                          if (pickedDate != null) {
+                            String formattedDate =
+                                DateFormat('yyyy-MM-dd').format(pickedDate);
+                            setState(() {
+                              deadlineController.text = formattedDate;
+                              Provider.of<StageWriteProvider>(context,
+                                      listen: false)
+                                  .setDeadline(formattedDate);
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: TextField(
+                        controller: dateController, // 나이 입력을 위한 컨트롤러 사용
+                        maxLines: null,
+                        maxLength: null,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                            hintText: '공연 날짜',
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.disabled)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.basic))),
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2101),
+                          );
+
+                          if (pickedDate != null) {
+                            String formattedDate =
+                                DateFormat('yyyy-MM-dd').format(pickedDate);
+                            setState(() {
+                              dateController.text = formattedDate;
+                              Provider.of<StageWriteProvider>(context,
+                                      listen: false)
+                                  .setDate(formattedDate);
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: TextField(
+                        controller: timeController,
+                        maxLines: null,
+                        maxLength: null,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                            hintText: '공연 시간',
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.disabled)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: PrimaryColors.basic))),
+                        onTap: () async {
+                          TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+
+                          if (pickedTime != null) {
+                            String formattedTime = pickedTime.format(context);
+                            setState(() {
+                              timeController.text = formattedTime;
+                              Provider.of<StageWriteProvider>(context,
+                                      listen: false)
+                                  .setDatetime(formattedTime);
+                            });
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 80,
-            ),
-            Center(
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    child: TextField(
-                      controller: deadlineController, // 성별 입력을 위한 컨트롤러 사용
-                      maxLines: null,
-                      maxLength: 50,
-                      decoration: const InputDecoration(
-                          hintText: '공고 마감일',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.disabled)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.basic))),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    child: TextField(
-                      controller: dateController, // 나이 입력을 위한 컨트롤러 사용
-                      maxLines: null,
-                      maxLength: 50,
-                      decoration: const InputDecoration(
-                          hintText: '공연 날짜',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.disabled)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.basic))),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
@@ -152,6 +244,20 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                 return ElevatedButton(
                   onPressed: hasDeadlineText && hasDateText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<StageWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Region: ${provider.region}');
+                          print('type: ${provider.type}');
+                          print('wishtype: ${provider.wishtype}');
+                          print('pay: ${provider.pay}');
+                          print('Deadline: ${provider.deadline}');
+                          print('Date: ${provider.date}');
+                          print('Datetime: ${provider.datetime}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(
