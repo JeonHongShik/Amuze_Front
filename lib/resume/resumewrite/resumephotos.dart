@@ -12,6 +12,7 @@ import 'package:amuze/main.dart';
 
 import 'package:photo_view/photo_view.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ResumePhotos extends StatefulWidget {
   const ResumePhotos({super.key});
@@ -119,6 +120,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
 //otherimages 선택 함수//////////////////////////////////////////////////
   Future<List<File>> loadAndConvertImages() async {
     streamController.add([]);
+    await requestPermissionIfNeeded();
     final otherImages = await MultiImagePicker.pickImages(
       selectedAssets: assetOhterImages,
       cupertinoOptions: const CupertinoOptions(
@@ -142,6 +144,21 @@ class _ResumePhotosState extends State<ResumePhotos> {
     streamController.add(fileOtherImages!);
 
     return fileOtherImages!;
+  }
+///////////////////////////////////////////////////////////
+
+//카메라, 사진첩 권한 체크//////////////////////////////////
+  Future<void> requestPermissionIfNeeded() async {
+    var cameraStatus = await Permission.camera.status;
+    var storageStatus = await Permission.storage.status;
+
+    if (!cameraStatus.isGranted) {
+      await Permission.camera.request();
+    }
+
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
   }
 ///////////////////////////////////////////////////////////
 
@@ -256,6 +273,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
                                   color: Colors.grey),
                               child: IconButton(
                                 onPressed: () async {
+                                  await requestPermissionIfNeeded();
                                   final mainImage =
                                       await MultiImagePicker.pickImages(
                                     selectedAssets: assetMainImage,
@@ -630,7 +648,8 @@ class _ResumePhotosState extends State<ResumePhotos> {
                 print('convertedimagenames: ${provider.convertedimagenames}');
 
                 // 서버 주소 지정
-                String serverEndpoint = '우리 서버 주소';
+                String serverEndpoint =
+                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes';
 
                 // 데이터 전송
                 provider.postResumeData(serverEndpoint).then((_) {
