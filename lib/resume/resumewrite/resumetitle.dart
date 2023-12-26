@@ -1,5 +1,7 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/resume/resumewrite/resumegenderage.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 
@@ -11,7 +13,17 @@ class Resumetitle extends StatefulWidget {
 }
 
 class _ResumetitleState extends State<Resumetitle> {
-  final TextEditingController controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // UserInfoProvider에서 uid 가져와서 ResumeWriteProvider에 설정
+    final userInfoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false);
+    final resumeWriteProvider =
+        Provider.of<ResumeWriteProvider>(context, listen: false);
+
+    resumeWriteProvider.uid = userInfoProvider.uid;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +49,8 @@ class _ResumetitleState extends State<Resumetitle> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<ResumeWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                     },
@@ -77,7 +91,14 @@ class _ResumetitleState extends State<Resumetitle> {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.75,
                 child: TextField(
-                  controller: controller,
+                  controller: TextEditingController(
+                      text: Provider.of<ResumeWriteProvider>(context,
+                              listen: false)
+                          .title),
+                  onChanged: (text) {
+                    Provider.of<ResumeWriteProvider>(context, listen: false)
+                        .setTitle(text);
+                  },
                   maxLines: null,
                   maxLength: 50,
                   decoration: const InputDecoration(
@@ -95,14 +116,17 @@ class _ResumetitleState extends State<Resumetitle> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20),
-        child: ValueListenableBuilder(
-          valueListenable: controller,
-          builder: (context, value, child) {
-            final bool hasText = controller.text.isNotEmpty;
+        child: Consumer<ResumeWriteProvider>(
+          builder: (context, provider, child) {
+            final bool hasText = provider.title.isNotEmpty;
 
             return ElevatedButton(
               onPressed: hasText
                   ? () {
+                      provider = Provider.of<ResumeWriteProvider>(context,
+                          listen: false);
+
+                      print('uid : ${provider.uid}');
                       Navigator.push(
                         context,
                         PageRouteBuilder(

@@ -1,6 +1,7 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/resume/resumewrite/resumegenderage.dart';
 import 'package:amuze/stage/stagewrite/stageregion.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,18 @@ class Stagetitle extends StatefulWidget {
 
 class _StagetitleState extends State<Stagetitle> {
   final TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // UserInfoProvider에서 uid 가져와서 ResumeWriteProvider에 설정
+    final userInfoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false);
+    final stageWriteProvider =
+        Provider.of<StageWriteProvider>(context, listen: false);
+
+    stageWriteProvider.uid = userInfoProvider.uid;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +51,8 @@ class _StagetitleState extends State<Stagetitle> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                     },
@@ -78,7 +93,14 @@ class _StagetitleState extends State<Stagetitle> {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.75,
                 child: TextField(
-                  controller: controller,
+                  controller: TextEditingController(
+                      text: Provider.of<StageWriteProvider>(context,
+                              listen: false)
+                          .title),
+                  onChanged: (text) {
+                    Provider.of<StageWriteProvider>(context, listen: false)
+                        .setTitle(text);
+                  },
                   maxLines: null,
                   maxLength: 50,
                   decoration: const InputDecoration(
@@ -96,14 +118,21 @@ class _StagetitleState extends State<Stagetitle> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20),
-        child: ValueListenableBuilder(
-          valueListenable: controller,
-          builder: (context, value, child) {
-            final bool hasText = controller.text.isNotEmpty;
+        child: Consumer<StageWriteProvider>(
+          builder: (context, provider, child) {
+            final bool hasText = provider.title.isNotEmpty;
 
             return ElevatedButton(
               onPressed: hasText
                   ? () {
+                      //provider 값 체크(추후 이 코드는 삭제)///////////
+                      var provider = Provider.of<StageWriteProvider>(context,
+                          listen: false);
+
+                      print('Title: ${provider.title}');
+                      print('uid : ${provider.uid}');
+
+                      ///////////////////////////////////////////////
                       Navigator.push(
                         context,
                         PageRouteBuilder(

@@ -8,11 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 Future<void> saveFirebaseAccountInfo() async {
   auth.User? user = auth.FirebaseAuth.instance.currentUser;
 
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-
   String providerId = user?.providerData[0].providerId ?? '';
 
-  FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
+  await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
     'providerId': providerId,
     'uid': user?.uid,
     'email': user?.email,

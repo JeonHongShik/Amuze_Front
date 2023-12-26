@@ -7,9 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
+import 'package:amuze/main.dart';
 
 import 'package:photo_view/photo_view.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class StagePhotos extends StatefulWidget {
   const StagePhotos({super.key});
@@ -19,8 +22,6 @@ class StagePhotos extends StatefulWidget {
 }
 
 class _StagePhotosState extends State<StagePhotos> {
-  bool mainLoading = true;
-
   List<Asset> assetMainImage = [];
   List<File> fileMainImage = [];
   List<Asset> assetOhterImages = [];
@@ -31,22 +32,41 @@ class _StagePhotosState extends State<StagePhotos> {
   StreamController<List<File>> streamController =
       StreamController<List<File>>();
 
+//main과 other 이미지들을 provider 값으로 초기화
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final provider =
+            Provider.of<StageWriteProvider>(context, listen: false);
+        setState(() {
+          fileMainImage = List<File>.from(provider.filemainimage);
+          assetMainImage = List<Asset>.from(provider.assetmainimage);
+          fileOtherImages = List<File>.from(provider.fileotherimages);
+          assetOhterImages = List<Asset>.from(provider.assetotherimages);
+          convertedImageNames = List<String>.from(provider.convertedimagenames);
+        });
+        streamController.add(fileOtherImages ?? []);
+      }
+    });
+  }
+
 //메인 이미지 Asset -> File 변경/////////////////////////////////////////////////////////
   Future<List<File>> convertMainImgageAssetToFile(
       List<Asset> assetMainImage) async {
     List<File> tempFiles = [];
     for (Asset asset in assetMainImage) {
-      setState(() {
-        mainLoading = true;
-      });
       File file = await _assetToFile(asset);
       tempFiles.add(file);
     }
 
     setState(() {
       fileMainImage = tempFiles;
-      mainLoading = false;
     });
+
+    Provider.of<StageWriteProvider>(context, listen: false)
+        .setFileMainimage(fileMainImage);
 
     return fileMainImage;
   }
@@ -61,6 +81,15 @@ class _StagePhotosState extends State<StagePhotos> {
         setState(() {
           fileOtherImages!.add(file);
           convertedImageNames.add(asset.name);
+          Provider.of<StageWriteProvider>(context, listen: false)
+              .convertedimagenames
+              .add(asset.name);
+          Provider.of<StageWriteProvider>(context, listen: false)
+              .fileotherimages
+              .add(file);
+          Provider.of<StageWriteProvider>(context, listen: false)
+              .assetotherimages
+              .add(asset);
         });
       }
     }
@@ -88,9 +117,10 @@ class _StagePhotosState extends State<StagePhotos> {
   }
 ////////////////////////////////////////////////////////////////////////////////////////
 
-//test 함수//////////////////////////////////////////////////
+//otherimages 선택 함수//////////////////////////////////////////////////
   Future<List<File>> loadAndConvertImages() async {
     streamController.add([]);
+    await requestPermissionIfNeeded();
     final otherImages = await MultiImagePicker.pickImages(
       selectedAssets: assetOhterImages,
       cupertinoOptions: const CupertinoOptions(
@@ -101,19 +131,34 @@ class _StagePhotosState extends State<StagePhotos> {
       materialOptions: const MaterialOptions(
         maxImages: 4,
         enableCamera: true,
-        actionBarTitle: "Example App",
+        actionBarTitle: "사진첩",
         allViewTitle: "All Photos",
-        useDetailsView: false,
+        useDetailsView: true,
       ),
     );
     assetOhterImages = otherImages;
+    //assetMainImage.insert(0, otherImages.first);
 
     await convertOtherImagesAssetToFile();
 
-    print('이미지 여깄다 : $fileOtherImages');
     streamController.add(fileOtherImages!);
 
     return fileOtherImages!;
+  }
+///////////////////////////////////////////////////////////
+
+//카메라, 사진첩 권한 체크//////////////////////////////////
+  Future<void> requestPermissionIfNeeded() async {
+    var cameraStatus = await Permission.camera.status;
+    var storageStatus = await Permission.storage.status;
+
+    if (!cameraStatus.isGranted) {
+      await Permission.camera.request();
+    }
+
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
   }
 ///////////////////////////////////////////////////////////
 
@@ -141,6 +186,8 @@ class _StagePhotosState extends State<StagePhotos> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -175,7 +222,7 @@ class _StagePhotosState extends State<StagePhotos> {
                         fontSize: 25,
                         fontWeight: FontWeight.bold),
                     children: <TextSpan>[
-                      TextSpan(text: '8. 공연 사진을 올려주세요.\n'),
+                      TextSpan(text: '8. 사진을 올려주세요.\n'),
                       TextSpan(
                           text: '       처음 사진이 메인에 올라갑니다.',
                           style: TextStyle(
@@ -201,8 +248,11 @@ class _StagePhotosState extends State<StagePhotos> {
                 height: 10,
               ),
               Center(
-                child: assetMainImage.isEmpty
-                    ? DottedBorder(
+                child: Consumer<StageWriteProvider>(
+                  builder: (context, provider, child) {
+                    if (provider.filemainimage.isEmpty &&
+                        provider.assetmainimage.isEmpty) {
+                      return DottedBorder(
                         color: Colors.grey,
                         borderType: BorderType.RRect,
                         dashPattern: const [10, 10],
@@ -223,6 +273,7 @@ class _StagePhotosState extends State<StagePhotos> {
                                   color: Colors.grey),
                               child: IconButton(
                                 onPressed: () async {
+                                  await requestPermissionIfNeeded();
                                   final mainImage =
                                       await MultiImagePicker.pickImages(
                                     selectedAssets: assetMainImage,
@@ -243,6 +294,9 @@ class _StagePhotosState extends State<StagePhotos> {
                                   );
                                   if (mainImage.isNotEmpty) {
                                     assetMainImage.insert(0, mainImage.first);
+                                    Provider.of<StageWriteProvider>(context,
+                                            listen: false)
+                                        .setAssetMainimage(mainImage);
                                   }
                                   await convertMainImgageAssetToFile(
                                       assetMainImage);
@@ -253,74 +307,91 @@ class _StagePhotosState extends State<StagePhotos> {
                             ),
                           ),
                         ),
-                      )
-                    : Stack(children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => Scaffold(
-                                  appBar: AppBar(
-                                    backgroundColor: Colors.transparent,
-                                    leading: BackButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
+                      );
+                    } else {
+                      if (Provider.of<StageWriteProvider>(context,
+                              listen: false)
+                          .filemainimage
+                          .isNotEmpty) {
+                        return Stack(children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => Scaffold(
+                                    appBar: AppBar(
+                                      backgroundColor: Colors.transparent,
+                                      leading: BackButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      iconTheme: const IconThemeData(
+                                          color: PrimaryColors.basic),
                                     ),
-                                    iconTheme: const IconThemeData(
-                                        color: PrimaryColors.basic),
-                                  ),
-                                  extendBodyBehindAppBar: true,
-                                  body: PhotoView(
-                                    imageProvider: FileImage(fileMainImage[0]),
+                                    extendBodyBehindAppBar: true,
+                                    body: PhotoView(
+                                      imageProvider:
+                                          FileImage(fileMainImage[0]),
+                                    ),
                                   ),
                                 ),
+                              );
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.75,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
                               ),
-                            );
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.75,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: mainLoading
-                                  ? Shimmer.fromColors(
-                                      baseColor: Colors.grey[300]!,
-                                      highlightColor: Colors.grey[100]!,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.75,
-                                        height: 200.0,
-                                        color: Colors.white,
-                                      ))
-                                  : fileMainImage.isNotEmpty
-                                      ? Image(
-                                          image: FileImage(fileMainImage[0]),
-                                          fit: BoxFit.fill,
-                                        )
-                                      : Container(),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(30),
+                                child: fileMainImage.isNotEmpty
+                                    ? Image(
+                                        image: FileImage(fileMainImage[0]),
+                                        fit: BoxFit.fill,
+                                      )
+                                    : Container(),
+                              ),
                             ),
                           ),
-                        ),
-                        if (!mainLoading)
-                          Positioned(
-                            right: 5,
-                            top: 5,
-                            child: IconButton(
-                              icon: Icon(Icons.close, color: Colors.red[900]),
-                              onPressed: () {
-                                setState(() {
-                                  assetMainImage.removeAt(0);
-                                  fileMainImage.removeAt(0);
-                                });
-                              },
+                          if (Provider.of<StageWriteProvider>(context,
+                                  listen: false)
+                              .filemainimage
+                              .isNotEmpty)
+                            Positioned(
+                              right: 5,
+                              top: 5,
+                              child: IconButton(
+                                icon: Icon(Icons.close, color: Colors.red[900]),
+                                onPressed: () {
+                                  setState(() {
+                                    assetMainImage.removeAt(0);
+                                    fileMainImage.removeAt(0);
+                                    Provider.of<StageWriteProvider>(context,
+                                            listen: false)
+                                        .removeMainImage();
+                                  });
+                                },
+                              ),
                             ),
-                          ),
-                      ]),
+                        ]);
+                      } else {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.75,
+                                height: 200.0,
+                                color: Colors.white,
+                              )),
+                        );
+                      }
+                    }
+                  },
+                ),
               ),
               const SizedBox(
                 height: 10,
@@ -473,6 +544,16 @@ class _StagePhotosState extends State<StagePhotos> {
                                               // stream에 변환된 이미지 리스트 업데이트
                                               streamController
                                                   .add(fileOtherImages!);
+
+                                              Provider.of<StageWriteProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .removeOtherImageAt(index);
+                                              Provider.of<StageWriteProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .removeConvertedimagenames(
+                                                      imageName);
                                             });
                                           },
                                         ),
@@ -556,25 +637,39 @@ class _StagePhotosState extends State<StagePhotos> {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const DummyPage(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      var begin = const Offset(1.0, 0.0);
-                      var end = Offset.zero;
-                      var tween = Tween(begin: begin, end: end);
-                      var offsetAnimation = animation.drive(tween);
+                var provider =
+                    Provider.of<StageWriteProvider>(context, listen: false);
 
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                // 서버 주소 지정
+                String serverEndpoint =
+                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts';
+
+                // 데이터 전송
+                provider.postStageData(serverEndpoint).then((_) {
+                  // 성공적으로 데이터를 전송한 후 해야 할 작업 (예: 다음 페이지로 이동)
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const DummyPage(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        var begin = const Offset(1.0, 0.0);
+                        var end = Offset.zero;
+                        var tween = Tween(begin: begin, end: end);
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                }).catchError((error) {
+                  // 에러 처리
+                  print('//////////////////Error sending data: $error');
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: PrimaryColors.basic,

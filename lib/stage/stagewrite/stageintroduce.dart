@@ -1,10 +1,8 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resumewrite/resumegenderage.dart';
-import 'package:amuze/resume/resumewrite/resumephotos.dart';
 import 'package:amuze/stage/stagewrite/stagephotos.dart';
-
 import 'package:flutter/material.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class StageIntroduce extends StatefulWidget {
   const StageIntroduce({super.key});
@@ -40,6 +38,8 @@ class _StageIntroduceState extends State<StageIntroduce> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -90,7 +90,14 @@ class _StageIntroduceState extends State<StageIntroduce> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 300),
                     child: TextField(
-                      controller: controller,
+                      controller: TextEditingController(
+                          text: Provider.of<StageWriteProvider>(context,
+                                  listen: false)
+                              .introduce),
+                      onChanged: (text) {
+                        Provider.of<StageWriteProvider>(context, listen: false)
+                            .setIntroduce(text);
+                      },
                       maxLines: 15,
                       maxLength: 3000,
                       decoration: const InputDecoration(
@@ -129,14 +136,27 @@ class _StageIntroduceState extends State<StageIntroduce> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: controller,
-              builder: (context, value, child) {
-                final bool hasText = controller.text.isNotEmpty;
-
+            Consumer<StageWriteProvider>(
+              builder: (context, provider, child) {
+                final bool hasText = provider.introduce.isNotEmpty;
                 return ElevatedButton(
                   onPressed: hasText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<StageWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Region: ${provider.region}');
+                          print('type: ${provider.type}');
+                          print('wishtype: ${provider.wishtype}');
+                          print('pay: ${provider.pay}');
+                          print('Deadline: ${provider.deadline}');
+                          print('Date: ${provider.date}');
+                          print('Datetime: ${provider.datetime}');
+                          print('introduce: ${provider.introduce}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(

@@ -1,7 +1,6 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resume_post.dart';
-import 'package:amuze/resume/resumewrite/resumetitle.dart';
+
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:flutter/material.dart';
 

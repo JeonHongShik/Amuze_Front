@@ -1,7 +1,8 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/resume/resumewrite/resumeregion.dart';
 import 'package:amuze/stage/stagewrite/stagetype.dart';
 import 'package:flutter/material.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class StageRegion extends StatefulWidget {
   const StageRegion({super.key});
@@ -38,6 +39,8 @@ class _StageRegionState extends State<StageRegion> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -80,9 +83,16 @@ class _StageRegionState extends State<StageRegion> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: TextField(
-                      controller: regionController, // 성별 입력을 위한 컨트롤러 사용
+                      controller: TextEditingController(
+                          text: Provider.of<StageWriteProvider>(context,
+                                  listen: false)
+                              .region),
+                      onChanged: (text) {
+                        Provider.of<StageWriteProvider>(context, listen: false)
+                            .setRegion(text);
+                      },
                       maxLines: null,
-                      maxLength: 50,
+                      maxLength: null,
                       decoration: const InputDecoration(
                           hintText: '공연 지역',
                           enabledBorder: UnderlineInputBorder(
@@ -120,14 +130,21 @@ class _StageRegionState extends State<StageRegion> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: regionController,
-              builder: (context, value, child) {
-                final bool hasRegionText = regionController.text.isNotEmpty;
+            Consumer<StageWriteProvider>(
+              builder: (context, provider, child) {
+                final bool hasRegionText = provider.region.isNotEmpty;
 
                 return ElevatedButton(
                   onPressed: hasRegionText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<StageWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Region: ${provider.region}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(

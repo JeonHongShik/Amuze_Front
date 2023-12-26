@@ -1,8 +1,8 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resumewrite/resumeregion.dart';
 import 'package:amuze/stage/stagewrite/stagepay.dart';
 import 'package:flutter/material.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class StageWishType extends StatefulWidget {
   const StageWishType({super.key});
@@ -39,6 +39,8 @@ class _StageWishTypeState extends State<StageWishType> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -83,7 +85,14 @@ class _StageWishTypeState extends State<StageWishType> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: TextField(
-                      controller: wishtypeController, // 성별 입력을 위한 컨트롤러 사용
+                      controller: TextEditingController(
+                          text: Provider.of<StageWriteProvider>(context,
+                                  listen: false)
+                              .wishtype),
+                      onChanged: (text) {
+                        Provider.of<StageWriteProvider>(context, listen: false)
+                            .setWishtype(text);
+                      },
                       maxLines: null,
                       maxLength: 50,
                       decoration: const InputDecoration(
@@ -123,14 +132,23 @@ class _StageWishTypeState extends State<StageWishType> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: wishtypeController,
-              builder: (context, value, child) {
-                final bool hasWishTypeText = wishtypeController.text.isNotEmpty;
+            Consumer<StageWriteProvider>(
+              builder: (context, provider, child) {
+                final bool hasWishTypeText = provider.wishtype.isNotEmpty;
 
                 return ElevatedButton(
                   onPressed: hasWishTypeText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<StageWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Region: ${provider.region}');
+                          print('type: ${provider.type}');
+                          print('wishtype: ${provider.wishtype}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(

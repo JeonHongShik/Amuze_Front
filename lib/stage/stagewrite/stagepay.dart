@@ -1,8 +1,8 @@
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resumewrite/resumeregion.dart';
 import 'package:amuze/stage/stagewrite/stagedeadlinedate.dart';
 import 'package:flutter/material.dart';
+import 'package:amuze/main.dart';
+import 'package:provider/provider.dart';
 
 class StagePay extends StatefulWidget {
   const StagePay({super.key});
@@ -39,6 +39,8 @@ class _StagePayState extends State<StagePay> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<StageWriteProvider>(context, listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
@@ -84,9 +86,14 @@ class _StagePayState extends State<StagePay> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: TextField(
-                      controller: payController,
-                      keyboardType: TextInputType.number,
-                      // 성별 입력을 위한 컨트롤러 사용
+                      controller: TextEditingController(
+                          text: Provider.of<StageWriteProvider>(context,
+                                  listen: false)
+                              .pay),
+                      onChanged: (text) {
+                        Provider.of<StageWriteProvider>(context, listen: false)
+                            .setPay(text);
+                      },
                       maxLines: null,
                       maxLength: 50,
                       decoration: const InputDecoration(
@@ -126,14 +133,24 @@ class _StagePayState extends State<StagePay> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            ValueListenableBuilder(
-              valueListenable: payController,
-              builder: (context, value, child) {
-                final bool hasPayText = payController.text.isNotEmpty;
+            Consumer<StageWriteProvider>(
+              builder: (context, provider, child) {
+                final bool hasPayText = provider.pay.isNotEmpty;
 
                 return ElevatedButton(
                   onPressed: hasPayText
                       ? () {
+                          //provider 값 체크(추후 이 코드는 삭제)///////////
+                          var provider = Provider.of<StageWriteProvider>(
+                              context,
+                              listen: false);
+
+                          print('Title: ${provider.title}');
+                          print('Region: ${provider.region}');
+                          print('type: ${provider.type}');
+                          print('wishtype: ${provider.wishtype}');
+                          print('pay: ${provider.pay}');
+                          ///////////////////////////////////////////////
                           Navigator.push(
                             context,
                             PageRouteBuilder(
