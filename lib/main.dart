@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
-import 'package:amuze/servercommunication/resumeserver.dart';
-import 'package:amuze/servercommunication/stageserver.dart';
+import 'package:amuze/servercommunication/post/resumepostserver.dart';
+import 'package:amuze/servercommunication/post/stagepostserver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -84,6 +84,14 @@ class UserInfoProvider extends ChangeNotifier {
   String? displayName;
   String? photoURL;
   String? email;
+
+  Future<void> updateUserName(String newName) async {
+    // FlutterSecureStorage에 새로운 이름 저장
+    await storage.write(key: 'displayName', value: newName);
+
+    // UserInfoProvider의 정보 갱신
+    await loadUserInfo();
+  }
 
   UserInfoProvider() {
     loadUserInfo();

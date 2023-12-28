@@ -287,7 +287,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
                                     materialOptions: const MaterialOptions(
                                       maxImages: 1,
                                       enableCamera: true,
-                                      actionBarTitle: "Example App",
+                                      actionBarTitle: "사진첩",
                                       allViewTitle: "All Photos",
                                       useDetailsView: false,
                                     ),
@@ -649,7 +649,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
 
                 // 서버 주소 지정
                 String serverEndpoint =
-                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes';
+                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/resume/create';
 
                 // 데이터 전송
                 provider.postResumeData(serverEndpoint).then((_) {

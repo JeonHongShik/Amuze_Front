@@ -1,11 +1,18 @@
-import 'dart:math';
+import 'dart:io';
 
 import 'package:amuze/main.dart';
-import 'package:amuze/pagelayout/mypage.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
 
 import '../gathercolors.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -17,6 +24,81 @@ class EditProfile extends StatefulWidget {
 var userInfoProvider = Provider.of<UserInfoProvider>;
 
 class _EditProfileState extends State<EditProfile> {
+  File? fileSelectedImage;
+
+  // 이미지 선택 및 변환 메서드
+  Future<void> selectAndConvertImage() async {
+    await requestPermissionIfNeeded();
+    List<Asset> resultList = await MultiImagePicker.pickImages(
+      cupertinoOptions: const CupertinoOptions(
+        doneButton: UIBarButtonItem(title: 'Confirm'),
+        cancelButton: UIBarButtonItem(title: 'Cancel'),
+        albumButtonColor: PrimaryColors.basic,
+      ),
+      materialOptions: const MaterialOptions(
+        maxImages: 4,
+        enableCamera: true,
+        actionBarTitle: "사진첩",
+        allViewTitle: "All Photos",
+        useDetailsView: true,
+      ),
+    );
+
+    if (resultList.isNotEmpty) {
+      File convertedFile = await _assetToFile(resultList.first);
+      setState(() {
+        fileSelectedImage = convertedFile;
+      });
+    }
+  }
+
+  // Asset을 File로 변환하는 메서드
+  Future<File> _assetToFile(Asset asset) async {
+    final byteData = await asset.getByteData();
+    final tempFile =
+        File("${(await getTemporaryDirectory()).path}/${asset.name}");
+    final file = await tempFile.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  //카메라, 사진첩 권한 체크//////////////////////////////////
+  Future<void> requestPermissionIfNeeded() async {
+    var cameraStatus = await Permission.camera.status;
+    var storageStatus = await Permission.storage.status;
+
+    if (!cameraStatus.isGranted) {
+      await Permission.camera.request();
+    }
+
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
+  }
+///////////////////////////////////////////////////////////
+
+  // Firestore 이름 업데이트
+  Future<void> updateUserNameInFirestore(String newName) async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'displayName': newName,
+      });
+    }
+  }
+
+  Future<void> updateUserNameInAuth(String newName) async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.updateDisplayName(newName);
+      await user.reload(); // 사용자 정보를 최신 상태로 새로고침
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var userInfoProvider = Provider.of<UserInfoProvider>(context);
@@ -44,28 +126,33 @@ class _EditProfileState extends State<EditProfile> {
             ),
             CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage(userInfoProvider.photoURL ?? ''),
+              backgroundImage: fileSelectedImage != null
+                  ? FileImage(fileSelectedImage!) as ImageProvider
+                  : NetworkImage(userInfoProvider.photoURL ?? ''),
             ),
             const SizedBox(
               height: 15,
             ),
             ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                elevation: 0.0,
-                side: const BorderSide(
-                  color:
-                      Color.fromARGB(255, 218, 218, 218), // 임시-figma컬러 (수정필요)
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0.0,
+                  side: const BorderSide(
+                    color:
+                        Color.fromARGB(255, 218, 218, 218), // 임시-figma컬러 (수정필요)
+                  ),
                 ),
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Color(0xFFCBD9F5), // 임시컬러 (figma색, 수정필요)
-                size: 22,
-              ),
-            ),
+                child: IconButton(
+                    onPressed: () async {
+                      await selectAndConvertImage();
+                    },
+                    icon: const Icon(
+                      Icons.camera_alt,
+                      size: 22,
+                      color: PrimaryColors.basic,
+                    ))),
             Padding(
               padding: const EdgeInsets.fromLTRB(35, 20, 35, 0),
               child: Column(
@@ -153,11 +240,16 @@ class _EditProfileState extends State<EditProfile> {
 
               return ElevatedButton(
                   onPressed: hasNameText
-                      ? () {
-                          Navigator.push(
+                      ? () async {
+                          var userInfoProvider = Provider.of<UserInfoProvider>(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const MyPage()));
+                              listen: false);
+                          await updateUserNameInAuth(nameController.text);
+                          await updateUserNameInFirestore(nameController.text);
+                          await userInfoProvider
+                              .updateUserName(nameController.text);
+
+                          Navigator.of(context).pop();
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

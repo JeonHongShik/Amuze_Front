@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_board.dart';
+import 'package:amuze/servercommunication/get/stage_priview_get_server.dart';
 import 'package:amuze/stage/stage_board.dart';
 import 'package:flutter/material.dart';
 
@@ -42,11 +45,11 @@ class HomeBody extends StatelessWidget {
               ),
             ),
             const ColumnBlank(),
-            const Boards(title: '공고 게시물'),
+            const StageBoards(title: '공고 게시물'),
             const ColumnBlank(),
-            const Boards(title: '이력서 게시물'),
+            const ResumeBoards(title: '이력서 게시물'),
             const ColumnBlank(),
-            const Boards(title: '커뮤니티'),
+            const ComunityBoards(title: '커뮤니티'),
           ],
         ),
       ),
@@ -144,10 +147,311 @@ class ColumnBlank extends StatelessWidget {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-//게시판들//////////////////////////////////////////////////////////////////////
-class Boards extends StatelessWidget {
+//공고게시판//////////////////////////////////////////////////////////////////////
+class StageBoards extends StatefulWidget {
   final String title;
-  const Boards({super.key, required this.title});
+  const StageBoards({super.key, required this.title});
+
+  @override
+  State<StageBoards> createState() => _StageBoardsState();
+}
+
+class _StageBoardsState extends State<StageBoards> {
+  late Future<List<StagePreviewServerData>> serverData;
+
+  @override
+  void initState() {
+    super.initState();
+    serverData = stagepreviewfetchData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 800,
+      width: MediaQuery.of(context).size.width,
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.title,
+                style: const TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                    color: TextColors.high),
+              ),
+              TextButton(
+                onPressed: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StageBoard()),
+                  ),
+                },
+                child: const Text(
+                  '전체보기',
+                  style: TextStyle(color: TextColors.high),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          FutureBuilder<List<StagePreviewServerData>>(
+            future: serverData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.hasData) {
+                // 항목 수를 5개로 제한합니다.
+                int itemCount = min(snapshot.data!.length, 5);
+                return Expanded(
+                  child: Column(
+                    children: List.generate(itemCount, (index) {
+                      var data = snapshot.data![index];
+                      return Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              print(data.mainimage);
+                              print(data.title);
+                            },
+                            child: Container(
+                              height: 120,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 3,
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ]),
+                              child: Row(children: [
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                (data.mainimage != null)
+                                    ? Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                  data.mainimage!,
+                                                ),
+                                                fit: BoxFit.fill)),
+                                      )
+                                    : Container(
+                                        width: 90,
+                                        height: 90,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: const DecorationImage(
+                                                image: AssetImage(
+                                                    'assets/images/공고임시이미지.png'),
+                                                fit: BoxFit.fill)),
+                                      ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.55,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.12,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                          child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            data.title!,
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      )),
+                                      SizedBox(
+                                        height: 60,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              height: 30,
+                                              color: Colors.grey[300],
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    '${data.pay!}원',
+                                                  ),
+                                                  const Text(' · '),
+                                                  Text(data.type!),
+                                                  const Text(' · '),
+                                                  Text(data.region!)
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 30,
+                                              child: Text(
+                                                  '공연 날짜 - ${data.datetime!}'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          )
+                        ],
+                      );
+                    }),
+                  ),
+                );
+              } else {
+                return const Text('No data available');
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//이력서게시판//////////////////////////////////////////////////////////////////////
+class ResumeBoards extends StatefulWidget {
+  final String title;
+  const ResumeBoards({super.key, required this.title});
+
+  @override
+  State<ResumeBoards> createState() => _ResumeBoardsState();
+}
+
+class _ResumeBoardsState extends State<ResumeBoards> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 760,
+      width: MediaQuery.of(context).size.width,
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.title,
+                style: const TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                    color: TextColors.high),
+              ),
+              TextButton(
+                onPressed: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DummyPage()),
+                  ),
+                },
+                child: const Text(
+                  '전체보기',
+                  style: TextStyle(color: TextColors.high),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            height: 120,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            height: 120,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            height: 120,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            height: 120,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Container(
+            height: 120,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
+      ),
+    );
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//커뮤니티게시판들//////////////////////////////////////////////////////////////////////
+class ComunityBoards extends StatelessWidget {
+  final String title;
+  const ComunityBoards({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

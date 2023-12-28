@@ -636,16 +636,16 @@ class _StagePhotosState extends State<StagePhotos> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 var provider =
                     Provider.of<StageWriteProvider>(context, listen: false);
 
                 // 서버 주소 지정
                 String serverEndpoint =
-                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts';
+                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/create/';
 
                 // 데이터 전송
-                provider.postStageData(serverEndpoint).then((_) {
+                await provider.postStageData(serverEndpoint).then((_) {
                   // 성공적으로 데이터를 전송한 후 해야 할 작업 (예: 다음 페이지로 이동)
                   Navigator.push(
                     context,
