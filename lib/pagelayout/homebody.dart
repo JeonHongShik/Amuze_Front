@@ -4,6 +4,7 @@ import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_board.dart';
+import 'package:amuze/resume/resume_post.dart';
 import 'package:amuze/servercommunication/get/stage_priview_get_server.dart';
 import 'package:amuze/stage/stage_board.dart';
 import 'package:flutter/material.dart';
@@ -221,6 +222,14 @@ class _StageBoardsState extends State<StageBoards> {
                             onTap: () {
                               print(data.mainimage);
                               print(data.title);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        StagePost(id: data.id),
+                                  )).then((_) => setState(() {
+                                    serverData = stagepreviewfetchData();
+                                  }));
                             },
                             child: Container(
                               height: 120,
