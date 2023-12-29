@@ -51,7 +51,7 @@ class SituationColors {
 //텍스트 색상
 class TextColors {
   //위계도 1순위
-  static const Color high = Color(0xFF212121);
+  static const Color high = Color(0xFF333333);
   //위계도 2순위
   static const Color medium = Color(0xFF666666);
   //위계도 3순위
@@ -72,6 +72,14 @@ class IconColors {
   static const Color inactive = Color(0xFF666666);
   //위계도 3순위
   static const Color disabled = Color(0xFF9E9E9E);
+}
+
+//배경//////////////////////////////////////////////////////////////////////
+
+//배경 색상
+class backColors {
+  // 기본 배경
+  static const Color disabled = Color(0xFFECECEC);
 }
 
 class IconSizes {

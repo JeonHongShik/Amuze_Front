@@ -34,7 +34,7 @@ class _StageBoardState extends State<StageBoard> {
         iconTheme: const IconThemeData(color: PrimaryColors.basic),
         title: const Text(
           '공고 게시판',
-          style: TextStyle(color: PrimaryColors.basic),
+          style: TextStyle(color: TextColors.high),
         ),
         actions: [
           IconButton(
@@ -56,13 +56,16 @@ class _StageBoardState extends State<StageBoard> {
             padding: const EdgeInsets.only(left: 17),
             width: MediaQuery.of(context).size.width,
             height: 50,
-            color: Colors.grey,
+            color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   '전체 100',
-                  style: TextStyle(color: TextColors.medium),
+                  style: TextStyle(
+                    color: TextColors.medium,
+                    fontSize: 12,
+                  ),
                 ),
                 TextButton(
                     onPressed: () {
@@ -89,7 +92,10 @@ class _StageBoardState extends State<StageBoard> {
                     },
                     child: const Text(
                       '공고 작성하기',
-                      style: TextStyle(color: TextColors.high),
+                      style: TextStyle(
+                        color: TextColors.medium,
+                        fontSize: 12,
+                      ),
                     ))
               ],
             ),
@@ -123,8 +129,8 @@ class _StageBoardState extends State<StageBoard> {
                         height: 120,
                         decoration: const BoxDecoration(
                             color: Colors.white,
-                            border:
-                                Border(bottom: BorderSide(color: Colors.grey))),
+                            border: Border(
+                                top: BorderSide(color: backColors.disabled))),
                         child: Row(
                           children: [
                             (data.mainimage != null)
@@ -132,7 +138,7 @@ class _StageBoardState extends State<StageBoard> {
                                     width: 100,
                                     height: 100,
                                     decoration: BoxDecoration(
-                                        color: Colors.grey,
+                                        color: backColors.disabled,
                                         image: DecorationImage(
                                             image: NetworkImage(
                                               data.mainimage!,
@@ -141,11 +147,11 @@ class _StageBoardState extends State<StageBoard> {
                                   )
                                 : Container(
                                     margin: const EdgeInsets.only(left: 10),
-                                    width: 90,
-                                    height: 90,
+                                    width: 85,
+                                    height: 85,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
-                                        color: Colors.grey,
+                                        color: backColors.disabled,
                                         image: const DecorationImage(
                                             image: AssetImage(
                                                 'assets/images/공고임시이미지.png'),
@@ -153,46 +159,70 @@ class _StageBoardState extends State<StageBoard> {
                                   ),
                             Expanded(
                               child: SizedBox(
-                                height: 90,
+                                height: 86,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      height: 45,
+                                      padding: const EdgeInsets.only(left: 13),
+                                      height: 42,
                                       child: Text(
                                         data.title!,
                                         style: const TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 16.5,
                                             fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 45,
+                                      height: 44,
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Container(
                                             padding:
-                                                const EdgeInsets.only(left: 10),
-                                            height: 22.5,
+                                                const EdgeInsets.only(left: 13),
+                                            height: 20,
                                             child: Row(
                                               children: [
                                                 data.pay!.isNotEmpty
-                                                    ? Text('${data.pay}원 · ')
+                                                    ? Text(
+                                                        '${data.pay}원 · ',
+                                                        style: const TextStyle(
+                                                          fontSize: 13,
+                                                          color:
+                                                              TextColors.medium,
+                                                        ),
+                                                      )
                                                     : const SizedBox.shrink(),
-                                                Text('${data.type!} · '),
-                                                Text(data.region!)
+                                                Text(
+                                                  '${data.type!} · ',
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: TextColors.medium,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  data.region!,
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: TextColors.medium,
+                                                  ),
+                                                )
                                               ],
                                             ),
                                           ),
                                           Container(
                                             padding:
-                                                const EdgeInsets.only(left: 10),
+                                                const EdgeInsets.only(left: 13),
                                             height: 22.5,
                                             child: Text(
-                                                '공연 날짜 - ${data.datetime}'),
+                                              '공연 날짜 - ${data.datetime}',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: TextColors.medium,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),

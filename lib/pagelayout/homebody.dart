@@ -97,7 +97,7 @@ class TopBoard extends StatelessWidget {
                   ? DecorationImage(
                       image: AssetImage(imagePath!), fit: BoxFit.cover)
                   : null,
-              color: Colors.grey,
+              color: const Color(0xffd9d9d9),
             ),
           ),
           SizedBox(
@@ -142,13 +142,13 @@ class ColumnBlank extends StatelessWidget {
     return Container(
       height: 30,
       width: MediaQuery.of(context).size.width,
-      color: Colors.grey,
+      color: backColors.disabled,
     );
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-//공고게시판//////////////////////////////////////////////////////////////////////
+//공고 게시물////////////////////////////////////////////////////////////////////
 class StageBoards extends StatefulWidget {
   final String title;
   const StageBoards({super.key, required this.title});
@@ -172,7 +172,7 @@ class _StageBoardsState extends State<StageBoards> {
       height: 800,
       width: MediaQuery.of(context).size.width,
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
+      padding: const EdgeInsets.fromLTRB(23, 20, 25, 5),
       child: Column(
         children: [
           Row(
@@ -181,7 +181,7 @@ class _StageBoardsState extends State<StageBoards> {
               Text(
                 widget.title,
                 style: const TextStyle(
-                    fontSize: 23,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: TextColors.high),
               ),
@@ -194,13 +194,15 @@ class _StageBoardsState extends State<StageBoards> {
                 },
                 child: const Text(
                   '전체보기',
-                  style: TextStyle(color: TextColors.high),
+                  style: TextStyle(
+                    color: TextColors.disabled,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(
-            height: 15,
+            height: 22,
           ),
           FutureBuilder<List<StagePreviewServerData>>(
             future: serverData,
@@ -232,13 +234,13 @@ class _StageBoardsState extends State<StageBoards> {
                                   }));
                             },
                             child: Container(
-                              height: 120,
+                              height: 100,
                               decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(14),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
+                                      color: Colors.grey.withOpacity(0.2),
                                       spreadRadius: 3,
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
@@ -250,8 +252,8 @@ class _StageBoardsState extends State<StageBoards> {
                                 ),
                                 (data.mainimage != null)
                                     ? Container(
-                                        width: 100,
-                                        height: 100,
+                                        width: 85,
+                                        height: 85,
                                         decoration: BoxDecoration(
                                             image: DecorationImage(
                                                 image: NetworkImage(
@@ -260,8 +262,8 @@ class _StageBoardsState extends State<StageBoards> {
                                                 fit: BoxFit.fill)),
                                       )
                                     : Container(
-                                        width: 90,
-                                        height: 90,
+                                        width: 85,
+                                        height: 85,
                                         decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(10),
@@ -281,44 +283,78 @@ class _StageBoardsState extends State<StageBoards> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                          child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            data.title!,
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      )),
                                       SizedBox(
-                                        height: 60,
+                                          height: 34,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                data.title!,
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          )),
+                                      SizedBox(
+                                        height: 45,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              height: 30,
-                                              color: Colors.grey[300],
+                                            SizedBox(
+                                              height: 20,
                                               child: Row(
                                                 children: [
                                                   Text(
                                                     '${data.pay!}원',
+                                                    style: const TextStyle(
+                                                      fontSize: 12.5,
+                                                      color: TextColors.medium,
+                                                    ),
                                                   ),
-                                                  const Text(' · '),
-                                                  Text(data.type!),
-                                                  const Text(' · '),
-                                                  Text(data.region!)
+                                                  const Text(
+                                                    ' · ',
+                                                    style: TextStyle(
+                                                      fontSize: 12.5,
+                                                      color: TextColors.medium,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    data.type!,
+                                                    style: const TextStyle(
+                                                      fontSize: 12.5,
+                                                      color: TextColors.medium,
+                                                    ),
+                                                  ),
+                                                  const Text(
+                                                    ' · ',
+                                                    style: TextStyle(
+                                                      fontSize: 12.5,
+                                                      color: TextColors.medium,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    data.region!,
+                                                    style: const TextStyle(
+                                                      fontSize: 12.5,
+                                                      color: TextColors.medium,
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
                                             SizedBox(
-                                              height: 30,
+                                              height: 20,
                                               child: Text(
-                                                  '공연 날짜 - ${data.datetime!}'),
+                                                '공연 날짜 - ${data.datetime!}',
+                                                style: const TextStyle(
+                                                  fontSize: 12.5,
+                                                  color: TextColors.medium,
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),

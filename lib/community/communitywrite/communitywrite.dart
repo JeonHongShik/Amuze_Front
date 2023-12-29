@@ -1,6 +1,8 @@
 import 'package:amuze/gathercolors.dart';
+import 'package:amuze/main.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Communitywrite extends StatefulWidget {
   const Communitywrite({super.key});
@@ -10,10 +12,26 @@ class Communitywrite extends StatefulWidget {
 }
 
 class _CommunitywriteState extends State<Communitywrite> {
-  final TextEditingController titleController =
-      TextEditingController(); // 게시물 제목 컨트롤러
-  final TextEditingController maintextController =
-      TextEditingController(); // 게시물 내용 컨트롤러
+  late TextEditingController titleController; // 게시물 제목 컨트롤러
+  late TextEditingController contentController; // 게시물 내용 컨트롤러
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    // text:
+    // Provider.of<CommunityWriteProvider>(context, listen: false).title
+    contentController = TextEditingController();
+    // text: Provider.of<CommunityWriteProvider>(context, listen: false)
+    //     .content);
+  }
+
+  // @override
+  // void dispose() {
+  //   titleController.dispose();
+  //   contentController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +115,7 @@ class _CommunitywriteState extends State<Communitywrite> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 300),
                     child: TextField(
-                      controller: maintextController, // 게시물 내용 입력 컨트롤러
+                      controller: contentController, // 게시물 내용 입력 컨트롤러
                       maxLines: 15,
                       maxLength: 3000,
                       decoration: InputDecoration(
@@ -130,10 +148,10 @@ class _CommunitywriteState extends State<Communitywrite> {
           valueListenable: titleController,
           builder: (context, value, child) {
             final bool hasTitleText = titleController.text.isNotEmpty;
-            final bool hasMaintextText = maintextController.text.isNotEmpty;
+            final bool hasContentText = contentController.text.isNotEmpty;
 
             return ElevatedButton(
-              onPressed: hasTitleText && hasMaintextText
+              onPressed: hasTitleText && hasContentText
                   ? () {
                       Navigator.push(
                         context,
@@ -158,10 +176,10 @@ class _CommunitywriteState extends State<Communitywrite> {
                     }
                   : null,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: hasTitleText && hasMaintextText
+                  backgroundColor: hasTitleText && hasContentText
                       ? PrimaryColors.basic
                       : PrimaryColors.disabled,
-                  foregroundColor: hasTitleText && hasMaintextText
+                  foregroundColor: hasTitleText && hasContentText
                       ? Colors.white
                       : TextColors.disabled,
                   minimumSize: Size(MediaQuery.of(context).size.width, 50),
