@@ -640,32 +640,20 @@ class _StagePhotosState extends State<StagePhotos> {
                 var provider =
                     Provider.of<StageWriteProvider>(context, listen: false);
 
-                // 서버 주소 지정
-                String serverEndpoint =
-                    'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/create/';
+                // 데이터 전송: id 값이 있으면 patch, 없으면 post 사용
+                Future<void> response;
+                if (provider.id == null) {
+                  response = provider.postStageData(); // id가 없으면 POST 요청
+                } else {
+                  response = provider.patchStageData(); // id가 있으면 PATCH 요청
+                }
 
-                // 데이터 전송
-                await provider.postStageData(serverEndpoint).then((_) {
-                  // 성공적으로 데이터를 전송한 후 해야 할 작업 (예: 다음 페이지로 이동)
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const DummyPage(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        var begin = const Offset(1.0, 0.0);
-                        var end = Offset.zero;
-                        var tween = Tween(begin: begin, end: end);
-                        var offsetAnimation = animation.drive(tween);
-
-                        return SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
+                // 응답 처리
+                await response.then((_) {
+                  provider.reset();
+                  for (int i = 0; i < 8; i++) {
+                    Navigator.of(context).pop(); // 여러 화면을 한 번에 닫기
+                  }
                 }).catchError((error) {
                   // 에러 처리
                   print('//////////////////Error sending data: $error');

@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resume_post.dart';
+import 'package:amuze/stage/stage_post.dart';
 import 'package:amuze/servercommunication/get/stage_priview_get_server.dart';
 
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
@@ -135,10 +135,12 @@ class _StageBoardState extends State<StageBoard> {
                           children: [
                             (data.mainimage != null)
                                 ? Container(
+                                    margin: const EdgeInsets.only(left: 10),
                                     width: 100,
                                     height: 100,
                                     decoration: BoxDecoration(
                                         color: backColors.disabled,
+                                        borderRadius: BorderRadius.circular(20),
                                         image: DecorationImage(
                                             image: NetworkImage(
                                               data.mainimage!,
@@ -147,8 +149,8 @@ class _StageBoardState extends State<StageBoard> {
                                   )
                                 : Container(
                                     margin: const EdgeInsets.only(left: 10),
-                                    width: 85,
-                                    height: 85,
+                                    width: 100,
+                                    height: 100,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         color: backColors.disabled,
@@ -269,7 +271,7 @@ class ShimmerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 5, // Shimmer 효과를 표시할 아이템 수 (임의로 5개 설정)
+      itemCount: 10, // Shimmer 효과를 표시할 아이템 수 (임의로 5개 설정)
       itemBuilder: (BuildContext context, int index) {
         return Shimmer.fromColors(
           baseColor: Colors.grey[300]!, // 기본 배경색

@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
-import 'package:amuze/servercommunication/post/resumepostserver.dart';
-import 'package:amuze/servercommunication/post/stagepostserver.dart';
+import 'package:amuze/servercommunication/post/resume_post_server.dart';
+import 'package:amuze/servercommunication/post/stage_post_server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -335,8 +335,6 @@ class StageWriteProvider extends ChangeNotifier {
   List<Asset> _assetotherimages = [];
   List<String> _convertedimagenames = [];
 
-  List<File> _photos = [];
-
   String get title => _title;
   String get region => _region;
   String get type => _type;
@@ -354,8 +352,6 @@ class StageWriteProvider extends ChangeNotifier {
   List<File> get fileotherimages => _fileotherimages;
   List<Asset> get assetotherimages => _assetotherimages;
   List<String> get convertedimagenames => _convertedimagenames;
-
-  List<File> get photos => _photos;
 
   void setTitle(String title) {
     _title = title;
@@ -457,11 +453,6 @@ class StageWriteProvider extends ChangeNotifier {
     convertedimagenames.remove(imageName);
   }
 
-  void setPhotos(List<File> photos) {
-    _photos = photos;
-    notifyListeners();
-  }
-
   void reset() {
     uid = '';
     id = null;
@@ -480,20 +471,6 @@ class StageWriteProvider extends ChangeNotifier {
     _fileotherimages = [];
     _assetotherimages = [];
     _convertedimagenames = [];
-    _photos = [];
-  }
-
-  Future<void> mergeImages() async {
-    _photos.clear(); // 기존의 photos 리스트를 비웁니다.
-
-    if (_filemainimage.isNotEmpty) {
-      _photos.add(_filemainimage[0]); // filemainimage의 첫 번째 이미지를 추가합니다.
-    }
-    if (_fileotherimages.isNotEmpty) {
-      _photos.addAll(_fileotherimages);
-    } // fileotherimages의 모든 이미지를 추가합니다.
-
-    notifyListeners();
   }
 
   Future<void> mergeDateAndTimeAsync() async {
@@ -506,11 +483,25 @@ class StageWriteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> postStageData(String serverEndpoint) async {
+  Future<void> splitDateAndTimeAsync() async {
+    if (_datetime.isNotEmpty) {
+      List<String> parts = _datetime.split(' ');
+      if (parts.length >= 2) {
+        _date = parts[0];
+        _time = parts.sublist(1).join(' '); // "2:40 PM"을 얻기 위해 나머지 부분을 합칩니다.
+      }
+    } else {
+      _date = '';
+      _time = '';
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> postStageData() async {
     Dio dio = Dio();
-    await mergeImages();
     await mergeDateAndTimeAsync();
-    FormData formData = createStgaeFormData(
+    FormData formData = createStageFormData(
       uid: uid,
       title: _title,
       region: _region,
@@ -520,12 +511,49 @@ class StageWriteProvider extends ChangeNotifier {
       deadline: _deadline,
       datetime: _datetime,
       introduce: _introduce,
-      photos: _photos,
+      mainimage: _filemainimage.isNotEmpty ? _filemainimage.first : null,
+      otherimages1: _fileotherimages.isNotEmpty ? _fileotherimages[0] : null,
+      otherimages2: _fileotherimages.length > 1 ? _fileotherimages[1] : null,
+      otherimages3: _fileotherimages.length > 2 ? _fileotherimages[2] : null,
+      otherimages4: _fileotherimages.length > 3 ? _fileotherimages[3] : null,
     );
 
     try {
       // 서버에 POST 요청
-      Response response = await dio.post(serverEndpoint, data: formData);
+      Response response = await dio.post(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/create/',
+          data: formData);
+      print(response.data); // 응답 출력
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> patchStageData() async {
+    Dio dio = Dio();
+    await mergeDateAndTimeAsync();
+    FormData formData = createStageFormData(
+      uid: uid,
+      title: _title,
+      region: _region,
+      type: _type,
+      wishtype: _wishtype,
+      pay: _pay,
+      deadline: _deadline,
+      datetime: _datetime,
+      introduce: _introduce,
+      mainimage: _filemainimage.isNotEmpty ? _filemainimage.first : null,
+      otherimages1: _fileotherimages.isNotEmpty ? _fileotherimages[0] : null,
+      otherimages2: _fileotherimages.length > 1 ? _fileotherimages[1] : null,
+      otherimages3: _fileotherimages.length > 2 ? _fileotherimages[2] : null,
+      otherimages4: _fileotherimages.length > 3 ? _fileotherimages[3] : null,
+    );
+
+    try {
+      // 서버에 POST 요청
+      Response response = await dio.patch(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/patch/${id.toString()}/',
+          data: formData);
       print(response.data); // 응답 출력
     } catch (e) {
       print(e);

@@ -4,7 +4,7 @@ import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_board.dart';
-import 'package:amuze/resume/resume_post.dart';
+import 'package:amuze/stage/stage_post.dart';
 import 'package:amuze/servercommunication/get/stage_priview_get_server.dart';
 import 'package:amuze/stage/stage_board.dart';
 import 'package:flutter/material.dart';
@@ -59,26 +59,31 @@ class HomeBody extends StatelessWidget {
 }
 
 //최상단 게시판 이동 버튼////////////////////////////////////////////////////////
-class TopBoard extends StatelessWidget {
+class TopBoard extends StatefulWidget {
   final String label;
   final String? imagePath;
   const TopBoard({super.key, required this.label, required this.imagePath});
 
   @override
+  State<TopBoard> createState() => _TopBoardState();
+}
+
+class _TopBoardState extends State<TopBoard> {
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (label == '공고 게시판') {
+        if (widget.label == '공고 게시판') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const StageBoard()),
           );
-        } else if (label == '이력서 게시판') {
+        } else if (widget.label == '이력서 게시판') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ResumeBoard()),
           );
-        } else if (label == '커뮤니티') {
+        } else if (widget.label == '커뮤니티') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const CommunityBoard()),
@@ -93,9 +98,9 @@ class TopBoard extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.25,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: imagePath != null
+              image: widget.imagePath != null
                   ? DecorationImage(
-                      image: AssetImage(imagePath!), fit: BoxFit.cover)
+                      image: AssetImage(widget.imagePath!), fit: BoxFit.cover)
                   : null,
               color: const Color(0xffd9d9d9),
             ),
@@ -105,7 +110,7 @@ class TopBoard extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.25,
             child: Center(
               child: Text(
-                label,
+                widget.label,
                 style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -190,7 +195,9 @@ class _StageBoardsState extends State<StageBoards> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const StageBoard()),
-                  ),
+                  ).then((_) {
+                    serverData = stagepreviewfetchData();
+                  }),
                 },
                 child: const Text(
                   '전체보기',
@@ -255,6 +262,8 @@ class _StageBoardsState extends State<StageBoards> {
                                         width: 85,
                                         height: 85,
                                         decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                             image: DecorationImage(
                                                 image: NetworkImage(
                                                   data.mainimage!,
@@ -266,7 +275,7 @@ class _StageBoardsState extends State<StageBoards> {
                                         height: 85,
                                         decoration: BoxDecoration(
                                             borderRadius:
-                                                BorderRadius.circular(10),
+                                                BorderRadius.circular(20),
                                             image: const DecorationImage(
                                                 image: AssetImage(
                                                     'assets/images/공고임시이미지.png'),
@@ -348,13 +357,16 @@ class _StageBoardsState extends State<StageBoards> {
                                             ),
                                             SizedBox(
                                               height: 20,
-                                              child: Text(
-                                                '공연 날짜 - ${data.datetime!}',
-                                                style: const TextStyle(
-                                                  fontSize: 12.5,
-                                                  color: TextColors.medium,
-                                                ),
-                                              ),
+                                              child: data.datetime != ''
+                                                  ? Text(
+                                                      '공연 날짜 - ${data.datetime}',
+                                                      style: const TextStyle(
+                                                        fontSize: 12.5,
+                                                        color:
+                                                            TextColors.medium,
+                                                      ),
+                                                    )
+                                                  : const SizedBox.shrink(),
                                             ),
                                           ],
                                         ),

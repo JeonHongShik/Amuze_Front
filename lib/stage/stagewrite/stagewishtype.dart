@@ -96,7 +96,7 @@ class _StageWishTypeState extends State<StageWishType> {
                       maxLines: null,
                       maxLength: 50,
                       decoration: const InputDecoration(
-                          hintText: '무용 종류',
+                          hintText: '원하는 무용 종류',
                           enabledBorder: UnderlineInputBorder(
                               borderSide:
                                   BorderSide(color: PrimaryColors.disabled)),
