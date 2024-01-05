@@ -122,10 +122,10 @@ class ResumeWriteProvider extends ChangeNotifier {
   String _introduce = '';
 
 //사진들
-  List<File> _filemainimage = [];
+  List<ImageItem> _filemainimage = [];
   List<Asset> _assetmainimage = [];
 
-  List<File> _fileotherimages = [];
+  List<ImageItem> _fileotherimages = [];
   List<Asset> _assetotherimages = [];
   List<String> _convertedimagenames = [];
 
@@ -142,10 +142,10 @@ class ResumeWriteProvider extends ChangeNotifier {
   String get introduce => _introduce;
 
 //사진들
-  List<File> get filemainimage => _filemainimage;
+  List<ImageItem> get filemainimage => _filemainimage;
   List<Asset> get assetmainimage => _assetmainimage;
 
-  List<File> get fileotherimages => _fileotherimages;
+  List<ImageItem> get fileotherimages => _fileotherimages;
   List<Asset> get assetotherimages => _assetotherimages;
   List<String> get convertedimagenames => _convertedimagenames;
 
@@ -196,7 +196,7 @@ class ResumeWriteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFileMainimage(List<File> filemainimage) {
+  void setFileMainimage(List<ImageItem> filemainimage) {
     _filemainimage = filemainimage;
     notifyListeners();
   }
@@ -206,7 +206,7 @@ class ResumeWriteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFileOtherimages(List<File> fileotherimages) {
+  void setFileOtherimages(List<ImageItem> fileotherimages) {
     _fileotherimages = fileotherimages;
     notifyListeners();
   }
@@ -272,39 +272,108 @@ class ResumeWriteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> mergeImages() async {
-    _photos.clear(); // 기존의 photos 리스트를 비웁니다.
-
-    if (_filemainimage.isNotEmpty) {
-      _photos.add(_filemainimage[0]); // filemainimage의 첫 번째 이미지를 추가합니다.
-    }
-    if (_fileotherimages.isNotEmpty) {
-      _photos.addAll(_fileotherimages);
-    } // fileotherimages의 모든 이미지를 추가합니다.
-
-    notifyListeners();
-  }
-
-  Future<void> postResumeData(String serverEndpoint) async {
+  Future<void> postResumeData() async {
     Dio dio = Dio();
-    await mergeImages();
-    FormData formData = createResumeFormData(
-      uid: uid,
-      title: _title,
-      gender: _gender,
-      age: _age,
-      regions: _regions,
-      educations: _educations,
-      careers: _careers,
-      awards: _awards,
-      completions: _completions,
-      introduce: _introduce,
-      photos: _photos,
-    );
+
+    String careersString = _careers.join(",");
+    String regionsString = _regions.join(",");
+    String educationsString = _educations.join(",");
+    String awardsString = _awards.join(",");
+    String completionsString = _completions.join(",");
+
+    // FormData 객체 생성
+    FormData formData = FormData.fromMap({
+      'uid': uid,
+      'id': id,
+      'title': _title,
+      'gender': _gender,
+      'age': _age,
+      'region': regionsString,
+      'education': educationsString,
+      'career': careersString,
+      'award': awardsString,
+      'completion': completionsString,
+      'introduce': _introduce,
+    });
+
+    // 메인 이미지 추가
+    if (_filemainimage.isNotEmpty) {
+      if (_filemainimage.first.isFile && _filemainimage.first.file != null) {
+        formData.files.add(MapEntry(
+          'mainimage',
+          await MultipartFile.fromFile(_filemainimage.first.file!.path),
+        ));
+      } else if (_filemainimage.first.isPath &&
+          _filemainimage.first.path != null) {
+        formData.fields.add(MapEntry('mainimage', _filemainimage.first.path!));
+      }
+    }
+
+    // 다른 이미지들 추가
+    for (int i = 0; i < _fileotherimages.length && i < 4; i++) {
+      if (_fileotherimages[i].isFile && _fileotherimages[i].file != null) {
+        formData.files.add(MapEntry(
+          'otherimages${i + 1}',
+          await MultipartFile.fromFile(_fileotherimages[i].file!.path),
+        ));
+      } else if (_fileotherimages[i].isPath &&
+          _fileotherimages[i].path != null) {
+        formData.fields
+            .add(MapEntry('otherimages${i + 1}', _fileotherimages[i].path!));
+      }
+    }
 
     try {
       // 서버에 POST 요청
-      Response response = await dio.post(serverEndpoint, data: formData);
+      Response response = await dio.post(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/resume/create/',
+          data: formData);
+      print(response.data); // 응답 출력
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> patchResumeData() async {
+    Dio dio = Dio();
+
+    FormData formData = createStageFormData(
+      uid: uid,
+      title: _title,
+      // 값 추가 해야 됨.
+      introduce: _introduce,
+    );
+    if (_filemainimage.isNotEmpty) {
+      if (_filemainimage.first.isFile && _filemainimage.first.file != null) {
+        formData.files.add(MapEntry(
+          'mainimage',
+          await MultipartFile.fromFile(_filemainimage.first.file!.path),
+        ));
+      } else if (_filemainimage.first.isPath &&
+          _filemainimage.first.path != null) {
+        formData.fields.add(MapEntry('mainimage', _filemainimage.first.path!));
+      }
+    }
+
+    // 다른 이미지들 추가
+    for (int i = 0; i < _fileotherimages.length && i < 4; i++) {
+      if (_fileotherimages[i].isFile && _fileotherimages[i].file != null) {
+        formData.files.add(MapEntry(
+          'otherimages${i + 1}',
+          await MultipartFile.fromFile(_fileotherimages[i].file!.path),
+        ));
+      } else if (_fileotherimages[i].isPath &&
+          _fileotherimages[i].path != null) {
+        formData.fields
+            .add(MapEntry('otherimages${i + 1}', _fileotherimages[i].path!));
+      }
+    }
+
+    try {
+      // 서버에 POST 요청
+      Response response = await dio.patch(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/patch/${id.toString()}/',
+          data: formData);
       print(response.data); // 응답 출력
     } catch (e) {
       print(e);
@@ -314,6 +383,22 @@ class ResumeWriteProvider extends ChangeNotifier {
 ///////////////////////////////////////////////////////////////////////////////
 
 //공고 작성 Provider///////////////////////////////////////////////////////////
+class ImageItem {
+  File? file;
+  String? path;
+
+  ImageItem.fromFile(File file) {
+    this.file = file;
+  }
+
+  ImageItem.fromPath(String path) {
+    this.path = path;
+  }
+
+  bool get isFile => file != null;
+  bool get isPath => path != null;
+}
+
 class StageWriteProvider extends ChangeNotifier {
   String? uid;
   int? id;
@@ -328,10 +413,10 @@ class StageWriteProvider extends ChangeNotifier {
   String _datetime = '';
   String _introduce = '';
 
-  List<File> _filemainimage = [];
+  List<ImageItem> _filemainimage = [];
   List<Asset> _assetmainimage = [];
 
-  List<File> _fileotherimages = [];
+  List<ImageItem> _fileotherimages = [];
   List<Asset> _assetotherimages = [];
   List<String> _convertedimagenames = [];
 
@@ -346,10 +431,10 @@ class StageWriteProvider extends ChangeNotifier {
   String get datetime => _datetime;
   String get introduce => _introduce;
 
-  List<File> get filemainimage => _filemainimage;
+  List<ImageItem> get filemainimage => _filemainimage;
   List<Asset> get assetmainimage => _assetmainimage;
 
-  List<File> get fileotherimages => _fileotherimages;
+  List<ImageItem> get fileotherimages => _fileotherimages;
   List<Asset> get assetotherimages => _assetotherimages;
   List<String> get convertedimagenames => _convertedimagenames;
 
@@ -403,7 +488,7 @@ class StageWriteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFileMainimage(List<File> filemainimage) {
+  void setFileMainimage(List<ImageItem> filemainimage) {
     _filemainimage = filemainimage;
     notifyListeners();
   }
@@ -413,7 +498,7 @@ class StageWriteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFileOtherimages(List<File> fileotherimages) {
+  void setFileOtherimages(List<ImageItem> fileotherimages) {
     _fileotherimages = fileotherimages;
     notifyListeners();
   }
@@ -501,22 +586,46 @@ class StageWriteProvider extends ChangeNotifier {
   Future<void> postStageData() async {
     Dio dio = Dio();
     await mergeDateAndTimeAsync();
-    FormData formData = createStageFormData(
-      uid: uid,
-      title: _title,
-      region: _region,
-      type: _type,
-      wishtype: _wishtype,
-      pay: _pay,
-      deadline: _deadline,
-      datetime: _datetime,
-      introduce: _introduce,
-      mainimage: _filemainimage.isNotEmpty ? _filemainimage.first : null,
-      otherimages1: _fileotherimages.isNotEmpty ? _fileotherimages[0] : null,
-      otherimages2: _fileotherimages.length > 1 ? _fileotherimages[1] : null,
-      otherimages3: _fileotherimages.length > 2 ? _fileotherimages[2] : null,
-      otherimages4: _fileotherimages.length > 3 ? _fileotherimages[3] : null,
-    );
+
+    // FormData 객체 생성
+    FormData formData = FormData.fromMap({
+      'uid': uid,
+      'title': _title,
+      'region': _region,
+      'type': _type,
+      'wishtype': _wishtype,
+      'pay': _pay,
+      'deadline': _deadline,
+      'datetime': _datetime,
+      'introduce': _introduce,
+    });
+
+    // 메인 이미지 추가
+    if (_filemainimage.isNotEmpty) {
+      if (_filemainimage.first.isFile && _filemainimage.first.file != null) {
+        formData.files.add(MapEntry(
+          'mainimage',
+          await MultipartFile.fromFile(_filemainimage.first.file!.path),
+        ));
+      } else if (_filemainimage.first.isPath &&
+          _filemainimage.first.path != null) {
+        formData.fields.add(MapEntry('mainimage', _filemainimage.first.path!));
+      }
+    }
+
+    // 다른 이미지들 추가
+    for (int i = 0; i < _fileotherimages.length && i < 4; i++) {
+      if (_fileotherimages[i].isFile && _fileotherimages[i].file != null) {
+        formData.files.add(MapEntry(
+          'otherimages${i + 1}',
+          await MultipartFile.fromFile(_fileotherimages[i].file!.path),
+        ));
+      } else if (_fileotherimages[i].isPath &&
+          _fileotherimages[i].path != null) {
+        formData.fields
+            .add(MapEntry('otherimages${i + 1}', _fileotherimages[i].path!));
+      }
+    }
 
     try {
       // 서버에 POST 요청
@@ -542,12 +651,32 @@ class StageWriteProvider extends ChangeNotifier {
       deadline: _deadline,
       datetime: _datetime,
       introduce: _introduce,
-      mainimage: _filemainimage.isNotEmpty ? _filemainimage.first : null,
-      otherimages1: _fileotherimages.isNotEmpty ? _fileotherimages[0] : null,
-      otherimages2: _fileotherimages.length > 1 ? _fileotherimages[1] : null,
-      otherimages3: _fileotherimages.length > 2 ? _fileotherimages[2] : null,
-      otherimages4: _fileotherimages.length > 3 ? _fileotherimages[3] : null,
     );
+    if (_filemainimage.isNotEmpty) {
+      if (_filemainimage.first.isFile && _filemainimage.first.file != null) {
+        formData.files.add(MapEntry(
+          'mainimage',
+          await MultipartFile.fromFile(_filemainimage.first.file!.path),
+        ));
+      } else if (_filemainimage.first.isPath &&
+          _filemainimage.first.path != null) {
+        formData.fields.add(MapEntry('mainimage', _filemainimage.first.path!));
+      }
+    }
+
+    // 다른 이미지들 추가
+    for (int i = 0; i < _fileotherimages.length && i < 4; i++) {
+      if (_fileotherimages[i].isFile && _fileotherimages[i].file != null) {
+        formData.files.add(MapEntry(
+          'otherimages${i + 1}',
+          await MultipartFile.fromFile(_fileotherimages[i].file!.path),
+        ));
+      } else if (_fileotherimages[i].isPath &&
+          _fileotherimages[i].path != null) {
+        formData.fields
+            .add(MapEntry('otherimages${i + 1}', _fileotherimages[i].path!));
+      }
+    }
 
     try {
       // 서버에 POST 요청

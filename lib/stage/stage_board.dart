@@ -88,7 +88,11 @@ class _StageBoardState extends State<StageBoard> {
                             );
                           },
                         ),
-                      );
+                      ).then((_) {
+                        setState(() {
+                          serverData = stagepreviewfetchData();
+                        });
+                      });
                     },
                     child: const Text(
                       '공고 작성하기',
@@ -170,6 +174,7 @@ class _StageBoardState extends State<StageBoard> {
                                       height: 42,
                                       child: Text(
                                         data.title!,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontSize: 16.5,
                                             fontWeight: FontWeight.w500),
@@ -246,21 +251,6 @@ class _StageBoardState extends State<StageBoard> {
           )),
         ],
       ),
-    );
-  }
-}
-
-class DummyContainer extends StatelessWidget {
-  const DummyContainer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 100,
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(bottom: BorderSide(color: Colors.grey))),
     );
   }
 }

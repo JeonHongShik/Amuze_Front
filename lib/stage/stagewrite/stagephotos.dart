@@ -23,14 +23,14 @@ class StagePhotos extends StatefulWidget {
 
 class _StagePhotosState extends State<StagePhotos> {
   List<Asset> assetMainImage = [];
-  List<File> fileMainImage = [];
+  List<ImageItem> fileMainImage = [];
   List<Asset> assetOhterImages = [];
-  List<File>? fileOtherImages = [];
+  List<ImageItem>? fileOtherImages = [];
   //이미 변환된 이미지들의 이름을 저장하는 배열
   List<String> convertedImageNames = [];
 
-  StreamController<List<File>> streamController =
-      StreamController<List<File>>();
+  StreamController<List<ImageItem>> streamController =
+      StreamController<List<ImageItem>>();
 
 //main과 other 이미지들을 provider 값으로 초기화
   @override
@@ -41,9 +41,9 @@ class _StagePhotosState extends State<StagePhotos> {
         final provider =
             Provider.of<StageWriteProvider>(context, listen: false);
         setState(() {
-          fileMainImage = List<File>.from(provider.filemainimage);
+          fileMainImage = List<ImageItem>.from(provider.filemainimage);
           assetMainImage = List<Asset>.from(provider.assetmainimage);
-          fileOtherImages = List<File>.from(provider.fileotherimages);
+          fileOtherImages = List<ImageItem>.from(provider.fileotherimages);
           assetOhterImages = List<Asset>.from(provider.assetotherimages);
           convertedImageNames = List<String>.from(provider.convertedimagenames);
         });
@@ -53,7 +53,7 @@ class _StagePhotosState extends State<StagePhotos> {
   }
 
 //메인 이미지 Asset -> File 변경/////////////////////////////////////////////////////////
-  Future<List<File>> convertMainImgageAssetToFile(
+  Future<List<ImageItem>> convertMainImgageAssetToFile(
       List<Asset> assetMainImage) async {
     List<File> tempFiles = [];
     for (Asset asset in assetMainImage) {
@@ -61,12 +61,15 @@ class _StagePhotosState extends State<StagePhotos> {
       tempFiles.add(file);
     }
 
+    List<ImageItem> imageItems =
+        tempFiles.map((file) => ImageItem.fromFile(file)).toList();
+
     setState(() {
-      fileMainImage = tempFiles;
+      fileMainImage = imageItems;
     });
 
     Provider.of<StageWriteProvider>(context, listen: false)
-        .setFileMainimage(fileMainImage);
+        .setFileMainimage(imageItems);
 
     return fileMainImage;
   }
@@ -79,14 +82,15 @@ class _StagePhotosState extends State<StagePhotos> {
         final file = await _assetToFile(asset);
 
         setState(() {
-          fileOtherImages!.add(file);
+          ImageItem imageItem = ImageItem.fromFile(file);
+          fileOtherImages!.add(imageItem);
           convertedImageNames.add(asset.name);
           Provider.of<StageWriteProvider>(context, listen: false)
               .convertedimagenames
               .add(asset.name);
           Provider.of<StageWriteProvider>(context, listen: false)
               .fileotherimages
-              .add(file);
+              .add(imageItem);
           Provider.of<StageWriteProvider>(context, listen: false)
               .assetotherimages
               .add(asset);
@@ -118,7 +122,7 @@ class _StagePhotosState extends State<StagePhotos> {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 //otherimages 선택 함수//////////////////////////////////////////////////
-  Future<List<File>> loadAndConvertImages() async {
+  Future<List<ImageItem>> loadAndConvertImages() async {
     streamController.add([]);
     await requestPermissionIfNeeded();
     final otherImages = await MultiImagePicker.pickImages(
@@ -315,46 +319,61 @@ class _StagePhotosState extends State<StagePhotos> {
                           .isNotEmpty) {
                         return Stack(children: [
                           InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => Scaffold(
-                                    appBar: AppBar(
-                                      backgroundColor: Colors.transparent,
-                                      leading: BackButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
+                              onTap: () {
+                                // ImageItem 객체의 유형에 따라 적절한 ImageProvider 사용
+                                ImageProvider imageProvider;
+                                if (fileMainImage[0].isFile) {
+                                  imageProvider =
+                                      FileImage(fileMainImage[0].file!);
+                                } else {
+                                  // isPath 조건을 여기서는 명시하지 않음
+                                  imageProvider =
+                                      NetworkImage(fileMainImage[0].path!);
+                                }
+
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => Scaffold(
+                                      appBar: AppBar(
+                                        backgroundColor: Colors.transparent,
+                                        leading: BackButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        iconTheme: const IconThemeData(
+                                            color: PrimaryColors.basic),
                                       ),
-                                      iconTheme: const IconThemeData(
-                                          color: PrimaryColors.basic),
-                                    ),
-                                    extendBodyBehindAppBar: true,
-                                    body: PhotoView(
-                                      imageProvider:
-                                          FileImage(fileMainImage[0]),
+                                      extendBodyBehindAppBar: true,
+                                      body: PhotoView(
+                                        imageProvider: imageProvider,
+                                      ),
                                     ),
                                   ),
+                                );
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.75,
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
-                              );
-                            },
-                            child: Container(
-                              width: MediaQuery.of(context).size.width * 0.75,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                child: fileMainImage.isNotEmpty
-                                    ? Image(
-                                        image: FileImage(fileMainImage[0]),
-                                        fit: BoxFit.fill,
-                                      )
-                                    : Container(),
-                              ),
-                            ),
-                          ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: fileMainImage.isNotEmpty
+                                      ? (fileMainImage[0].isFile &&
+                                              fileMainImage[0].file != null
+                                          ? Image.file(fileMainImage[0].file!,
+                                              fit: BoxFit.fill)
+                                          : (fileMainImage[0].isPath &&
+                                                  fileMainImage[0].path != null
+                                              ? Image.network(
+                                                  fileMainImage[0].path!,
+                                                  fit: BoxFit.fill)
+                                              : Container())) // File 또는 Path가 없는 경우 빈 컨테이너
+                                      : Container(), // 이미지 리스트가 비어있는 경우
+                                ),
+                              )),
                           if (Provider.of<StageWriteProvider>(context,
                                   listen: false)
                               .filemainimage
@@ -366,7 +385,9 @@ class _StagePhotosState extends State<StagePhotos> {
                                 icon: Icon(Icons.close, color: Colors.red[900]),
                                 onPressed: () {
                                   setState(() {
-                                    assetMainImage.removeAt(0);
+                                    if (assetMainImage.isNotEmpty) {
+                                      assetMainImage.removeAt(0);
+                                    }
                                     fileMainImage.removeAt(0);
                                     Provider.of<StageWriteProvider>(context,
                                             listen: false)
@@ -454,18 +475,19 @@ class _StagePhotosState extends State<StagePhotos> {
               Column(
                 children: [
                   //외 이미지들 들어갈 자리
-                  StreamBuilder<List<File>>(
+                  StreamBuilder<List<ImageItem>>(
                     stream: streamController.stream,
                     builder: (BuildContext context,
-                        AsyncSnapshot<List<File>> snapshot) {
+                        AsyncSnapshot<List<ImageItem>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container();
+                        return Container(); // 로딩 중 표시
                       } else if (snapshot.hasData &&
                           snapshot.data!.isNotEmpty) {
                         return Column(
                           children: snapshot.data!.asMap().entries.map((entry) {
                             int index = entry.key;
-                            File file = entry.value;
+                            ImageItem imageItem = entry.value;
+
                             return Center(
                               child: Column(
                                 children: [
@@ -473,6 +495,19 @@ class _StagePhotosState extends State<StagePhotos> {
                                     children: <Widget>[
                                       InkWell(
                                         onTap: () {
+                                          ImageProvider imageProvider;
+                                          if (imageItem.isFile &&
+                                              imageItem.file != null) {
+                                            imageProvider =
+                                                FileImage(imageItem.file!);
+                                          } else if (imageItem.isPath &&
+                                              imageItem.path != null) {
+                                            imageProvider =
+                                                NetworkImage(imageItem.path!);
+                                          } else {
+                                            return; // 이미지가 없는 경우 아무것도 하지 않음
+                                          }
+
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (context) => Scaffold(
@@ -492,9 +527,8 @@ class _StagePhotosState extends State<StagePhotos> {
                                                 ),
                                                 extendBodyBehindAppBar: true,
                                                 body: PhotoView(
-                                                  imageProvider:
-                                                      FileImage(file),
-                                                ),
+                                                    imageProvider:
+                                                        imageProvider),
                                               ),
                                             ),
                                           );
@@ -510,50 +544,56 @@ class _StagePhotosState extends State<StagePhotos> {
                                                 BorderRadius.circular(30),
                                           ),
                                           child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              child: Image(
-                                                image: FileImage(file),
-                                                fit: BoxFit.fill,
-                                              )),
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            child: imageItem.isFile &&
+                                                    imageItem.file != null
+                                                ? Image.file(imageItem.file!,
+                                                    fit: BoxFit.fill)
+                                                : (imageItem.isPath &&
+                                                        imageItem.path != null
+                                                    ? Image.network(
+                                                        imageItem.path!,
+                                                        fit: BoxFit.fill)
+                                                    : Container()), // File 또는 Path가 없는 경우
+                                          ),
                                         ),
                                       ),
                                       Positioned(
                                         top: 0,
                                         right: 0,
                                         child: IconButton(
-                                          icon: Icon(
-                                            Icons.close,
-                                            color: Colors.red[900],
-                                          ),
+                                          icon: Icon(Icons.close,
+                                              color: Colors.red[900]),
                                           onPressed: () {
                                             setState(() {
-                                              String imageName =
-                                                  assetOhterImages[index].name;
-
-                                              // assetOtherImages에서 제거
-                                              assetOhterImages.removeAt(index);
-
-                                              // fileOtherImages에서 제거
-                                              fileOtherImages!.removeAt(index);
-
-                                              // convertedImageNames에서 제거
-                                              convertedImageNames
-                                                  .remove(imageName);
-
-                                              // stream에 변환된 이미지 리스트 업데이트
+                                              final provider = Provider.of<
+                                                      StageWriteProvider>(
+                                                  context,
+                                                  listen: false);
+                                              if (assetOhterImages.isNotEmpty &&
+                                                  index <
+                                                      assetOhterImages.length) {
+                                                String imageName =
+                                                    assetOhterImages[index]
+                                                        .name;
+                                                assetOhterImages
+                                                    .removeAt(index);
+                                                provider.convertedimagenames
+                                                    .remove(imageName);
+                                                convertedImageNames
+                                                    .remove(imageName);
+                                              }
+                                              if (fileOtherImages!.isNotEmpty &&
+                                                  index <
+                                                      fileOtherImages!.length) {
+                                                fileOtherImages!
+                                                    .removeAt(index);
+                                              }
                                               streamController
                                                   .add(fileOtherImages!);
-
-                                              Provider.of<StageWriteProvider>(
-                                                      context,
-                                                      listen: false)
+                                              provider
                                                   .removeOtherImageAt(index);
-                                              Provider.of<StageWriteProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .removeConvertedimagenames(
-                                                      imageName);
                                             });
                                           },
                                         ),
@@ -567,11 +607,12 @@ class _StagePhotosState extends State<StagePhotos> {
                           }).toList(),
                         );
                       } else {
-                        // 이미지가 로딩 중이면 Shimmer를 표시하고, 모든 이미지가 삭제되었다면 아무것도 표시하지 않음
+                        // 스트림에 데이터가 없는 경우
                         return Container();
                       }
                     },
                   ),
+
                   if (fileOtherImages!.length < 4)
                     Center(
                       child: DottedBorder(
@@ -622,6 +663,13 @@ class _StagePhotosState extends State<StagePhotos> {
           children: [
             ElevatedButton(
               onPressed: () {
+                final provider =
+                    Provider.of<StageWriteProvider>(context, listen: false);
+                print(provider.filemainimage);
+                print(provider.fileotherimages);
+                print(assetOhterImages);
+                print(convertedImageNames);
+                print(fileOtherImages);
                 Navigator.pop(context); // 이전 페이지로 이동
               },
               style: ElevatedButton.styleFrom(

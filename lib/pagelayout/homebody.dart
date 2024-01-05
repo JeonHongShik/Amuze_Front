@@ -174,7 +174,7 @@ class _StageBoardsState extends State<StageBoards> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 800,
+      height: 700,
       width: MediaQuery.of(context).size.width,
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(23, 20, 25, 5),

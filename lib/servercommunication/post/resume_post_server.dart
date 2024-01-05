@@ -7,27 +7,38 @@ FormData createResumeFormData({
   String? title,
   String? gender,
   String? age,
-  List<String>? regions,
-  List<String>? educations,
-  List<String>? careers,
-  List<String>? awards,
-  List<String>? completions,
+  String? regions,
+  String? educations,
+  String? careers,
+  String? awards,
+  String? completions,
   String? introduce,
-  List<File>? photos,
+  File? mainimage,
+  File? otherimages1,
+  File? otherimages2,
+  File? otherimages3,
+  File? otherimages4,
 }) {
   return FormData.fromMap({
     'author': uid,
     'title': title,
     'gender': gender,
     'age': age,
-    'regions': regions,
-    'educations': educations,
-    'careers': careers,
-    'awards': awards,
-    'completions': completions,
+    'region': regions,
+    'education': educations,
+    'career': careers,
+    'award': awards,
+    'completion': completions,
     'introduce': introduce,
-    'photos': photos
-        ?.map((File file) => MultipartFile.fromFileSync(file.path))
-        .toList(),
+    if (mainimage != null)
+      'mainimage': MultipartFile.fromFileSync(mainimage.path),
+    if (otherimages1 != null)
+      'otherimages1': MultipartFile.fromFileSync(otherimages1.path),
+    if (otherimages2 != null)
+      'otherimages2': MultipartFile.fromFileSync(otherimages2.path),
+    if (otherimages3 != null)
+      'otherimages3': MultipartFile.fromFileSync(otherimages3.path),
+    if (otherimages4 != null)
+      'otherimages4': MultipartFile.fromFileSync(otherimages4.path),
   });
 }

@@ -5,9 +5,9 @@ import 'package:amuze/mypage/editprofile.dart';
 import 'package:amuze/mypage/postmanagement.dart';
 import 'package:amuze/mypage/savedpost.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/servercommunication/get/test.dart';
+
 import 'package:flutter/material.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+
 import 'package:provider/provider.dart';
 
 class MyPage extends StatelessWidget {
@@ -142,7 +142,7 @@ class MyPage extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DataDisplayWidget(),
+                      builder: (context) => const DummyPage(),
                     ));
               }),
           const Spacer(),

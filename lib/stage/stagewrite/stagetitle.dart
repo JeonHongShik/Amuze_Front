@@ -131,6 +131,7 @@ class _StagetitleState extends State<Stagetitle> {
 
                       print('Title: ${provider.title}');
                       print('uid : ${provider.uid}');
+                      print('id : ${provider.id}');
 
                       ///////////////////////////////////////////////
                       Navigator.push(

@@ -4,7 +4,10 @@ import 'package:amuze/servercommunication/get/stage_detail_get_server.dart';
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:photo_view/photo_view.dart';
 
 class StagePost extends StatefulWidget {
   final int? id;
@@ -108,6 +111,7 @@ class _StagePostState extends State<StagePost> {
 
   @override
   Widget build(BuildContext context) {
+    int currentPageIndex = 0;
     double imageHeight = MediaQuery.of(context).size.height / 3;
     return Scaffold(
       body: CustomScrollView(
@@ -116,18 +120,92 @@ class _StagePostState extends State<StagePost> {
           SliverAppBar(
             expandedHeight: imageHeight,
             pinned: true,
-            backgroundColor: Colors.transparent, // AppBar 배경을 투명하게 설정
+            backgroundColor: Colors.transparent,
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 bool isExpanded = constraints.biggest.height > kToolbarHeight;
                 return FlexibleSpaceBar(
                   background: isExpanded
-                      ? Image.asset(
-                          'assets/images/김채원.jpg',
-                          fit: BoxFit.cover,
+                      ? FutureBuilder<List<StageDetailServerData>>(
+                          future: serverData,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                              var item = snapshot.data!.first;
+                              List<String?> imagePaths = [
+                                item.mainimage,
+                                item.otherimages1,
+                                item.otherimages2,
+                                item.otherimages3,
+                                item.otherimages4,
+                              ].where((path) => path != null).toList();
+
+                              if (imagePaths.isEmpty) {
+                                // 이미지가 없는 경우 기본 이미지 표시
+                                return Image.asset('assets/images/김채원.jpg',
+                                    fit: BoxFit.cover);
+                              } else {
+                                return PageView.builder(
+                                  itemCount: imagePaths.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => Scaffold(
+                                            appBar: AppBar(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              leading:
+                                                  BackButton(onPressed: () {
+                                                Navigator.of(context).pop();
+                                              }),
+                                              iconTheme: const IconThemeData(
+                                                  color: PrimaryColors.basic),
+                                            ),
+                                            extendBodyBehindAppBar: true,
+                                            body: PhotoViewGallery.builder(
+                                              itemCount: imagePaths.length,
+                                              builder: (context, index) {
+                                                return PhotoViewGalleryPageOptions(
+                                                  imageProvider: NetworkImage(
+                                                      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${imagePaths[index]}'),
+                                                  minScale:
+                                                      PhotoViewComputedScale
+                                                          .contained,
+                                                  maxScale:
+                                                      PhotoViewComputedScale
+                                                              .contained *
+                                                          2,
+                                                );
+                                              },
+                                              scrollPhysics:
+                                                  const BouncingScrollPhysics(),
+                                              backgroundDecoration:
+                                                  const BoxDecoration(
+                                                color: Colors.transparent,
+                                              ),
+                                              pageController: PageController(
+                                                  initialPage: index),
+                                              enableRotation: false,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      child: Image.network(
+                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${imagePaths[index]}',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            } else {
+                              return Image.asset('assets/images/김채원.jpg',
+                                  fit: BoxFit.cover);
+                            }
+                          },
                         )
                       : Container(
-                          color: Colors.grey.shade300, // AppBar가 축소될 때의 배경색
+                          color: Colors.grey.shade300,
                         ),
                 );
               },
@@ -171,6 +249,7 @@ class _StagePostState extends State<StagePost> {
                                         Text(
                                           '${item.title}' ?? 'No Title',
                                           style: const TextStyle(fontSize: 25),
+                                          maxLines: 2,
                                         ),
                                         if (item.author ==
                                             Provider.of<UserInfoProvider>(
@@ -244,6 +323,68 @@ class _StagePostState extends State<StagePost> {
                                                           .setIntroduce(
                                                               item.introduce!);
                                                     }
+                                                    if (item.mainimage !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
+                                                      ImageItem mainImageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      stageprovider
+                                                          .setFileMainimage(
+                                                              [mainImageItem]);
+                                                    }
+                                                    final provider = Provider
+                                                        .of<StageWriteProvider>(
+                                                            context,
+                                                            listen: false);
+                                                    List<ImageItem>
+                                                        otherImages = [];
+
+                                                    if (item.otherimages1 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages1!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+                                                    if (item.otherimages2 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages2!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+                                                    if (item.otherimages3 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages3!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+                                                    if (item.otherimages4 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages4!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+
+                                                    provider.setFileOtherimages(
+                                                        otherImages);
+
                                                     Navigator.push(
                                                       context,
                                                       PageRouteBuilder(
@@ -296,7 +437,7 @@ class _StagePostState extends State<StagePost> {
                                           )
                                       ],
                                     ),
-                                    Container(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Container(
