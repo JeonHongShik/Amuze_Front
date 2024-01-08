@@ -5,13 +5,17 @@ import 'package:amuze/mypage/editprofile.dart';
 import 'package:amuze/mypage/postmanagement.dart';
 import 'package:amuze/mypage/savedpost.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
 class MyPage extends StatelessWidget {
   const MyPage({super.key});
+
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,7 @@ class MyPage extends StatelessWidget {
         title: const Text(
           '마이페이지',
           style: TextStyle(
-            color: TextColors.high,
+            color: PrimaryColors.basic,
             fontSize: 20,
           ),
         ),
@@ -148,7 +152,11 @@ class MyPage extends StatelessWidget {
           const Spacer(),
           // 로그아웃 버튼
           GestureDetector(
-            onTap: () => {},
+            onTap: () async {
+              await signOut();
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/login', (Route<dynamic> route) => false);
+            },
             child: Container(
               padding: const EdgeInsets.all(25),
               alignment: Alignment.bottomLeft,

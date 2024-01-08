@@ -65,6 +65,7 @@ dependencies:
   dio: ^5.4.0
   permission_handler: ^11.1.0
   firebase_storage: ^11.5.6
+  flutter_launcher_icons: ^0.13.1
   
   
   

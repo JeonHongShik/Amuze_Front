@@ -95,18 +95,6 @@ class LoginPage extends StatelessWidget {
                   await peristalsis();
                 },
               ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(
-                      Size(MediaQuery.of(context).size.width * 0.55, 50)),
-                ),
-                child: const Text(
-                  'Apple로 로그인 하기',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {},
-              )
             ],
           ),
         ),
