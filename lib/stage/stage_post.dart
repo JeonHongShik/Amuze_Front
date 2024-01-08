@@ -1,6 +1,6 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
-import 'package:amuze/servercommunication/get/stage_detail_get_server.dart';
+import 'package:amuze/server_communication/get/stage_detail_get_server.dart';
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';

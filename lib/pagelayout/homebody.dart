@@ -5,7 +5,7 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_board.dart';
 import 'package:amuze/stage/stage_post.dart';
-import 'package:amuze/servercommunication/get/stage_priview_get_server.dart';
+import 'package:amuze/server_communication/get/stage_preview_get_server.dart';
 import 'package:amuze/stage/stage_board.dart';
 import 'package:flutter/material.dart';
 
@@ -29,12 +29,12 @@ class HomeBody extends StatelessWidget {
                   TopBoardRowBlank(),
                   TopBoard(
                     label: '공고 게시판',
-                    imagePath: null,
+                    imagePath: 'assets/images/공고_게시판_이미지.png',
                   ),
                   TopBoardRowBlank(),
                   TopBoard(
                     label: '이력서 게시판',
-                    imagePath: 'assets/images/이력서_게시판_이미지.png',
+                    imagePath: 'assets/images/이력서_게시판_이미지_다른버전.png',
                   ),
                   TopBoardRowBlank(),
                   TopBoard(
@@ -97,7 +97,7 @@ class _TopBoardState extends State<TopBoard> {
             height: 100,
             width: MediaQuery.of(context).size.width * 0.25,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(25),
               image: widget.imagePath != null
                   ? DecorationImage(
                       image: AssetImage(widget.imagePath!), fit: BoxFit.cover)

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-class ResumePreviewServerData {
+class ResumeDetailServerData {
   int? id;
   String? author;
   String? title;
@@ -9,15 +9,16 @@ class ResumePreviewServerData {
   List<String>? education;
   List<String>? careers;
   List<String>? awards;
-  List<String>? completion;
+  //List<String>? completion;
   List<String>? regions;
+  String? introduce;
   String? mainimage;
   String? otherimage1;
   String? otherimage2;
   String? otherimage3;
   String? otherimage4;
 
-  ResumePreviewServerData({
+  ResumeDetailServerData({
     required this.id,
     required this.author,
     required this.title,
@@ -26,7 +27,8 @@ class ResumePreviewServerData {
     required this.education,
     required this.careers,
     required this.awards,
-    required this.completion,
+    //required this.completion,
+    required this.introduce,
     required this.regions,
     required this.mainimage,
     required this.otherimage1,
@@ -35,7 +37,7 @@ class ResumePreviewServerData {
     required this.otherimage4,
   });
 
-  factory ResumePreviewServerData.fromJson(Map<String, dynamic> json) {
+  factory ResumeDetailServerData.fromJson(Map<String, dynamic> json) {
     try {
       List<String>? educationList;
       if (json['educations'] != null) {
@@ -54,19 +56,19 @@ class ResumePreviewServerData {
         awardsList =
             (json['awards'] as List).map((e) => e['award'] as String).toList();
       }
-      List<String>? completionsList;
+      /*List<String>? completionsList;
       if (json['completions'] != null) {
         completionsList = (json['completions'] as List)
             .map((e) => e['completion'] as String)
             .toList();
-      }
+      }*/
       List<String>? regionsList;
       if (json['regions'] != null) {
         regionsList = (json['regions'] as List)
             .map((e) => e['region'] as String)
             .toList();
       }
-      return ResumePreviewServerData(
+      return ResumeDetailServerData(
         id: json['id'],
         author: json['author'],
         title: json['title'],
@@ -75,8 +77,9 @@ class ResumePreviewServerData {
         education: educationList,
         careers: careersList,
         awards: awardsList,
-        completion: completionsList,
+        //completion: completionsList,
         regions: regionsList,
+        introduce: json['introduce'],
         mainimage: json['mainimage'],
         otherimage1: json['otherimages1'],
         otherimage2: json['otherimages2'],
@@ -90,11 +93,9 @@ class ResumePreviewServerData {
   }
 }
 
-Future<List<ResumePreviewServerData>> resumepreviewfetchData() async {
+Future<List<ResumeDetailServerData>> resumedetailfetchData(int id) async {
   var dio = Dio();
   final response = await dio.get(
-      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/resume/');
-  return (response.data as List)
-      .map((json) => ResumePreviewServerData.fromJson(json))
-      .toList();
+      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/resume/${id.toString()}/');
+  return [ResumeDetailServerData.fromJson(response.data)];
 }

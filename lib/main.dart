@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
-import 'package:amuze/servercommunication/post/resume_post_server.dart';
-import 'package:amuze/servercommunication/post/stage_post_server.dart';
+import 'package:amuze/server_communication/post/resume_post_server.dart';
+import 'package:amuze/server_communication/post/stage_post_server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -662,6 +662,8 @@ class StageWriteProvider extends ChangeNotifier {
           _filemainimage.first.path != null) {
         formData.fields.add(MapEntry('mainimage', _filemainimage.first.path!));
       }
+    } else {
+      formData.fields.add(const MapEntry('mainimage', 'null'));
     }
 
     // 다른 이미지들 추가
@@ -675,6 +677,8 @@ class StageWriteProvider extends ChangeNotifier {
           _fileotherimages[i].path != null) {
         formData.fields
             .add(MapEntry('otherimages${i + 1}', _fileotherimages[i].path!));
+      } else {
+        formData.fields.add(MapEntry('otherimages${i + 1}', 'null'));
       }
     }
 

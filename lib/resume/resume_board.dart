@@ -2,12 +2,10 @@ import 'dart:math';
 
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:amuze/resume/resume_post.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
-import 'package:amuze/servercommunication/get/resume_priview_get_server.dart';
-import 'package:amuze/stage/stage_post.dart';
-import 'package:amuze/servercommunication/get/stage_priview_get_server.dart';
+import 'package:amuze/server_communication/get/resume_priview_get_server.dart';
 
-import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -36,7 +34,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
         iconTheme: const IconThemeData(color: PrimaryColors.basic),
         title: const Text(
           '이력서 게시판',
-          style: TextStyle(color: TextColors.high),
+          style: TextStyle(color: PrimaryColors.basic),
         ),
         actions: [
           IconButton(
@@ -126,7 +124,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => StagePost(id: data.id),
+                              builder: (context) => ResumePost(id: data.id),
                             )).then((_) => setState(() {
                               serverData = resumepreviewfetchData();
                             }));
