@@ -6,10 +6,10 @@ class ResumeDetailServerData {
   String? title;
   String? age;
   String? gender;
-  List<String>? education;
+  List<String>? educations;
   List<String>? careers;
   List<String>? awards;
-  //List<String>? completion;
+  List<String>? completions;
   List<String>? regions;
   String? introduce;
   String? mainimage;
@@ -24,10 +24,10 @@ class ResumeDetailServerData {
     required this.title,
     required this.age,
     required this.gender,
-    required this.education,
+    required this.educations,
     required this.careers,
     required this.awards,
-    //required this.completion,
+    required this.completions,
     required this.introduce,
     required this.regions,
     required this.mainimage,
@@ -56,12 +56,12 @@ class ResumeDetailServerData {
         awardsList =
             (json['awards'] as List).map((e) => e['award'] as String).toList();
       }
-      /*List<String>? completionsList;
+      List<String>? completionsList;
       if (json['completions'] != null) {
         completionsList = (json['completions'] as List)
             .map((e) => e['completion'] as String)
             .toList();
-      }*/
+      }
       List<String>? regionsList;
       if (json['regions'] != null) {
         regionsList = (json['regions'] as List)
@@ -74,10 +74,10 @@ class ResumeDetailServerData {
         title: json['title'],
         age: json['age'],
         gender: json['gender'],
-        education: educationList,
+        educations: educationList,
         careers: careersList,
         awards: awardsList,
-        //completion: completionsList,
+        completions: completionsList,
         regions: regionsList,
         introduce: json['introduce'],
         mainimage: json['mainimage'],

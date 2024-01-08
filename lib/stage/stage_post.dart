@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+
 import 'package:photo_view/photo_view.dart';
 
 class StagePost extends StatefulWidget {
@@ -231,222 +231,215 @@ class _StagePostState extends State<StagePost> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Container(
-                                decoration: const BoxDecoration(
-                                    border: Border(
-                                        bottom:
-                                            BorderSide(color: Colors.grey))),
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 10, 0, 0),
-                                width: MediaQuery.of(context).size.width,
-                                height: 110,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '${item.title}' ?? 'No Title',
-                                          style: const TextStyle(fontSize: 25),
-                                          maxLines: 2,
-                                        ),
-                                        if (item.author ==
-                                            Provider.of<UserInfoProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .displayName)
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                  onPressed: () async {
-                                                    final stageprovider = Provider
-                                                        .of<StageWriteProvider>(
-                                                            context,
-                                                            listen: false);
-                                                    if (item.id != null) {
-                                                      stageprovider.id =
-                                                          item.id;
-                                                    }
-                                                    if (item.author != null &&
+                              decoration: const BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(color: Colors.grey))),
+                              padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
+                              width: MediaQuery.of(context).size.width,
+                              height: 110,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${item.title}',
+                                        style: const TextStyle(fontSize: 25),
+                                        maxLines: 2,
+                                      ),
+                                      if (item.author ==
+                                          Provider.of<UserInfoProvider>(context,
+                                                  listen: false)
+                                              .displayName)
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                                onPressed: () async {
+                                                  final stageprovider = Provider
+                                                      .of<StageWriteProvider>(
+                                                          context,
+                                                          listen: false);
+                                                  if (item.id != null) {
+                                                    stageprovider.id = item.id;
+                                                  }
+                                                  /*if (item.author != null &&
                                                         item.author != '') {
                                                       stageprovider.uid =
                                                           item.author;
-                                                    }
-                                                    if (item.title != null &&
-                                                        item.title != '') {
-                                                      stageprovider.setTitle(
-                                                          item.title!);
-                                                    }
-                                                    if (item.region != null &&
-                                                        item.region != '') {
-                                                      stageprovider.setRegion(
-                                                          item.region!);
-                                                    }
-                                                    if (item.type != null &&
-                                                        item.type != '') {
-                                                      stageprovider
-                                                          .setType(item.type!);
-                                                    }
-                                                    if (item.type != null &&
-                                                        item.type != '') {
-                                                      stageprovider
-                                                          .setType(item.type!);
-                                                    }
+                                                    }*/
+                                                  if (item.title != null &&
+                                                      item.title != '') {
+                                                    stageprovider
+                                                        .setTitle(item.title!);
+                                                  }
+                                                  if (item.region != null &&
+                                                      item.region != '') {
+                                                    stageprovider.setRegion(
+                                                        item.region!);
+                                                  }
+                                                  if (item.type != null &&
+                                                      item.type != '') {
+                                                    stageprovider
+                                                        .setType(item.type!);
+                                                  }
+                                                  if (item.type != null &&
+                                                      item.type != '') {
+                                                    stageprovider
+                                                        .setType(item.type!);
+                                                  }
 
-                                                    if (item.wishtype != null &&
-                                                        item.wishtype != '') {
-                                                      stageprovider.setWishtype(
-                                                          item.wishtype!);
-                                                    }
-                                                    if (item.pay != null &&
-                                                        item.pay != '') {
-                                                      stageprovider
-                                                          .setPay(item.pay!);
-                                                    }
-                                                    if (item.deadline != null &&
-                                                        item.deadline != '') {
-                                                      stageprovider.setDeadline(
-                                                          item.deadline!);
-                                                    }
-                                                    if (item.datetime != null &&
-                                                        item.datetime != '') {
-                                                      stageprovider.setDatetime(
-                                                          item.datetime!);
-                                                      stageprovider
-                                                          .splitDateAndTimeAsync();
-                                                    }
-                                                    if (item.introduce !=
-                                                            null &&
-                                                        item.introduce != '') {
-                                                      stageprovider
-                                                          .setIntroduce(
-                                                              item.introduce!);
-                                                    }
-                                                    if (item.mainimage !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
-                                                      ImageItem mainImageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      stageprovider
-                                                          .setFileMainimage(
-                                                              [mainImageItem]);
-                                                    }
-                                                    final provider = Provider
-                                                        .of<StageWriteProvider>(
-                                                            context,
-                                                            listen: false);
-                                                    List<ImageItem>
-                                                        otherImages = [];
+                                                  if (item.wishtype != null &&
+                                                      item.wishtype != '') {
+                                                    stageprovider.setWishtype(
+                                                        item.wishtype!);
+                                                  }
+                                                  if (item.pay != null &&
+                                                      item.pay != '') {
+                                                    stageprovider
+                                                        .setPay(item.pay!);
+                                                  }
+                                                  if (item.deadline != null &&
+                                                      item.deadline != '') {
+                                                    stageprovider.setDeadline(
+                                                        item.deadline!);
+                                                  }
+                                                  if (item.datetime != null &&
+                                                      item.datetime != '') {
+                                                    stageprovider.setDatetime(
+                                                        item.datetime!);
+                                                    stageprovider
+                                                        .splitDateAndTimeAsync();
+                                                  }
+                                                  if (item.introduce != null &&
+                                                      item.introduce != '') {
+                                                    stageprovider.setIntroduce(
+                                                        item.introduce!);
+                                                  }
+                                                  if (item.mainimage != null) {
+                                                    String fullImageUrl =
+                                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
+                                                    ImageItem mainImageItem =
+                                                        ImageItem.fromPath(
+                                                            fullImageUrl);
+                                                    stageprovider
+                                                        .setFileMainimage(
+                                                            [mainImageItem]);
+                                                  }
 
-                                                    if (item.otherimages1 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages1!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-                                                    if (item.otherimages2 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages2!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-                                                    if (item.otherimages3 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages3!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-                                                    if (item.otherimages4 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages4!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
+                                                  List<ImageItem> otherImages =
+                                                      [];
 
-                                                    provider.setFileOtherimages(
-                                                        otherImages);
+                                                  if (item.otherimages1 !=
+                                                      null) {
+                                                    String fullImageUrl =
+                                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages1!}';
+                                                    ImageItem imageItem =
+                                                        ImageItem.fromPath(
+                                                            fullImageUrl);
+                                                    otherImages.add(imageItem);
+                                                  }
+                                                  if (item.otherimages2 !=
+                                                      null) {
+                                                    String fullImageUrl =
+                                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages2!}';
+                                                    ImageItem imageItem =
+                                                        ImageItem.fromPath(
+                                                            fullImageUrl);
+                                                    otherImages.add(imageItem);
+                                                  }
+                                                  if (item.otherimages3 !=
+                                                      null) {
+                                                    String fullImageUrl =
+                                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages3!}';
+                                                    ImageItem imageItem =
+                                                        ImageItem.fromPath(
+                                                            fullImageUrl);
+                                                    otherImages.add(imageItem);
+                                                  }
+                                                  if (item.otherimages4 !=
+                                                      null) {
+                                                    String fullImageUrl =
+                                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages4!}';
+                                                    ImageItem imageItem =
+                                                        ImageItem.fromPath(
+                                                            fullImageUrl);
+                                                    otherImages.add(imageItem);
+                                                  }
 
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation,
-                                                                secondaryAnimation) =>
-                                                            const Stagetitle(),
-                                                        transitionsBuilder:
-                                                            (context,
-                                                                animation,
-                                                                secondaryAnimation,
-                                                                child) {
-                                                          var begin =
-                                                              const Offset(
-                                                                  1.0, 0.0);
-                                                          var end = Offset.zero;
-                                                          var tween = Tween(
-                                                              begin: begin,
-                                                              end: end);
-                                                          var offsetAnimation =
-                                                              animation
-                                                                  .drive(tween);
+                                                  stageprovider
+                                                      .setFileOtherimages(
+                                                          otherImages);
 
-                                                          return SlideTransition(
-                                                            position:
-                                                                offsetAnimation,
-                                                            child: child,
-                                                          );
-                                                        },
-                                                      ),
-                                                    ).then((_) {
-                                                      setState(() {
-                                                        serverData =
-                                                            stagedetailfetchData(
-                                                                widget.id!);
-                                                      });
+                                                  Navigator.push(
+                                                    context,
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context,
+                                                              animation,
+                                                              secondaryAnimation) =>
+                                                          const Stagetitle(),
+                                                      transitionsBuilder:
+                                                          (context,
+                                                              animation,
+                                                              secondaryAnimation,
+                                                              child) {
+                                                        var begin =
+                                                            const Offset(
+                                                                1.0, 0.0);
+                                                        var end = Offset.zero;
+                                                        var tween = Tween(
+                                                            begin: begin,
+                                                            end: end);
+                                                        var offsetAnimation =
+                                                            animation
+                                                                .drive(tween);
+
+                                                        return SlideTransition(
+                                                          position:
+                                                              offsetAnimation,
+                                                          child: child,
+                                                        );
+                                                      },
+                                                    ),
+                                                  ).then((_) {
+                                                    setState(() {
+                                                      serverData =
+                                                          stagedetailfetchData(
+                                                              widget.id!);
                                                     });
-                                                  },
-                                                  icon: const Icon(Icons.edit)),
-                                              IconButton(
-                                                  onPressed: () async {
-                                                    await _showDeleteDialog(
-                                                        context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: IconColors.inactive,
-                                                  )),
-                                            ],
-                                          )
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child:
-                                            Text(item.author ?? 'No Author')),
-                                  ],
-                                )),
+                                                  });
+                                                },
+                                                icon: const Icon(Icons.edit)),
+                                            IconButton(
+                                                onPressed: () async {
+                                                  await _showDeleteDialog(
+                                                      context);
+                                                },
+                                                icon: const Icon(
+                                                  Icons.delete,
+                                                  color: IconColors.inactive,
+                                                )),
+                                          ],
+                                        )
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      //여기에 author를 firestore에 비교해서 프로필사진 가져와야 함.
+                                      Container(
+                                          margin:
+                                              const EdgeInsets.only(bottom: 10),
+                                          child:
+                                              Text(item.author ?? 'No Author')),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                             buildNullableInfo('원하는 무용 종류', item.wishtype),
                             buildNullableInfo('무대 종류', item.type),
                             buildNullableInfo('공연 일시', item.datetime),
@@ -466,6 +459,21 @@ class _StagePostState extends State<StagePost> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: PrimaryColors.basic,
+            foregroundColor: Colors.white,
+            minimumSize: Size(MediaQuery.of(context).size.width, 50),
+          ),
+          child: const Text(
+            '채팅',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
       ),
     );
   }
@@ -494,7 +502,7 @@ Widget buildNullableInfo(String label, String? value) {
                 ),
                 Text(
                   value,
-                  style: const TextStyle(color: TextColors.high, fontSize: 20),
+                  style: const TextStyle(color: TextColors.high, fontSize: 18),
                 )
               ],
             ),

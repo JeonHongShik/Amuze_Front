@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
+import 'package:amuze/server_communication/patch/resume_patch_server.dart';
+import 'package:amuze/server_communication/patch/stage_patch_server.dart';
 import 'package:amuze/server_communication/post/resume_post_server.dart';
 import 'package:amuze/server_communication/post/stage_post_server.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +112,7 @@ class UserInfoProvider extends ChangeNotifier {
 //이력서 작성 Provider//////////////////////////////////////////////////////////
 class ResumeWriteProvider extends ChangeNotifier {
   String? uid;
-  int? id;
+  String? id;
   String _title = '';
   String _gender = '';
   String _age = '';
@@ -336,11 +338,23 @@ class ResumeWriteProvider extends ChangeNotifier {
 
   Future<void> patchResumeData() async {
     Dio dio = Dio();
+    String careersString = _careers.join(",");
+    String regionsString = _regions.join(",");
+    String educationsString = _educations.join(",");
+    String awardsString = _awards.join(",");
+    String completionsString = _completions.join(",");
 
-    FormData formData = createStageFormData(
+    FormData formData = patchResumeFormData(
+      id: id,
       uid: uid,
       title: _title,
-      // 값 추가 해야 됨.
+      age: _age,
+      gender: _gender,
+      educations: educationsString,
+      careers: careersString,
+      awards: awardsString,
+      completions: completionsString,
+      regions: regionsString,
       introduce: _introduce,
     );
     if (_filemainimage.isNotEmpty) {
@@ -353,9 +367,10 @@ class ResumeWriteProvider extends ChangeNotifier {
           _filemainimage.first.path != null) {
         formData.fields.add(MapEntry('mainimage', _filemainimage.first.path!));
       }
+    } else {
+      formData.fields.add(const MapEntry('mainimage', 'null'));
     }
 
-    // 다른 이미지들 추가
     for (int i = 0; i < _fileotherimages.length && i < 4; i++) {
       if (_fileotherimages[i].isFile && _fileotherimages[i].file != null) {
         formData.files.add(MapEntry(
@@ -366,13 +381,15 @@ class ResumeWriteProvider extends ChangeNotifier {
           _fileotherimages[i].path != null) {
         formData.fields
             .add(MapEntry('otherimages${i + 1}', _fileotherimages[i].path!));
+      } else {
+        formData.fields.add(MapEntry('otherimages${i + 1}', 'null'));
       }
     }
 
     try {
       // 서버에 POST 요청
       Response response = await dio.patch(
-          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/patch/${id.toString()}/',
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/resume/patch/$id/',
           data: formData);
       print(response.data); // 응답 출력
     } catch (e) {
@@ -641,7 +658,7 @@ class StageWriteProvider extends ChangeNotifier {
   Future<void> patchStageData() async {
     Dio dio = Dio();
     await mergeDateAndTimeAsync();
-    FormData formData = createStageFormData(
+    FormData formData = patchStageFormData(
       uid: uid,
       title: _title,
       region: _region,
@@ -666,7 +683,6 @@ class StageWriteProvider extends ChangeNotifier {
       formData.fields.add(const MapEntry('mainimage', 'null'));
     }
 
-    // 다른 이미지들 추가
     for (int i = 0; i < _fileotherimages.length && i < 4; i++) {
       if (_fileotherimages[i].isFile && _fileotherimages[i].file != null) {
         formData.files.add(MapEntry(
@@ -683,7 +699,6 @@ class StageWriteProvider extends ChangeNotifier {
     }
 
     try {
-      // 서버에 POST 요청
       Response response = await dio.patch(
           'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/patch/${id.toString()}/',
           data: formData);

@@ -158,6 +158,9 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
                           print('Awards : ${provider.awards}');
                           print('Completions : ${provider.completions}');
                           print('Introduce : ${provider.introduce}');
+                          print(provider.id);
+                          print(provider.uid);
+
                           ///////////////////////////////////////////////
                           Navigator.push(
                             context,

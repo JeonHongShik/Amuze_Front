@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:dio/dio.dart';
 
 //로그인 후 sucure_storage에 정보 저장
 Future<void> saveFirebaseAccountInfo() async {
@@ -24,6 +25,19 @@ Future<void> saveFirebaseAccountInfo() async {
   await storage.write(key: 'email', value: user?.email);
   await storage.write(key: 'displayName', value: user?.displayName);
   await storage.write(key: 'photoURL', value: user?.photoURL);
+}
+
+Future<void> peristalsis() async {
+  var dio = Dio();
+  try {
+    String url =
+        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/accounts/SignUp/';
+    Response response = await dio.get(url);
+    print("Response data: ${response.data}");
+    print("Response status: ${response.statusCode}");
+  } catch (e) {
+    print("Error making GET request: $e");
+  }
 }
 
 class LoginPage extends StatelessWidget {
@@ -78,6 +92,7 @@ class LoginPage extends StatelessWidget {
                   } catch (error) {
                     print('카카오계정으로 로그인 실패 $error');
                   }
+                  await peristalsis();
                 },
               ),
               const SizedBox(height: 30),

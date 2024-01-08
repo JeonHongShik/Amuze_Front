@@ -13,6 +13,7 @@ import '../gathercolors.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:dio/dio.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -96,6 +97,19 @@ class _EditProfileState extends State<EditProfile> {
     if (user != null) {
       await user.updateDisplayName(newName);
       await user.reload(); // 사용자 정보를 최신 상태로 새로고침
+    }
+  }
+
+  Future<void> peristalsis() async {
+    var dio = Dio();
+    try {
+      String url =
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/accounts/SignUp/';
+      Response response = await dio.get(url);
+      print("Response data: ${response.data}");
+      print("Response status: ${response.statusCode}");
+    } catch (e) {
+      print("Error making GET request: $e");
     }
   }
 
@@ -248,7 +262,7 @@ class _EditProfileState extends State<EditProfile> {
                           await updateUserNameInFirestore(nameController.text);
                           await userInfoProvider
                               .updateUserName(nameController.text);
-
+                          await peristalsis();
                           Navigator.of(context).pop();
                         }
                       : null,

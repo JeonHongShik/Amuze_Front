@@ -260,6 +260,119 @@ class _ResumePostState extends State<ResumePost> {
                                             children: [
                                               IconButton(
                                                   onPressed: () async {
+                                                    final resumeprovider = Provider
+                                                        .of<ResumeWriteProvider>(
+                                                            context,
+                                                            listen: false);
+                                                    if (item.id != null) {
+                                                      resumeprovider.id =
+                                                          item.id.toString();
+                                                    }
+                                                    if (item.title != null) {
+                                                      resumeprovider.setTitle(
+                                                          item.title!);
+                                                    }
+                                                    if (item.title != null) {
+                                                      resumeprovider.setTitle(
+                                                          item.title!);
+                                                    }
+                                                    if (item.gender != null) {
+                                                      resumeprovider.setGender(
+                                                          item.gender!);
+                                                    }
+                                                    if (item.age != null) {
+                                                      resumeprovider
+                                                          .setAge(item.age!);
+                                                    }
+                                                    if (item.regions != null) {
+                                                      resumeprovider.setRegions(
+                                                          item.regions!);
+                                                    }
+                                                    if (item.educations !=
+                                                        null) {
+                                                      resumeprovider
+                                                          .setEducations(
+                                                              item.educations!);
+                                                    }
+                                                    if (item.careers != null) {
+                                                      resumeprovider.setCareers(
+                                                          item.careers!);
+                                                    }
+                                                    if (item.awards != null) {
+                                                      resumeprovider.setAwards(
+                                                          item.awards!);
+                                                    }
+                                                    if (item.completions !=
+                                                        null) {
+                                                      resumeprovider
+                                                          .setCompletions(item
+                                                              .completions!);
+                                                    }
+                                                    if (item.introduce !=
+                                                        null) {
+                                                      resumeprovider
+                                                          .setIntroduce(
+                                                              item.introduce!);
+                                                    }
+                                                    if (item.mainimage !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
+                                                      ImageItem mainImageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      resumeprovider
+                                                          .setFileMainimage(
+                                                              [mainImageItem]);
+                                                    }
+
+                                                    List<ImageItem>
+                                                        otherImages = [];
+
+                                                    if (item.otherimage1 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage1!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+                                                    if (item.otherimage2 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage2!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+                                                    if (item.otherimage3 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage3!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+                                                    if (item.otherimage4 !=
+                                                        null) {
+                                                      String fullImageUrl =
+                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage4!}';
+                                                      ImageItem imageItem =
+                                                          ImageItem.fromPath(
+                                                              fullImageUrl);
+                                                      otherImages
+                                                          .add(imageItem);
+                                                    }
+
+                                                    resumeprovider
+                                                        .setFileOtherimages(
+                                                            otherImages);
                                                     Navigator.push(
                                                       context,
                                                       PageRouteBuilder(
@@ -324,10 +437,11 @@ class _ResumePostState extends State<ResumePost> {
                                 )),
                             buildNullableInfo('나이', item.age),
                             buildNullableInfo('성별', item.gender),
-                            listNullableInfo('학력', item.education),
+                            listNullableInfo('학력', item.educations),
                             listNullableInfo('활동지역', item.regions),
                             listNullableInfo('경력', item.careers),
                             listNullableInfo('수상', item.awards),
+                            listNullableInfo('수료', item.completions),
                             buildNullableInfo('자기소개서', item.introduce),
                           ],
                         );
@@ -341,6 +455,21 @@ class _ResumePostState extends State<ResumePost> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: PrimaryColors.basic,
+            foregroundColor: Colors.white,
+            minimumSize: Size(MediaQuery.of(context).size.width, 50),
+          ),
+          child: const Text(
+            '채팅',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
       ),
     );
   }
@@ -369,7 +498,7 @@ Widget buildNullableInfo(String label, String? value) {
                 ),
                 Text(
                   value,
-                  style: const TextStyle(color: TextColors.high, fontSize: 20),
+                  style: const TextStyle(color: TextColors.high, fontSize: 18),
                 )
               ],
             ),
@@ -397,7 +526,7 @@ Widget listNullableInfo(String label, List<String>? value) {
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
                 item,
-                style: const TextStyle(color: TextColors.high, fontSize: 20),
+                style: const TextStyle(color: TextColors.high, fontSize: 18),
               ),
             )),
       ],

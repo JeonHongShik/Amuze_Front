@@ -39,7 +39,7 @@ class HomeBody extends StatelessWidget {
                   TopBoardRowBlank(),
                   TopBoard(
                     label: '커뮤니티',
-                    imagePath: null,
+                    imagePath: 'assets/images/커뮤니티_게시판_이미지.png',
                   ),
                   TopBoardRowBlank()
                 ],
