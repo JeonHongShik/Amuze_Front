@@ -172,13 +172,15 @@ class _StageBoardState extends State<StageBoard> {
                                     Container(
                                       padding: const EdgeInsets.only(left: 13),
                                       height: 42,
-                                      child: Text(
-                                        data.title!,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            fontSize: 16.5,
-                                            fontWeight: FontWeight.w500),
-                                      ),
+                                      child: data.title != null
+                                          ? Text(
+                                              data.title!,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontSize: 16.5,
+                                                  fontWeight: FontWeight.w500),
+                                            )
+                                          : const SizedBox.shrink(),
                                     ),
                                     SizedBox(
                                       height: 44,
@@ -192,7 +194,7 @@ class _StageBoardState extends State<StageBoard> {
                                             height: 20,
                                             child: Row(
                                               children: [
-                                                data.pay!.isNotEmpty
+                                                data.pay != null
                                                     ? Text(
                                                         '${data.pay}원 · ',
                                                         style: const TextStyle(
@@ -202,20 +204,26 @@ class _StageBoardState extends State<StageBoard> {
                                                         ),
                                                       )
                                                     : const SizedBox.shrink(),
-                                                Text(
-                                                  '${data.type!} · ',
-                                                  style: const TextStyle(
-                                                    fontSize: 13,
-                                                    color: TextColors.medium,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  data.region!,
-                                                  style: const TextStyle(
-                                                    fontSize: 13,
-                                                    color: TextColors.medium,
-                                                  ),
-                                                )
+                                                data.type != null
+                                                    ? Text(
+                                                        '${data.type!} · ',
+                                                        style: const TextStyle(
+                                                          fontSize: 13,
+                                                          color:
+                                                              TextColors.medium,
+                                                        ),
+                                                      )
+                                                    : const SizedBox.shrink(),
+                                                data.region != null
+                                                    ? Text(
+                                                        data.region!,
+                                                        style: const TextStyle(
+                                                          fontSize: 13,
+                                                          color:
+                                                              TextColors.medium,
+                                                        ),
+                                                      )
+                                                    : const SizedBox.shrink(),
                                               ],
                                             ),
                                           ),
