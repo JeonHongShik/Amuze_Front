@@ -4,8 +4,6 @@ import 'package:amuze/homepage.dart';
 import 'package:amuze/loginpage.dart';
 import 'package:amuze/server_communication/patch/resume_patch_server.dart';
 import 'package:amuze/server_communication/patch/stage_patch_server.dart';
-import 'package:amuze/server_communication/post/resume_post_server.dart';
-import 'package:amuze/server_communication/post/stage_post_server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
