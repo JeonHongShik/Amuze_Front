@@ -69,7 +69,7 @@ class IconColors {
   //위계도 1순위
   static const Color active = Color(0xFF212121);
   //위계도 2순위
-  static const Color inactive = Color(0xFF666666);
+  static const Color inactive = Color(0xFFACACAC);
   //위계도 3순위
   static const Color disabled = Color(0xFF9E9E9E);
 }

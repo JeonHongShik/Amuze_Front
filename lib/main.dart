@@ -15,6 +15,8 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:dio/dio.dart';
 
+import 'server_communication/patch/community_patch._server.dart';
+
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +56,10 @@ void main() async {
           ),
           ChangeNotifierProvider(
             create: (c) => StageWriteProvider(),
-          )
+          ),
+          ChangeNotifierProvider(
+            create: (c) => CommunityWriteProvider(),
+          ),
         ],
         child: MaterialApp(
           initialRoute: auth.FirebaseAuth.instance.currentUser == null
@@ -707,48 +712,72 @@ class StageWriteProvider extends ChangeNotifier {
   }
 }
 
-// // 커뮤니티 게시물 작성 Provider /////////////////////////////////////
-// class CommunityWriteProvider extends ChangeNotifier {
-//   String? writer;
-//   String _title = '';
-//   String _content = '';
+// 커뮤니티 게시물 작성 Provider /////////////////////////////////////
+class CommunityWriteProvider extends ChangeNotifier {
+  int? id;
+  String? author;
+  String _title = '';
+  String _content = '';
 
-//   String get title => _title;
-//   String get content => _content;
+  String get title => _title;
+  String get content => _content;
 
-//   void setTitle(String title) {
-//     _title = title;
-//     notifyListeners();
-//   }
+  void setTitle(String title) {
+    _title = title;
+    notifyListeners();
+  }
 
-//   void setContent(String title) {
-//     _title = title;
-//     notifyListeners();
-//   }
+  void setContent(String content) {
+    _content = content;
+    notifyListeners();
+  }
 
-//   void reset() {
-//     writer = '';
-//     _title = '';
-//     _content = '';
-//   }
+  void reset() {
+    id = null;
+    author = '';
+    _title = '';
+    _content = '';
+  }
 
-//   Future<void> postCommunityData(String serverEndpoint) async {
-//     Dio dio = Dio();
-//     FormData formdata = createCommunityFormData(
-//       writer: writer,
-//       title: _title,
-//       content: _content,
-//     );
+  Future<void> postCommunityData() async {
+    Dio dio = Dio();
 
-//     try {
-//       // 서버에 POST 요청
-//       Response response = await dio.post(serverEndpoint, data: formdata);
-//       print(response.data); // 응답 출력
-//     } catch (e) {
-//       print(e);
-//     }
-//   }
-// }
+    FormData formdata = FormData.fromMap({
+      'uid': author,
+      'title': _title,
+      'content': _content,
+    });
+
+    try {
+      // 서버에 POST 요청
+      Response response = await dio.post(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/communities/community/create/',
+          data: formdata);
+      print(response.data); // 응답 출력
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> patchCommunityData() async {
+    Dio dio = Dio();
+
+    FormData formData = patchCommunityFormData(
+      author: author,
+      title: title,
+      content: content,
+    );
+
+    try {
+      Response response = await dio.patch(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/communities/community/patch/${id.toString()}/',
+          data: formData);
+      print(response.data);
+    } catch (e) {
+      print(e);
+    }
+  }
+}
 
 //이거는 사용 안하는데 test폴더의 widget_test.dart 파일에서의 오류 때문에 유지
 class MyApp extends StatelessWidget {
