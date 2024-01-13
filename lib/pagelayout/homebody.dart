@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:amuze/community/community_board.dart';
+import 'package:amuze/community/community_post.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_board.dart';
+import 'package:amuze/server_communication/get/community_preview_get_server.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:amuze/server_communication/get/stage_preview_get_server.dart';
 import 'package:amuze/stage/stage_board.dart';
@@ -506,9 +508,22 @@ class _ResumeBoardsState extends State<ResumeBoards> {
 ////////////////////////////////////////////////////////////////////////////////
 
 //커뮤니티게시판들//////////////////////////////////////////////////////////////////////
-class ComunityBoards extends StatelessWidget {
+class ComunityBoards extends StatefulWidget {
   final String title;
   const ComunityBoards({super.key, required this.title});
+
+  @override
+  State<ComunityBoards> createState() => _ComunityBoardsState();
+}
+
+class _ComunityBoardsState extends State<ComunityBoards> {
+  late Future<List<CommunityPreviewServerData>> serverData;
+
+  @override
+  void initState() {
+    super.initState();
+    serverData = communitypreviewfetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -523,7 +538,7 @@ class ComunityBoards extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
@@ -533,7 +548,8 @@ class ComunityBoards extends StatelessWidget {
                 onPressed: () => {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DummyPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const CommunityBoard()),
                   ),
                 },
                 child: const Text(
@@ -546,61 +562,159 @@ class ComunityBoards extends StatelessWidget {
           const SizedBox(
             height: 15,
           ),
-          Container(
-            height: 120,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Container(
-            height: 120,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Container(
-            height: 120,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Container(
-            height: 120,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Container(
-            height: 120,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
+          // Container(
+          //   height: 120,
+          //   width: MediaQuery.of(context).size.width,
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(15),
+          //     color: Colors.grey,
+          //   ),
+          // ),
+          // const SizedBox(
+          //   height: 15,
+          // ),
+          FutureBuilder<List<CommunityPreviewServerData>>(
+              future: serverData,
+              builder: ((context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  int itemCount = min(snapshot.data!.length, 5);
+                  return Expanded(
+                    child: Column(
+                      children: List.generate(itemCount, (index) {
+                        var data = snapshot.data![index];
+                        return Column(
+                          children: [
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CommunityPost(
+                                            id: data.id,
+                                          ),
+                                        )).then((value) => setState(
+                                          () {
+                                            serverData =
+                                                communitypreviewfetchData();
+                                          },
+                                        ));
+                                  },
+                                  child: Container(
+                                    height: 100,
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(14),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          spreadRadius: 3,
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 3),
+                                        )
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          18, 8, 18, 8),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.5,
+                                            child: Text(
+                                              data.title!,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                color: TextColors.high,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 7,
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.65,
+                                            height: 20,
+                                            child: Text(
+                                              data.content!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 13.5,
+                                                fontWeight: FontWeight.w400,
+                                                color: TextColors.disabled,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 4,
+                                          ),
+                                          const Row(
+                                            children: [
+                                              Text(
+                                                '공감 3',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: TextColors.disabled,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 8,
+                                              ),
+                                              Text(
+                                                '댓글 2',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: TextColors.disabled,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Text(
+                                                '01/13 10:05',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: TextColors.disabled,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                )
+                              ],
+                            )
+                          ],
+                        );
+                      }),
+                    ),
+                  );
+                } else {
+                  return const Text('No data available');
+                }
+              }))
         ],
       ),
     );

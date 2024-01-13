@@ -18,20 +18,22 @@ class _CommunitywriteState extends State<Communitywrite> {
   @override
   void initState() {
     super.initState();
-    titleController = TextEditingController();
-    // text:
-    // Provider.of<CommunityWriteProvider>(context, listen: false).title
-    contentController = TextEditingController();
-    // text: Provider.of<CommunityWriteProvider>(context, listen: false)
-    //     .content);
+    final userInfoProvider =
+        Provider.of<UserInfoProvider>(context, listen: false);
+    final communityWriteProvider =
+        Provider.of<CommunityWriteProvider>(context, listen: false);
+    communityWriteProvider.author = userInfoProvider.uid;
+    titleController = TextEditingController(text: communityWriteProvider.title);
+    contentController =
+        TextEditingController(text: communityWriteProvider.content);
   }
 
-  // @override
-  // void dispose() {
-  //   titleController.dispose();
-  //   contentController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +59,9 @@ class _CommunitywriteState extends State<Communitywrite> {
                   TextButton(
                     child: const Text('예'),
                     onPressed: () {
+                      Provider.of<CommunityWriteProvider>(context,
+                              listen: false)
+                          .reset();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                     },
@@ -93,6 +98,11 @@ class _CommunitywriteState extends State<Communitywrite> {
                   width: MediaQuery.of(context).size.width * 0.75,
                   child: TextField(
                     controller: titleController, // 게시물 제목 입력 컨트롤러
+                    onChanged: (text) {
+                      Provider.of<CommunityWriteProvider>(context,
+                              listen: false)
+                          .setTitle(text);
+                    },
                     maxLength: 50,
                     decoration: const InputDecoration(
                         hintText: '게시물 제목을 입력하세요.',
@@ -116,6 +126,11 @@ class _CommunitywriteState extends State<Communitywrite> {
                     constraints: const BoxConstraints(maxHeight: 300),
                     child: TextField(
                       controller: contentController, // 게시물 내용 입력 컨트롤러
+                      onChanged: (text) {
+                        Provider.of<CommunityWriteProvider>(context,
+                                listen: false)
+                            .setContent(text);
+                      },
                       maxLines: 15,
                       maxLength: 3000,
                       decoration: InputDecoration(
@@ -152,27 +167,35 @@ class _CommunitywriteState extends State<Communitywrite> {
 
             return ElevatedButton(
               onPressed: hasTitleText && hasContentText
-                  ? () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  const DummyPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = const Offset(1.0, 0.0);
-                            var end = Offset.zero;
-                            var tween = Tween(begin: begin, end: end);
-                            var offsetAnimation = animation.drive(tween);
+                  ? () async {
+                      ////////////////////////////////////////////////////////
 
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
+                      var provider = Provider.of<CommunityWriteProvider>(
+                          context,
+                          listen: false);
+
+                      print(provider.author);
+                      print('author : ${provider.author}');
+                      print('Title : ${provider.title}');
+                      print('Content : ${provider.content}');
+                      ////////////////////////////////////////////////////////
+
+                      // 데이터 전송
+                      Future<void> response;
+                      if (provider.id == null) {
+                        response = provider.postCommunityData();
+                      } else {
+                        response = provider.patchCommunityData();
+                      }
+
+                      // 응답 처리
+                      await response.then((_) {
+                        provider.reset();
+                        Navigator.of(context).pop();
+                        // Navigator.of(context).pop();
+                      }).catchError((error) {
+                        print('//////////////////Error sending data: $error');
+                      });
                     }
                   : null,
               style: ElevatedButton.styleFrom(
