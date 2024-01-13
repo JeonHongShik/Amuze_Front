@@ -295,11 +295,11 @@ class ResumeWriteProvider extends ChangeNotifier {
       'title': _title,
       'gender': _gender,
       'age': _age,
-      'region': regionsString,
-      'education': educationsString,
-      'career': careersString,
-      'award': awardsString,
-      'completion': completionsString,
+      'regions': regionsString,
+      'educations': educationsString,
+      'careers': careersString,
+      'awards': awardsString,
+      'completions': completionsString,
       'introduce': _introduce,
     });
 
