@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-class StagePreviewServerData {
+class MyStageServerData {
   int? id;
   String? author;
   String? title;
@@ -10,7 +10,7 @@ class StagePreviewServerData {
   String? pay;
   String? datetime;
 
-  StagePreviewServerData({
+  MyStageServerData({
     required this.id,
     required this.author,
     required this.title,
@@ -21,9 +21,9 @@ class StagePreviewServerData {
     required this.mainimage,
   });
 
-  factory StagePreviewServerData.fromJson(Map<String, dynamic> json) {
+  factory MyStageServerData.fromJson(Map<String, dynamic> json) {
     try {
-      return StagePreviewServerData(
+      return MyStageServerData(
           id: json['id'],
           author: json['author'],
           title: json['title'],
@@ -39,14 +39,15 @@ class StagePreviewServerData {
   }
 }
 
-Future<List<StagePreviewServerData>> stagepreviewfetchData() async {
+Future<List<MyStageServerData>> mystagefetchData(String uid) async {
   var dio = Dio();
+
   try {
     final response = await dio.get(
-        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/postview/');
+        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/mypost/$uid/');
 
     return (response.data as List)
-        .map((json) => StagePreviewServerData.fromJson(json))
+        .map((json) => MyStageServerData.fromJson(json))
         .toList();
   } on DioException catch (e) {
     // DioException 처리

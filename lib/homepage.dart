@@ -1,4 +1,5 @@
 import 'package:amuze/gathercolors.dart';
+import 'package:amuze/main.dart';
 import 'package:amuze/pagelayout/chatbody.dart';
 import 'package:amuze/pagelayout/homebody.dart';
 import 'package:amuze/pagelayout/mypage.dart';
@@ -26,10 +27,28 @@ class IconChangeProvider extends ChangeNotifier {
   }
 }
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   late BottomNavigationProvider _bottomNavigationProvider;
+
   late IconChangeProvider _iconChangeProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<StageWriteProvider>(context, listen: false).uid =
+        Provider.of<UserInfoProvider>(context, listen: false).uid;
+    Provider.of<ResumeWriteProvider>(context, listen: false).uid =
+        Provider.of<UserInfoProvider>(context, listen: false).uid;
+    Provider.of<CommunityWriteProvider>(context, listen: false).uid =
+        Provider.of<UserInfoProvider>(context, listen: false).uid;
+  }
 
   @override
   Widget build(BuildContext context) {

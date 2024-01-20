@@ -2,6 +2,7 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
 import 'package:amuze/server_communication/get/resume_detail_get_server.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -25,6 +26,13 @@ class _ResumePostState extends State<ResumePost> {
 
   late Future<List<ResumeDetailServerData>> serverData;
   List<String?> imageList = [];
+
+  bool bookmarked = false;
+  int bookmarkId = 0;
+  bool ready = true;
+
+  String displayName = '';
+  String photoURL = '';
 
   Future<void> _showDeleteDialog(BuildContext context) async {
     return showDialog<void>(
@@ -91,6 +99,79 @@ class _ResumePostState extends State<ResumePost> {
     }
   }
 
+  Future<void> _checkBookmarked() async {
+    try {
+      final provider = Provider.of<UserInfoProvider>(context, listen: false);
+      final response = await dio.get(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/bookmarks/bookmark/resume/check/${provider.uid}/${widget.id.toString()}/');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setState(() {
+          bookmarked = response.data['bookmark'];
+          bookmarkId = response.data['id'];
+        });
+        print('/////////////////////////////$bookmarked');
+        print('/////////////////////////////$bookmarkId');
+      }
+    } catch (e) {
+      print('Error : $e');
+    }
+  }
+
+  void _toggleBookmarked() async {
+    final provider = Provider.of<UserInfoProvider>(context, listen: false);
+    if (bookmarked == false) {
+      try {
+        final response = await dio.post(
+            'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/bookmarks/bookmark/resume/',
+            data: {'uid': provider.uid, 'resume': widget.id});
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          setState(() {
+            bookmarked = true;
+            bookmarkId = response.data['id'];
+            ready = true;
+          });
+          print('//////////////////////$bookmarkId');
+        }
+      } catch (e) {
+        print('postError : $e');
+      }
+    } else if (bookmarked == true) {
+      try {
+        final response = await dio.delete(
+            'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/bookmarks/bookmark/resume/delete/$bookmarkId/',
+            data: {'uid': provider.uid});
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          setState(() {
+            bookmarked = !bookmarked;
+            ready = true;
+          });
+        }
+      } catch (e) {
+        print('deletError : $e');
+      }
+    }
+  }
+
+  Future<void> fetchUserProfile(String author) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(author)
+          .get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+        setState(() {
+          photoURL = userData['photoURL'];
+          displayName = userData['displayName'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching user profile: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +181,12 @@ class _ResumePostState extends State<ResumePost> {
       setState(() {
         _containerTop = _scrollController.offset;
       });
+    });
+    _checkBookmarked();
+    serverData.then((data) {
+      if (data.isNotEmpty) {
+        fetchUserProfile(data.first.author!);
+      }
     });
   }
 
@@ -221,10 +308,10 @@ class _ResumePostState extends State<ResumePost> {
                 future: serverData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Text('게시물 불러오는 중...'));
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     return Column(
                       children: snapshot.data!.map((item) {
                         return Column(
@@ -238,7 +325,6 @@ class _ResumePostState extends State<ResumePost> {
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 10, 0, 0),
                                 width: MediaQuery.of(context).size.width,
-                                height: 110,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -246,193 +332,55 @@ class _ResumePostState extends State<ResumePost> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
+                                        // 첫 12글자 표시
                                         Text(
-                                          '${item.title}',
+                                          item.title!.length > 12
+                                              ? item.title!.substring(0, 12)
+                                              : item.title!,
                                           style: const TextStyle(fontSize: 25),
-                                          maxLines: 2,
                                         ),
-                                        if (item.author ==
-                                            Provider.of<UserInfoProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .displayName)
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                  onPressed: () async {
-                                                    final resumeprovider = Provider
-                                                        .of<ResumeWriteProvider>(
-                                                            context,
-                                                            listen: false);
-                                                    if (item.id != null) {
-                                                      resumeprovider.id =
-                                                          item.id.toString();
-                                                    }
-                                                    if (item.title != null) {
-                                                      resumeprovider.setTitle(
-                                                          item.title!);
-                                                    }
-                                                    if (item.title != null) {
-                                                      resumeprovider.setTitle(
-                                                          item.title!);
-                                                    }
-                                                    if (item.gender != null) {
-                                                      resumeprovider.setGender(
-                                                          item.gender!);
-                                                    }
-                                                    if (item.age != null) {
-                                                      resumeprovider
-                                                          .setAge(item.age!);
-                                                    }
-                                                    if (item.regions != null) {
-                                                      resumeprovider.setRegions(
-                                                          item.regions!);
-                                                    }
-                                                    if (item.educations !=
-                                                        null) {
-                                                      resumeprovider
-                                                          .setEducations(
-                                                              item.educations!);
-                                                    }
-                                                    if (item.careers != null) {
-                                                      resumeprovider.setCareers(
-                                                          item.careers!);
-                                                    }
-                                                    if (item.awards != null) {
-                                                      resumeprovider.setAwards(
-                                                          item.awards!);
-                                                    }
-                                                    if (item.completions !=
-                                                        null) {
-                                                      resumeprovider
-                                                          .setCompletions(item
-                                                              .completions!);
-                                                    }
-                                                    if (item.introduce !=
-                                                        null) {
-                                                      resumeprovider
-                                                          .setIntroduce(
-                                                              item.introduce!);
-                                                    }
-                                                    if (item.mainimage !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
-                                                      ImageItem mainImageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      resumeprovider
-                                                          .setFileMainimage(
-                                                              [mainImageItem]);
-                                                    }
-
-                                                    List<ImageItem>
-                                                        otherImages = [];
-
-                                                    if (item.otherimage1 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage1!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-                                                    if (item.otherimage2 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage2!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-                                                    if (item.otherimage3 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage3!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-                                                    if (item.otherimage4 !=
-                                                        null) {
-                                                      String fullImageUrl =
-                                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage4!}';
-                                                      ImageItem imageItem =
-                                                          ImageItem.fromPath(
-                                                              fullImageUrl);
-                                                      otherImages
-                                                          .add(imageItem);
-                                                    }
-
-                                                    resumeprovider
-                                                        .setFileOtherimages(
-                                                            otherImages);
-                                                    Navigator.push(
-                                                      context,
-                                                      PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                                animation,
-                                                                secondaryAnimation) =>
-                                                            const Resumetitle(),
-                                                        transitionsBuilder:
-                                                            (context,
-                                                                animation,
-                                                                secondaryAnimation,
-                                                                child) {
-                                                          var begin =
-                                                              const Offset(
-                                                                  1.0, 0.0);
-                                                          var end = Offset.zero;
-                                                          var tween = Tween(
-                                                              begin: begin,
-                                                              end: end);
-                                                          var offsetAnimation =
-                                                              animation
-                                                                  .drive(tween);
-
-                                                          return SlideTransition(
-                                                            position:
-                                                                offsetAnimation,
-                                                            child: child,
-                                                          );
-                                                        },
-                                                      ),
-                                                    ).then((_) {
-                                                      setState(() {
-                                                        serverData =
-                                                            resumedetailfetchData(
-                                                                widget.id!);
-                                                      });
-                                                    });
-                                                  },
-                                                  icon: const Icon(Icons.edit)),
-                                              IconButton(
-                                                  onPressed: () async {
-                                                    await _showDeleteDialog(
-                                                        context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: IconColors.inactive,
-                                                  )),
-                                            ],
-                                          )
+                                        // customIcons 표시
+                                        customIcons(item, context),
                                       ],
                                     ),
+                                    // 12글자를 초과하는 경우 나머지 텍스트 표시
+                                    if (item.title!.length > 12)
+                                      Text(
+                                        item.title!.substring(12),
+                                        style: const TextStyle(fontSize: 25),
+                                      ),
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child:
-                                            Text(item.author ?? 'No Author')),
+                                    Row(
+                                      children: [
+                                        if (photoURL.isNotEmpty)
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                                25), // 이미지를 원형으로 만들기 위한 경계 반지름
+                                            child: Image.network(
+                                              photoURL,
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(bottom: 5),
+                                          child: Text(
+                                            displayName,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
                                   ],
                                 )),
                             buildNullableInfo('나이', item.age),
@@ -474,6 +422,137 @@ class _ResumePostState extends State<ResumePost> {
     );
   }
 
+  Widget customIcons(ResumeDetailServerData item, BuildContext context) {
+    return item.author ==
+            Provider.of<UserInfoProvider>(context, listen: false).uid
+        ? Row(
+            children: [
+              IconButton(
+                  onPressed: () async {
+                    final resumeprovider = Provider.of<ResumeWriteProvider>(
+                        context,
+                        listen: false);
+                    if (item.id != null) {
+                      resumeprovider.id = item.id.toString();
+                    }
+                    if (item.title != null) {
+                      resumeprovider.setTitle(item.title!);
+                    }
+                    if (item.title != null) {
+                      resumeprovider.setTitle(item.title!);
+                    }
+                    if (item.gender != null) {
+                      resumeprovider.setGender(item.gender!);
+                    }
+                    if (item.age != null) {
+                      resumeprovider.setAge(item.age!);
+                    }
+                    if (item.regions != null) {
+                      resumeprovider.setRegions(item.regions!);
+                    }
+                    if (item.educations != null) {
+                      resumeprovider.setEducations(item.educations!);
+                    }
+                    if (item.careers != null) {
+                      resumeprovider.setCareers(item.careers!);
+                    }
+                    if (item.awards != null) {
+                      resumeprovider.setAwards(item.awards!);
+                    }
+                    if (item.completions != null) {
+                      resumeprovider.setCompletions(item.completions!);
+                    }
+                    if (item.introduce != null) {
+                      resumeprovider.setIntroduce(item.introduce!);
+                    }
+                    if (item.mainimage != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
+                      ImageItem mainImageItem =
+                          ImageItem.fromPath(fullImageUrl);
+                      resumeprovider.setFileMainimage([mainImageItem]);
+                    }
+
+                    List<ImageItem> otherImages = [];
+
+                    if (item.otherimage1 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage1!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+                    if (item.otherimage2 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage2!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+                    if (item.otherimage3 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage3!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+                    if (item.otherimage4 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimage4!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+
+                    resumeprovider.setFileOtherimages(otherImages);
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const Resumetitle(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = const Offset(1.0, 0.0);
+                          var end = Offset.zero;
+                          var tween = Tween(begin: begin, end: end);
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                      ),
+                    ).then((_) {
+                      setState(() {
+                        serverData = resumedetailfetchData(widget.id!);
+                      });
+                    });
+                  },
+                  icon: const Icon(Icons.edit)),
+              IconButton(
+                  onPressed: () async {
+                    await _showDeleteDialog(context);
+                  },
+                  icon: const Icon(
+                    Icons.delete,
+                    color: IconColors.inactive,
+                  )),
+            ],
+          )
+        : IconButton(
+            onPressed: () {
+              if (ready == true) {
+                setState(() {
+                  ready = false;
+                });
+                _toggleBookmarked();
+              }
+            },
+            icon: Icon(
+              bookmarked ? Icons.bookmark : Icons.bookmark_border,
+              color: SecondaryColors.basic,
+              size: 30,
+            ),
+          );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -485,9 +564,8 @@ Widget buildNullableInfo(String label, String? value) {
   return value != null && value.isNotEmpty
       ? Container(
           margin: const EdgeInsets.only(left: 20),
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 30),
+          padding: const EdgeInsets.fromLTRB(0, 20, 20, 40),
           child: SizedBox(
-            height: 80,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -514,7 +592,7 @@ Widget listNullableInfo(String label, List<String>? value) {
 
   return Container(
     margin: const EdgeInsets.only(left: 20),
-    padding: const EdgeInsets.fromLTRB(0, 20, 0, 30),
+    padding: const EdgeInsets.fromLTRB(0, 20, 20, 40),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_post.dart';
@@ -18,6 +16,7 @@ class ResumeBoard extends StatefulWidget {
 
 class _ResumeBoardState extends State<ResumeBoard> {
   late Future<List<ResumePreviewServerData>> serverData;
+  int totalcount = 0;
 
   @override
   void initState() {
@@ -60,9 +59,9 @@ class _ResumeBoardState extends State<ResumeBoard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '전체 100',
-                  style: TextStyle(
+                Text(
+                  '전체 $totalcount',
+                  style: const TextStyle(
                     color: TextColors.medium,
                     fontSize: 12,
                   ),
@@ -105,149 +104,163 @@ class _ResumeBoardState extends State<ResumeBoard> {
             ),
           ),
           Expanded(
-              child: FutureBuilder<List<ResumePreviewServerData>>(
-            future: serverData,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const ShimmerList();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                return ListView.builder(
-                  itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
-                  itemBuilder: (context, index) {
-                    var data = snapshot.data![index];
-                    return GestureDetector(
-                      onTap: () {
-                        print(data.id);
-                        print(data.author);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ResumePost(id: data.id),
-                            )).then((_) => setState(() {
-                              serverData = resumepreviewfetchData();
-                            }));
-                      },
-                      child: Container(
-                        height: 120,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            border: Border(
-                                top: BorderSide(color: backColors.disabled))),
-                        child: Row(
-                          children: [
-                            (data.mainimage != null)
-                                ? Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    width: 100,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                        color: backColors.disabled,
-                                        borderRadius: BorderRadius.circular(20),
-                                        image: DecorationImage(
-                                            image: NetworkImage(
-                                              data.mainimage!,
+            child: FutureBuilder<List<ResumePreviewServerData>>(
+              future: serverData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const ShimmerList();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      totalcount = snapshot.data!.length;
+                    });
+                  });
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
+                    itemBuilder: (context, index) {
+                      var data = snapshot.data![index];
+                      return GestureDetector(
+                        onTap: () {
+                          print(data.id);
+                          print(data.author);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ResumePost(id: data.id),
+                              )).then((_) => setState(() {
+                                serverData = resumepreviewfetchData();
+                              }));
+                        },
+                        child: Container(
+                          height: 120,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                  top: BorderSide(color: backColors.disabled))),
+                          child: Row(
+                            children: [
+                              (data.mainimage != null)
+                                  ? Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                      width: 100,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                          color: backColors.disabled,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                data.mainimage!,
+                                              ),
+                                              fit: BoxFit.fill)),
+                                    )
+                                  : Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                      width: 100,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: backColors.disabled,
+                                          image: const DecorationImage(
+                                              image: AssetImage(
+                                                  'assets/images/공고임시이미지.png'),
+                                              fit: BoxFit.fill)),
+                                    ),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 86,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 13),
+                                        height: 42,
+                                        child: Text(
+                                          data.title!,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 16.5,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 44,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 13),
+                                              height: 20,
+                                              child: Row(
+                                                children: [
+                                                  data.age != null
+                                                      ? Text(
+                                                          '${data.age} · ',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 13,
+                                                            color: TextColors
+                                                                .medium,
+                                                          ),
+                                                        )
+                                                      : const SizedBox.shrink(),
+                                                  data.gender != null
+                                                      ? Text(
+                                                          '${data.gender}',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 13,
+                                                            color: TextColors
+                                                                .medium,
+                                                          ),
+                                                        )
+                                                      : const SizedBox.shrink(),
+                                                ],
+                                              ),
                                             ),
-                                            fit: BoxFit.fill)),
-                                  )
-                                : Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    width: 100,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: backColors.disabled,
-                                        image: const DecorationImage(
-                                            image: AssetImage(
-                                                'assets/images/공고임시이미지.png'),
-                                            fit: BoxFit.fill)),
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 13),
+                                              height: 22.5,
+                                              child: (data.education != null &&
+                                                      data.education!
+                                                          .isNotEmpty)
+                                                  ? Text(
+                                                      data.education![0],
+                                                      style: const TextStyle(
+                                                        fontSize: 13,
+                                                        color:
+                                                            TextColors.medium,
+                                                      ),
+                                                    )
+                                                  : const SizedBox.shrink(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                            Expanded(
-                              child: SizedBox(
-                                height: 86,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.only(left: 13),
-                                      height: 42,
-                                      child: Text(
-                                        data.title!,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            fontSize: 16.5,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 44,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            padding:
-                                                const EdgeInsets.only(left: 13),
-                                            height: 20,
-                                            child: Row(
-                                              children: [
-                                                data.age != null
-                                                    ? Text(
-                                                        '${data.age} · ',
-                                                        style: const TextStyle(
-                                                          fontSize: 13,
-                                                          color:
-                                                              TextColors.medium,
-                                                        ),
-                                                      )
-                                                    : const SizedBox.shrink(),
-                                                data.gender != null
-                                                    ? Text(
-                                                        '${data.gender}',
-                                                        style: const TextStyle(
-                                                          fontSize: 13,
-                                                          color:
-                                                              TextColors.medium,
-                                                        ),
-                                                      )
-                                                    : const SizedBox.shrink(),
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            padding:
-                                                const EdgeInsets.only(left: 13),
-                                            height: 22.5,
-                                            child: (data.education != null &&
-                                                    data.education!.isNotEmpty)
-                                                ? Text(
-                                                    data.education![0],
-                                                    style: const TextStyle(
-                                                      fontSize: 13,
-                                                      color: TextColors.medium,
-                                                    ),
-                                                  )
-                                                : const SizedBox.shrink(),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              } else {
-                return const Text('No data available');
-              }
-            },
-          )),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: Text('아직 작성된 이력서가 없습니다.'));
+                }
+              },
+            ),
+          ),
         ],
       ),
     );

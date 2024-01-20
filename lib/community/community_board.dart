@@ -17,6 +17,7 @@ class CommunityBoard extends StatefulWidget {
 
 class _CommunityBoardState extends State<CommunityBoard> {
   late Future<List<CommunityPreviewServerData>> serverData;
+  int totalcount = 0;
 
   @override
   void initState() {
@@ -59,9 +60,9 @@ class _CommunityBoardState extends State<CommunityBoard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '전체 7',
-                  style: TextStyle(
+                Text(
+                  '전체 $totalcount',
+                  style: const TextStyle(
                     color: TextColors.medium,
                     fontSize: 12,
                   ),
@@ -111,8 +112,14 @@ class _CommunityBoardState extends State<CommunityBoard> {
                   return const ShimmerList();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                } else if (snapshot.hasData) {
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      totalcount = snapshot.data!.length;
+                    });
+                  });
                   return ListView.builder(
+                    shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       var data = snapshot.data![index];
@@ -138,39 +145,29 @@ class _CommunityBoardState extends State<CommunityBoard> {
                               border: Border(
                                   top: BorderSide(color: backColors.disabled))),
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(15, 5, 0, 0),
+                            padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      data.title!,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500,
-                                        color: TextColors.high,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8),
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(
-                                          Icons.bookmark_border,
-                                          size: 25,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  data.title!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w500,
+                                    color: TextColors.high,
+                                  ),
                                 ),
-                                SizedBox(
-                                  width: 220,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  width: MediaQuery.of(context).size.width,
                                   child: Text(
                                     data.content!,
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -182,7 +179,7 @@ class _CommunityBoardState extends State<CommunityBoard> {
                                   height: 10,
                                 ),
                                 const Padding(
-                                  padding: EdgeInsets.only(right: 15),
+                                  padding: EdgeInsets.fromLTRB(0, 0, 15, 5),
                                   child: Row(
                                     children: [
                                       Text(
@@ -221,7 +218,7 @@ class _CommunityBoardState extends State<CommunityBoard> {
                     },
                   );
                 } else {
-                  return const Text('No data available');
+                  return const Center(child: Text('아직 커뮤니티 글이 없습니다.'));
                 }
               },
             ),

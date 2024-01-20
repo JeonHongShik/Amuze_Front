@@ -30,10 +30,35 @@ class CommunityPreviewServerData {
 
 Future<List<CommunityPreviewServerData>> communitypreviewfetchData() async {
   var dio = Dio();
-  final response = await dio.get(
-      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/communities/community/');
+  try {
+    final response = await dio.get(
+        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/communities/community/');
 
-  return (response.data as List)
-      .map((json) => CommunityPreviewServerData.fromJson(json))
-      .toList();
+    return (response.data as List)
+        .map((json) => CommunityPreviewServerData.fromJson(json))
+        .toList();
+  } on DioException catch (e) {
+    // Handle DioException
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        print('Connection timeout');
+        break;
+      case DioExceptionType.receiveTimeout:
+        print('Receive timeout');
+        break;
+      case DioExceptionType.badResponse:
+        print('Server response error: ${e.response?.statusCode}');
+        break;
+      case DioExceptionType.connectionError:
+        print('Connection error');
+        break;
+      default:
+        print('Unknown DioException: ${e.message}');
+    }
+    rethrow; // Propagate the error
+  } catch (e) {
+    // Handle other exceptions
+    print('Unknown error: $e');
+    rethrow;
+  }
 }

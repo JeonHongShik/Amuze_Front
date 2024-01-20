@@ -2,6 +2,7 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/server_communication/get/stage_detail_get_server.dart';
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -29,6 +30,9 @@ class _StagePostState extends State<StagePost> {
   bool bookmarked = false;
   int bookmarkId = 0;
   bool ready = true;
+
+  String displayName = '';
+  String photoURL = '';
 
   Future<void> _showDeleteDialog(BuildContext context) async {
     return showDialog<void>(
@@ -149,6 +153,25 @@ class _StagePostState extends State<StagePost> {
     }
   }
 
+  Future<void> fetchUserProfile(String author) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(author)
+          .get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+        setState(() {
+          photoURL = userData['photoURL'];
+          displayName = userData['displayName'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching user profile: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -160,6 +183,11 @@ class _StagePostState extends State<StagePost> {
       });
     });
     _checkBookmarked();
+    serverData.then((data) {
+      if (data.isNotEmpty) {
+        fetchUserProfile(data.first.author!);
+      }
+    });
   }
 
   @override
@@ -251,6 +279,11 @@ class _StagePostState extends State<StagePost> {
                                   },
                                 );
                               }
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: Text('사진 불러오는 중...'),
+                              );
                             } else {
                               return Image.asset('assets/images/김채원.jpg',
                                   fit: BoxFit.cover);
@@ -274,284 +307,111 @@ class _StagePostState extends State<StagePost> {
                 future: serverData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Text('게시물 불러오는 중...'));
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     return Column(
                       children: snapshot.data!.map((item) {
+                        var children2 = <Widget>[
+                          Container(
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(color: Colors.grey))),
+                            padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // 첫 12글자 표시
+                                    Text(
+                                      item.title!.length > 12
+                                          ? item.title!.substring(0, 12)
+                                          : item.title!,
+                                      style: const TextStyle(fontSize: 25),
+                                    ),
+                                    // customIcons 표시
+                                    customIcons(item, context),
+                                  ],
+                                ),
+                                // 12글자를 초과하는 경우 나머지 텍스트 표시
+                                if (item.title!.length > 12)
+                                  Text(
+                                    item.title!.substring(12),
+                                    style: const TextStyle(fontSize: 25),
+                                  ),
+                                const SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    if (photoURL.isNotEmpty)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                            25), // 이미지를 원형으로 만들기 위한 경계 반지름
+                                        child: Image.network(
+                                          photoURL,
+                                          width: 40,
+                                          height: 40,
+                                        ),
+                                      ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(bottom: 5),
+                                      child: Text(
+                                        displayName,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            ),
+                          ),
+                          buildNullableInfo('원하는 무용 종류', item.wishtype),
+                          const postmargin(),
+                          buildNullableInfo('무대 종류', item.type),
+                          const postmargin(),
+                          buildNullableInfo('공연 일시', item.datetime),
+                          const postmargin(),
+                          buildNullableInfo('공고 마감기한', item.deadline),
+                          const postmargin(),
+                          buildNullableInfo('위치', item.region),
+                          const postmargin(),
+                          buildNullableInfo('페이', item.pay),
+                          const postmargin(),
+                          buildNullableInfo('공연 정보', item.introduce),
+                        ];
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              decoration: const BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(color: Colors.grey))),
-                              padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
-                              width: MediaQuery.of(context).size.width,
-                              height: 110,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '${item.title}',
-                                          style: const TextStyle(fontSize: 25),
-                                          maxLines: 2,
-                                        ),
-                                        item.author ==
-                                                Provider.of<UserInfoProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .displayName
-                                            ? Row(
-                                                children: [
-                                                  IconButton(
-                                                      onPressed: () async {
-                                                        final stageprovider =
-                                                            Provider.of<
-                                                                    StageWriteProvider>(
-                                                                context,
-                                                                listen: false);
-                                                        if (item.id != null) {
-                                                          stageprovider.id =
-                                                              item.id;
-                                                        }
-                                                        /*if (item.author != null &&
-                                                        item.author != '') {
-                                                      stageprovider.uid =
-                                                          item.author;
-                                                    }*/
-                                                        if (item.title !=
-                                                                null &&
-                                                            item.title != '') {
-                                                          stageprovider
-                                                              .setTitle(
-                                                                  item.title!);
-                                                        }
-                                                        if (item.region !=
-                                                                null &&
-                                                            item.region != '') {
-                                                          stageprovider
-                                                              .setRegion(
-                                                                  item.region!);
-                                                        }
-                                                        if (item.type != null &&
-                                                            item.type != '') {
-                                                          stageprovider.setType(
-                                                              item.type!);
-                                                        }
-                                                        if (item.type != null &&
-                                                            item.type != '') {
-                                                          stageprovider.setType(
-                                                              item.type!);
-                                                        }
-
-                                                        if (item.wishtype !=
-                                                                null &&
-                                                            item.wishtype !=
-                                                                '') {
-                                                          stageprovider
-                                                              .setWishtype(item
-                                                                  .wishtype!);
-                                                        }
-                                                        if (item.pay != null &&
-                                                            item.pay != '') {
-                                                          stageprovider.setPay(
-                                                              item.pay!);
-                                                        }
-                                                        if (item.deadline !=
-                                                                null &&
-                                                            item.deadline !=
-                                                                '') {
-                                                          stageprovider
-                                                              .setDeadline(item
-                                                                  .deadline!);
-                                                        }
-                                                        if (item.datetime !=
-                                                                null &&
-                                                            item.datetime !=
-                                                                '') {
-                                                          stageprovider
-                                                              .setDatetime(item
-                                                                  .datetime!);
-                                                          stageprovider
-                                                              .splitDateAndTimeAsync();
-                                                        }
-                                                        if (item.introduce !=
-                                                                null &&
-                                                            item.introduce !=
-                                                                '') {
-                                                          stageprovider
-                                                              .setIntroduce(item
-                                                                  .introduce!);
-                                                        }
-                                                        if (item.mainimage !=
-                                                            null) {
-                                                          String fullImageUrl =
-                                                              'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
-                                                          ImageItem
-                                                              mainImageItem =
-                                                              ImageItem.fromPath(
-                                                                  fullImageUrl);
-                                                          stageprovider
-                                                              .setFileMainimage([
-                                                            mainImageItem
-                                                          ]);
-                                                        }
-
-                                                        List<ImageItem>
-                                                            otherImages = [];
-
-                                                        if (item.otherimages1 !=
-                                                            null) {
-                                                          String fullImageUrl =
-                                                              'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages1!}';
-                                                          ImageItem imageItem =
-                                                              ImageItem.fromPath(
-                                                                  fullImageUrl);
-                                                          otherImages
-                                                              .add(imageItem);
-                                                        }
-                                                        if (item.otherimages2 !=
-                                                            null) {
-                                                          String fullImageUrl =
-                                                              'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages2!}';
-                                                          ImageItem imageItem =
-                                                              ImageItem.fromPath(
-                                                                  fullImageUrl);
-                                                          otherImages
-                                                              .add(imageItem);
-                                                        }
-                                                        if (item.otherimages3 !=
-                                                            null) {
-                                                          String fullImageUrl =
-                                                              'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages3!}';
-                                                          ImageItem imageItem =
-                                                              ImageItem.fromPath(
-                                                                  fullImageUrl);
-                                                          otherImages
-                                                              .add(imageItem);
-                                                        }
-                                                        if (item.otherimages4 !=
-                                                            null) {
-                                                          String fullImageUrl =
-                                                              'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages4!}';
-                                                          ImageItem imageItem =
-                                                              ImageItem.fromPath(
-                                                                  fullImageUrl);
-                                                          otherImages
-                                                              .add(imageItem);
-                                                        }
-
-                                                        stageprovider
-                                                            .setFileOtherimages(
-                                                                otherImages);
-
-                                                        Navigator.push(
-                                                          context,
-                                                          PageRouteBuilder(
-                                                            pageBuilder: (context,
-                                                                    animation,
-                                                                    secondaryAnimation) =>
-                                                                const Stagetitle(),
-                                                            transitionsBuilder:
-                                                                (context,
-                                                                    animation,
-                                                                    secondaryAnimation,
-                                                                    child) {
-                                                              var begin =
-                                                                  const Offset(
-                                                                      1.0, 0.0);
-                                                              var end =
-                                                                  Offset.zero;
-                                                              var tween = Tween(
-                                                                  begin: begin,
-                                                                  end: end);
-                                                              var offsetAnimation =
-                                                                  animation
-                                                                      .drive(
-                                                                          tween);
-
-                                                              return SlideTransition(
-                                                                position:
-                                                                    offsetAnimation,
-                                                                child: child,
-                                                              );
-                                                            },
-                                                          ),
-                                                        ).then((_) {
-                                                          setState(() {
-                                                            serverData =
-                                                                stagedetailfetchData(
-                                                                    widget.id!);
-                                                          });
-                                                        });
-                                                      },
-                                                      icon: const Icon(
-                                                          Icons.edit)),
-                                                  IconButton(
-                                                      onPressed: () async {
-                                                        await _showDeleteDialog(
-                                                            context);
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.delete,
-                                                        color:
-                                                            IconColors.inactive,
-                                                      )),
-                                                ],
-                                              )
-                                            : IconButton(
-                                                onPressed: () {
-                                                  if (ready == true) {
-                                                    setState(() {
-                                                      ready = false;
-                                                    });
-                                                    _toggleBookmarked();
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  bookmarked
-                                                      ? Icons.bookmark
-                                                      : Icons.bookmark_border,
-                                                  color: SecondaryColors.basic,
-                                                  size: 30,
-                                                ),
-                                              )
-                                      ]),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    children: [
-                                      //여기에 author를 firestore에 비교해서 프로필사진 가져와야 함.
-                                      Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 10),
-                                          child:
-                                              Text(item.author ?? 'No Author')),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            buildNullableInfo('원하는 무용 종류', item.wishtype),
-                            buildNullableInfo('무대 종류', item.type),
-                            buildNullableInfo('공연 일시', item.datetime),
-                            buildNullableInfo('공고 마감기한', item.deadline),
-                            buildNullableInfo('위치', item.region),
-                            buildNullableInfo('페이', item.pay),
-                            buildNullableInfo('공연 정보', item.introduce),
-                          ],
+                          children: children2,
                         );
                       }).toList(),
                     );
                   } else {
-                    return const Center(child: Text('No Data Available'));
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min, // 컬럼 내용을 중앙에 정렬
+                        children: [
+                          const Text('게시물을 불러오지 못 했습니다.'),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back), // 뒤로 가기 아이콘
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // 현재 화면을 닫고 이전 화면으로 돌아감
+                            },
+                          ),
+                        ],
+                      ),
+                    );
                   }
                 },
               ),
@@ -577,6 +437,139 @@ class _StagePostState extends State<StagePost> {
     );
   }
 
+  Widget customIcons(StageDetailServerData item, BuildContext context) {
+    return item.author ==
+            Provider.of<UserInfoProvider>(context, listen: false).uid
+        ? Row(
+            children: [
+              IconButton(
+                  onPressed: () async {
+                    final stageprovider =
+                        Provider.of<StageWriteProvider>(context, listen: false);
+                    if (item.id != null) {
+                      stageprovider.id = item.id;
+                    }
+                    if (item.title != null && item.title != '') {
+                      stageprovider.setTitle(item.title!);
+                    }
+                    if (item.region != null && item.region != '') {
+                      stageprovider.setRegion(item.region!);
+                    }
+                    if (item.type != null && item.type != '') {
+                      stageprovider.setType(item.type!);
+                    }
+                    if (item.type != null && item.type != '') {
+                      stageprovider.setType(item.type!);
+                    }
+
+                    if (item.wishtype != null && item.wishtype != '') {
+                      stageprovider.setWishtype(item.wishtype!);
+                    }
+                    if (item.pay != null && item.pay != '') {
+                      stageprovider.setPay(item.pay!);
+                    }
+                    if (item.deadline != null && item.deadline != '') {
+                      stageprovider.setDeadline(item.deadline!);
+                    }
+                    if (item.datetime != null && item.datetime != '') {
+                      stageprovider.setDatetime(item.datetime!);
+                      stageprovider.splitDateAndTimeAsync();
+                    }
+                    if (item.introduce != null && item.introduce != '') {
+                      stageprovider.setIntroduce(item.introduce!);
+                    }
+                    if (item.mainimage != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.mainimage!}';
+                      ImageItem mainImageItem =
+                          ImageItem.fromPath(fullImageUrl);
+                      stageprovider.setFileMainimage([mainImageItem]);
+                    }
+
+                    List<ImageItem> otherImages = [];
+
+                    if (item.otherimages1 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages1!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+                    if (item.otherimages2 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages2!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+                    if (item.otherimages3 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages3!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+                    if (item.otherimages4 != null) {
+                      String fullImageUrl =
+                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${item.otherimages4!}';
+                      ImageItem imageItem = ImageItem.fromPath(fullImageUrl);
+                      otherImages.add(imageItem);
+                    }
+
+                    stageprovider.setFileOtherimages(otherImages);
+
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const Stagetitle(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = const Offset(1.0, 0.0);
+                          var end = Offset.zero;
+                          var tween = Tween(begin: begin, end: end);
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                      ),
+                    ).then((_) {
+                      setState(() {
+                        serverData = stagedetailfetchData(widget.id!);
+                      });
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.edit,
+                    color: IconColors.inactive,
+                  )),
+              IconButton(
+                  onPressed: () async {
+                    await _showDeleteDialog(context);
+                  },
+                  icon: const Icon(
+                    Icons.delete,
+                    color: IconColors.inactive,
+                  )),
+            ],
+          )
+        : IconButton(
+            onPressed: () {
+              if (ready == true) {
+                setState(() {
+                  ready = false;
+                });
+                _toggleBookmarked();
+              }
+            },
+            icon: Icon(
+              bookmarked ? Icons.bookmark : Icons.bookmark_border,
+              color: SecondaryColors.basic,
+              size: 30,
+            ),
+          );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -584,27 +577,38 @@ class _StagePostState extends State<StagePost> {
   }
 }
 
+class postmargin extends StatelessWidget {
+  const postmargin({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 30,
+    );
+  }
+}
+
 Widget buildNullableInfo(String label, String? value) {
   return value != null && value.isNotEmpty
       ? Container(
           margin: const EdgeInsets.only(left: 20),
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 30),
-          child: SizedBox(
-            height: 80,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style:
-                      const TextStyle(color: TextColors.medium, fontSize: 15),
-                ),
-                Text(
-                  value,
-                  style: const TextStyle(color: TextColors.high, fontSize: 18),
-                )
-              ],
-            ),
+          padding: const EdgeInsets.fromLTRB(0, 20, 10, 10), // 하단 패딩 조정
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(color: TextColors.medium, fontSize: 15),
+              ),
+              Text(
+                value,
+                style: const TextStyle(color: TextColors.high, fontSize: 18),
+                overflow: TextOverflow.visible, // 오버플로우 처리 변경
+                softWrap: true, // 자동 줄바꿈 활성화
+              )
+            ],
           ),
         )
       : const SizedBox.shrink();

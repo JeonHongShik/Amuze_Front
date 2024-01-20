@@ -1,36 +1,39 @@
 import 'package:dio/dio.dart';
 
-class StagePreviewServerData {
+class MyResumeServerData {
   int? id;
   String? author;
   String? title;
+  String? age;
+  String? gender;
+  List<String>? education;
   String? mainimage;
-  String? region;
-  String? type;
-  String? pay;
-  String? datetime;
 
-  StagePreviewServerData({
+  MyResumeServerData({
     required this.id,
     required this.author,
     required this.title,
-    required this.region,
-    required this.type,
-    required this.pay,
-    required this.datetime,
+    required this.age,
+    required this.gender,
+    required this.education,
     required this.mainimage,
   });
 
-  factory StagePreviewServerData.fromJson(Map<String, dynamic> json) {
+  factory MyResumeServerData.fromJson(Map<String, dynamic> json) {
     try {
-      return StagePreviewServerData(
+      List<String>? educationList;
+      if (json['educations'] != null) {
+        educationList = (json['educations'] as List)
+            .map((e) => e['education'] as String)
+            .toList();
+      }
+      return MyResumeServerData(
           id: json['id'],
           author: json['author'],
           title: json['title'],
-          region: json['region'],
-          type: json['type'],
-          pay: json['pay'],
-          datetime: json['datetime'],
+          age: json['age'],
+          gender: json['gender'],
+          education: educationList,
           mainimage: json['mainimage']);
     } catch (e) {
       print("Error during JSON parsing: $e");
@@ -39,14 +42,14 @@ class StagePreviewServerData {
   }
 }
 
-Future<List<StagePreviewServerData>> stagepreviewfetchData() async {
+Future<List<MyResumeServerData>> myresumefetchData(String uid) async {
   var dio = Dio();
   try {
     final response = await dio.get(
-        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/postview/');
+        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/myresume/$uid/');
 
     return (response.data as List)
-        .map((json) => StagePreviewServerData.fromJson(json))
+        .map((json) => MyResumeServerData.fromJson(json))
         .toList();
   } on DioException catch (e) {
     // DioException 처리

@@ -67,7 +67,7 @@ void main() async {
               : '/home',
           routes: {
             '/login': (context) => const LoginPage(),
-            '/home': (context) => HomePage(),
+            '/home': (context) => const HomePage(),
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
@@ -257,7 +257,6 @@ class ResumeWriteProvider extends ChangeNotifier {
   }
 
   void reset() {
-    uid = '';
     id = null;
     _title = '';
     _gender = '';
@@ -559,7 +558,6 @@ class StageWriteProvider extends ChangeNotifier {
   }
 
   void reset() {
-    uid = '';
     id = null;
     _title = '';
     _region = '';
@@ -714,6 +712,7 @@ class StageWriteProvider extends ChangeNotifier {
 
 // 커뮤니티 게시물 작성 Provider /////////////////////////////////////
 class CommunityWriteProvider extends ChangeNotifier {
+  String? uid;
   int? id;
   String? author;
   String _title = '';

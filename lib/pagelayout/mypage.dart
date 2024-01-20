@@ -101,7 +101,7 @@ class MyPage extends StatelessWidget {
           ),
           MypageElement(
               icon: Icons.article_rounded,
-              text: '게시물 관리',
+              text: '나의 게시물 관리',
               onTap: () {
                 Navigator.push(
                     context,
