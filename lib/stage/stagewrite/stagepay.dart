@@ -2,6 +2,7 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/stage/stagewrite/stagedeadlinedate.dart';
 import 'package:flutter/material.dart';
 import 'package:amuze/main.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class StagePay extends StatefulWidget {
@@ -83,28 +84,45 @@ class _StagePayState extends State<StagePay> {
             Center(
               child: Column(
                 children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    child: TextField(
-                      controller: TextEditingController(
-                          text: Provider.of<StageWriteProvider>(context,
-                                  listen: false)
-                              .pay),
-                      onChanged: (text) {
-                        Provider.of<StageWriteProvider>(context, listen: false)
-                            .setPay(text);
-                      },
-                      maxLines: null,
-                      maxLength: 50,
-                      decoration: const InputDecoration(
-                          hintText: '공연 페이',
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.disabled)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.basic))),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: TextField(
+                          controller: TextEditingController(
+                              text: Provider.of<StageWriteProvider>(context,
+                                      listen: false)
+                                  .pay),
+                          onChanged: (text) {
+                            Provider.of<StageWriteProvider>(context,
+                                    listen: false)
+                                .setPay(text);
+                          },
+                          maxLines: null,
+                          keyboardType: TextInputType.datetime,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: const InputDecoration(
+                              hintText: '공연 페이',
+                              enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: PrimaryColors.disabled)),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: PrimaryColors.basic))),
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          '원',
+                          style:
+                              TextStyle(fontSize: 15, color: TextColors.medium),
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),

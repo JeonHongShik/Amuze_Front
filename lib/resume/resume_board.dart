@@ -2,7 +2,7 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_post.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
-import 'package:amuze/server_communication/get/resume_priview_get_server.dart';
+import 'package:amuze/server_communication/get/preview/resume_preview_get_server.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -28,6 +28,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),
@@ -94,7 +95,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
                       });
                     },
                     child: const Text(
-                      '공고 작성하기',
+                      '이력서 작성하기',
                       style: TextStyle(
                         color: TextColors.medium,
                         fontSize: 12,

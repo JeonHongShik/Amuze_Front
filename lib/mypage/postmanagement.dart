@@ -1,10 +1,9 @@
 import 'package:amuze/community/community_post.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/resume/resume_post.dart';
-import 'package:amuze/server_communication/get/mycommunity_get_server.dart';
-import 'package:amuze/server_communication/get/myresume_get_server.dart';
-import 'package:amuze/server_communication/get/mystage_get_server.dart';
-import 'package:amuze/server_communication/get/stage_preview_get_server.dart';
+import 'package:amuze/server_communication/get/my/mycommunity_get_server.dart';
+import 'package:amuze/server_communication/get/my/myresume_get_server.dart';
+import 'package:amuze/server_communication/get/my/mystage_get_server.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -348,7 +347,7 @@ class _MyresumesState extends State<Myresumes> {
                                               BorderRadius.circular(20),
                                           image: DecorationImage(
                                               image: NetworkImage(
-                                                  'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${data.mainimage!}'),
+                                                  'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${data.mainimage!}/'),
                                               fit: BoxFit.fill)),
                                     )
                                   : Container(
@@ -495,6 +494,7 @@ class _MycommunitiesState extends State<Mycommunities> {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
+                    shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       var data = snapshot.data![index];
@@ -520,29 +520,29 @@ class _MycommunitiesState extends State<Mycommunities> {
                               border: Border(
                                   top: BorderSide(color: backColors.disabled))),
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(15, 5, 0, 0),
+                            padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      data.title!,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500,
-                                        color: TextColors.high,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                  ],
+                                Text(
+                                  data.title!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w500,
+                                    color: TextColors.high,
+                                  ),
                                 ),
-                                SizedBox(
-                                  width: 220,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  width: MediaQuery.of(context).size.width,
                                   child: Text(
                                     data.content!,
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -554,7 +554,7 @@ class _MycommunitiesState extends State<Mycommunities> {
                                   height: 10,
                                 ),
                                 const Padding(
-                                  padding: EdgeInsets.only(right: 15),
+                                  padding: EdgeInsets.fromLTRB(0, 0, 15, 5),
                                   child: Row(
                                     children: [
                                       Text(

@@ -14,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:dio/dio.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'server_communication/patch/community_patch._server.dart';
 
@@ -71,10 +72,16 @@ void main() async {
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            primaryColor: Colors.white,
+            primaryColor: Colors.transparent,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
           ),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('ko', 'KR')],
         ),
       ),
     );

@@ -31,6 +31,8 @@ dependencies:
   kakao_flutter_sdk: ^1.6.1
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   
 
@@ -59,13 +61,24 @@ dependencies:
   multi_image_picker_plus: ^0.0.3
   shimmer: ^3.0.0
   webview_flutter: ^4.4.2
-  intl: ^0.19.0
+  intl: ^0.18.0
   flutter_time_picker_spinner: ^2.0.0
   flutter_custom_dialog: ^1.3.0
   dio: ^5.4.0
   permission_handler: ^11.1.0
   firebase_storage: ^11.5.6
   flutter_launcher_icons: ^0.13.1
+  android_intent: ^2.0.2
+  package_info: ^2.0.2
+  flutter_native_splash: ^2.3.9
+
+flutter_native_splash:
+  color: "F5E8D4"
+  image: assets/images/amuze이름로고_정사각형.png
+  android: true
+  android_gravity: center
+  fullscreen: true
+  #android12: true
   
   
   

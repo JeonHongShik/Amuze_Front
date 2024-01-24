@@ -132,23 +132,17 @@ class MyPage extends StatelessWidget {
           MypageElement(
               icon: Icons.notifications,
               text: '알림 설정',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DummyPage(),
-                    ));
+              onTap: () async {
+                // 알림 설정 페이지로 가는 코드 현재 오류
+                /* PackageInfo packageInfo = await PackageInfo.fromPlatform();
+                String packageName = packageInfo.packageName;
+                var intent = AndroidIntent(
+                    action: 'android.settings.APPLICATION_SETTINGS',
+                    data: 'package:$packageName');
+                await intent.launch(); */
               }),
           MypageElement(
-              icon: Icons.headset_mic,
-              text: '문의 (카카오톡 채널상담)',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DummyPage(),
-                    ));
-              }),
+              icon: Icons.headset_mic, text: '문의 (카카오톡 채널상담)', onTap: () {}),
           const Spacer(),
           // 로그아웃 버튼
           GestureDetector(

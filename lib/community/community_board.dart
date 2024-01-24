@@ -2,11 +2,10 @@ import 'package:amuze/community/community_post.dart';
 import 'package:amuze/community/communitywrite/communitywrite.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/resume/resume_board.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../server_communication/get/community_preview_get_server.dart';
+import '../server_communication/get/preview/community_preview_get_server.dart';
 
 class CommunityBoard extends StatefulWidget {
   const CommunityBoard({super.key});
@@ -29,6 +28,7 @@ class _CommunityBoardState extends State<CommunityBoard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),

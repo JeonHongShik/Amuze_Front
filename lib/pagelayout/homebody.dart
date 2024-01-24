@@ -4,10 +4,10 @@ import 'package:amuze/gathercolors.dart';
 
 import 'package:amuze/resume/resume_board.dart';
 import 'package:amuze/resume/resume_post.dart';
-import 'package:amuze/server_communication/get/community_preview_get_server.dart';
-import 'package:amuze/server_communication/get/resume_priview_get_server.dart';
+import 'package:amuze/server_communication/get/preview/community_preview_get_server.dart';
+import 'package:amuze/server_communication/get/preview/resume_preview_get_server.dart';
 
-import 'package:amuze/server_communication/get/stage_preview_get_server.dart';
+import 'package:amuze/server_communication/get/preview/stage_preview_get_server.dart';
 import 'package:amuze/stage/stage_board.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:flutter/material.dart';
@@ -326,13 +326,16 @@ class _StageBoardsState extends State<StageBoards> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              data.title!.length > 13
-                                                  ? '${data.title!.substring(0, 13)}...'
-                                                  : data.title!,
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                            Expanded(
+                                              child: Text(
+                                                data.title!,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
                                             )
                                           ],
                                         )),

@@ -1,7 +1,7 @@
 import 'package:amuze/community/communitywrite/communitywrite.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/server_communication/get/comment_get_server.dart';
-import 'package:amuze/server_communication/get/community_detail_get_server.dart';
+import 'package:amuze/server_communication/get/detail/community_detail_get_server.dart';
 import 'package:amuze/server_communication/post/comment_post_server.dart';
 
 import 'package:dio/dio.dart';
@@ -30,6 +30,7 @@ class _CommunityPostState extends State<CommunityPost> {
   bool bookmarked = false;
   int bookmarkId = 0;
   bool ready = true;
+  int commenttotal = 0;
 
   Future<void> _showPostDeleteDialog(BuildContext context) async {
     return showDialog<void>(
@@ -192,17 +193,20 @@ class _CommunityPostState extends State<CommunityPost> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         setState(() {
           bookmarked = response.data['bookmark'];
-          bookmarkId = response.data['id'];
+          if (bookmarked) {
+            bookmarkId = response.data['id'];
+          }
         });
         print('/////////////////////////////$bookmarked');
         print('/////////////////////////////$bookmarkId');
       }
     } catch (e) {
-      print('Error : $e');
+      print('CheckError : $e');
     }
   }
 
   void _toggleBookmarked() async {
+    // post에 400에러 문제 있음
     final provider = Provider.of<UserInfoProvider>(context, listen: false);
     if (bookmarked == false) {
       try {
@@ -256,6 +260,7 @@ class _CommunityPostState extends State<CommunityPost> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),
         leading: IconButton(
           onPressed: () {
@@ -423,7 +428,7 @@ class _CommunityPostState extends State<CommunityPost> {
                               ],
                             ),
                             const SizedBox(
-                              height: 15,
+                              height: 30,
                             ),
                             Text(
                               '${item.content}',
@@ -433,31 +438,29 @@ class _CommunityPostState extends State<CommunityPost> {
                               ),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 50,
                             ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: const Icon(Icons.favorite_border),
+                                ),
                                 const Text(
-                                  '공감 8',
+                                  ' 8',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 15,
                                     color: TextColors.disabled,
                                   ),
                                 ),
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                const Text(
-                                  '댓글 2',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: TextColors.disabled,
-                                  ),
-                                ),
                                 const SizedBox(
                                   width: 5,
                                 ),
+                                const Spacer(),
                                 const Text(
                                   '01/12 19:55',
                                   style: TextStyle(
@@ -465,19 +468,6 @@ class _CommunityPostState extends State<CommunityPost> {
                                     color: TextColors.disabled,
                                   ),
                                 ),
-                                const Spacer(),
-                                IconButton(
-                                    visualDensity: const VisualDensity(
-                                      horizontal: -4,
-                                      vertical: -4,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.warning_amber_rounded,
-                                      color: IconColors.inactive,
-                                      size: 18,
-                                    )),
                               ],
                             ),
                           ],
@@ -509,10 +499,10 @@ class _CommunityPostState extends State<CommunityPost> {
                 children: [
                   Container(
                     padding: const EdgeInsets.only(left: 15),
-                    child: const Text(
-                      '댓글',
-                      style:
-                          TextStyle(color: PrimaryColors.basic, fontSize: 18),
+                    child: Text(
+                      '댓글 $commenttotal',
+                      style: const TextStyle(
+                          color: PrimaryColors.basic, fontSize: 17),
                     ),
                   ),
                 ],
@@ -560,6 +550,11 @@ class _CommunityPostState extends State<CommunityPost> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      commenttotal = snapshot.data!.length;
+                    });
+                  });
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
@@ -582,8 +577,7 @@ class _CommunityPostState extends State<CommunityPost> {
                                       '익명',
                                       style: TextStyle(fontSize: 15),
                                     ),
-                                    if (userprovider.displayName ==
-                                        comment.uid) ...[
+                                    if (userprovider.uid == comment.uid) ...[
                                       GestureDetector(
                                         onTap: () async {
                                           await _showCommentDeleteDialog(
@@ -595,6 +589,7 @@ class _CommunityPostState extends State<CommunityPost> {
                                           child: const Icon(
                                             Icons.delete,
                                             size: 20,
+                                            color: IconColors.inactive,
                                           ),
                                         ),
                                       )

@@ -1,7 +1,7 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
-import 'package:amuze/server_communication/get/resume_detail_get_server.dart';
+import 'package:amuze/server_communication/get/detail/resume_detail_get_server.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -199,6 +199,7 @@ class _ResumePostState extends State<ResumePost> {
         controller: _scrollController,
         slivers: <Widget>[
           SliverAppBar(
+            scrolledUnderElevation: 0,
             expandedHeight: imageHeight,
             pinned: true,
             backgroundColor: Colors.transparent,
@@ -316,7 +317,7 @@ class _ResumePostState extends State<ResumePost> {
                       children: snapshot.data!.map((item) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
+                          children: [
                             Container(
                                 decoration: const BoxDecoration(
                                     border: Border(

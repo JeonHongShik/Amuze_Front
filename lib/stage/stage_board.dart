@@ -1,7 +1,7 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/stage/stage_post.dart';
-import 'package:amuze/server_communication/get/stage_preview_get_server.dart';
+import 'package:amuze/server_communication/get/preview/stage_preview_get_server.dart';
 
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +28,7 @@ class _StageBoardState extends State<StageBoard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),

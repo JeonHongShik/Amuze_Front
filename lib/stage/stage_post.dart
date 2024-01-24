@@ -1,6 +1,6 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
-import 'package:amuze/server_communication/get/stage_detail_get_server.dart';
+import 'package:amuze/server_communication/get/detail/stage_detail_get_server.dart';
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
@@ -199,6 +199,7 @@ class _StagePostState extends State<StagePost> {
         controller: _scrollController,
         slivers: <Widget>[
           SliverAppBar(
+            scrolledUnderElevation: 0,
             expandedHeight: imageHeight,
             pinned: true,
             backgroundColor: Colors.transparent,
@@ -386,7 +387,7 @@ class _StagePostState extends State<StagePost> {
                           const postmargin(),
                           buildNullableInfo('위치', item.region),
                           const postmargin(),
-                          buildNullableInfo('페이', item.pay),
+                          paybuildNullableInfo('페이', item.pay),
                           const postmargin(),
                           buildNullableInfo('공연 정보', item.introduce),
                         ];
@@ -604,6 +605,30 @@ Widget buildNullableInfo(String label, String? value) {
               ),
               Text(
                 value,
+                style: const TextStyle(color: TextColors.high, fontSize: 18),
+                overflow: TextOverflow.visible, // 오버플로우 처리 변경
+                softWrap: true, // 자동 줄바꿈 활성화
+              )
+            ],
+          ),
+        )
+      : const SizedBox.shrink();
+}
+
+Widget paybuildNullableInfo(String label, String? value) {
+  return value != null && value.isNotEmpty
+      ? Container(
+          margin: const EdgeInsets.only(left: 20),
+          padding: const EdgeInsets.fromLTRB(0, 20, 10, 10), // 하단 패딩 조정
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(color: TextColors.medium, fontSize: 15),
+              ),
+              Text(
+                '$value원',
                 style: const TextStyle(color: TextColors.high, fontSize: 18),
                 overflow: TextOverflow.visible, // 오버플로우 처리 변경
                 softWrap: true, // 자동 줄바꿈 활성화

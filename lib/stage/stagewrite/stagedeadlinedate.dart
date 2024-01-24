@@ -113,11 +113,34 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                                     BorderSide(color: PrimaryColors.basic))),
                         onTap: () async {
                           DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2101),
-                          );
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2101),
+                              initialEntryMode:
+                                  DatePickerEntryMode.calendarOnly,
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: const ColorScheme.light(
+                                      primary: PrimaryColors
+                                          .basic, // header background color
+
+                                      onPrimary:
+                                          Colors.black, // header text color
+                                      onSurface:
+                                          Colors.black, // body text color
+                                    ),
+                                    textButtonTheme: TextButtonThemeData(
+                                      style: TextButton.styleFrom(
+                                          foregroundColor:
+                                              Colors.black // button text color
+                                          ),
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              });
 
                           if (pickedDate != null) {
                             String formattedDate =
@@ -152,11 +175,33 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                                     BorderSide(color: PrimaryColors.basic))),
                         onTap: () async {
                           DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2101),
-                          );
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2101),
+                              initialEntryMode:
+                                  DatePickerEntryMode.calendarOnly,
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: const ColorScheme.light(
+                                      primary: PrimaryColors
+                                          .basic, // header background color
+                                      onPrimary:
+                                          Colors.black, // header text color
+                                      onSurface:
+                                          Colors.black, // body text color
+                                    ),
+                                    textButtonTheme: TextButtonThemeData(
+                                      style: TextButton.styleFrom(
+                                          foregroundColor:
+                                              Colors.black // button text color
+                                          ),
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              });
 
                           if (pickedDate != null) {
                             String formattedDate =
@@ -193,10 +238,35 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                           TimeOfDay? pickedTime = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
+                            initialEntryMode: TimePickerEntryMode.inputOnly,
+                            builder: (context, child) {
+                              return MediaQuery(
+                                data: MediaQuery.of(context)
+                                    .copyWith(alwaysUse24HourFormat: true),
+                                child: Theme(
+                                  data: ThemeData.light().copyWith(
+                                    colorScheme: const ColorScheme.light(
+                                        // change the border color
+                                        primary: PrimaryColors.basic,
+                                        // change the text color
+                                        onSurface: Colors.black,
+                                        onBackground: Colors.black),
+                                    // button colors
+                                    buttonTheme: const ButtonThemeData(
+                                      colorScheme: ColorScheme.light(
+                                        primary: PrimaryColors.basic,
+                                      ),
+                                    ),
+                                  ),
+                                  child: child!,
+                                ),
+                              );
+                            },
                           );
 
                           if (pickedTime != null) {
-                            String formattedTime = pickedTime.format(context);
+                            String formattedTime =
+                                '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
                             setState(() {
                               timeController.text = formattedTime;
                               Provider.of<StageWriteProvider>(context,

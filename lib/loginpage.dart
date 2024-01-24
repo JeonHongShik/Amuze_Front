@@ -1,3 +1,5 @@
+import 'package:amuze/gathercolors.dart';
+import 'package:amuze/loadingscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -5,7 +7,7 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:dio/dio.dart';
 
-//로그인 후 sucure_storage에 정보 저장
+// 로그인 후 secure_storage에 정보 저장
 Future<void> saveFirebaseAccountInfo() async {
   auth.User? user = auth.FirebaseAuth.instance.currentUser;
 
@@ -40,64 +42,106 @@ Future<void> peristalsis() async {
   }
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool ready = true;
+
+  Future<void> navigateToHome(BuildContext context) async {
+    try {
+      OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+      var provider = auth.OAuthProvider('oidc.kakao');
+      var credential = provider.credential(
+        idToken: token.idToken,
+        accessToken: token.accessToken,
+      );
+
+      if (context.mounted) {
+        showGeneralDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.transparent, // 투명한 배경색
+          pageBuilder: (context, animation1, animation2) {
+            return const LoadingScreen();
+          },
+        );
+      }
+      await auth.FirebaseAuth.instance.signInWithCredential(credential);
+      await saveFirebaseAccountInfo();
+      await peristalsis();
+
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (error) {
+      print('카카오계정으로 로그인 실패 $error');
+      if (context.mounted) {
+        setState(() {
+          ready = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Align(
-        alignment: const Alignment(0, 0.8),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
-                child: Container(
-                  decoration: BoxDecoration(
-                      image: const DecorationImage(
-                        image: AssetImage(
-                            'assets/images/kakao_login_large_narrow.png'),
-                        fit: BoxFit.fill,
+      backgroundColor: TertiaryColors.basic,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+              child: Center(
+            child: Image.asset('assets/images/amuze이름로고.png'),
+          )),
+          Align(
+            alignment: const Alignment(0, 0.8),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: GestureDetector(
+                      onTap: ready
+                          ? () async {
+                              setState(() {
+                                ready = false;
+                              });
+                              await navigateToHome(context);
+                            }
+                          : null,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            image: const DecorationImage(
+                              image: AssetImage(
+                                  'assets/images/kakao_login_large_narrow.png'),
+                              fit: BoxFit.fill,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 3,
+                                blurRadius: 7,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]),
+                        width: MediaQuery.of(context).size.width * 0.55,
+                        height: 50,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 3,
-                          blurRadius: 7,
-                          offset: const Offset(0, 4), // 그림자의 위치 조정
-                        ),
-                      ]),
-                  width: MediaQuery.of(context).size.width * 0.55,
-                  height: 50,
-                ),
-                onTap: () async {
-                  try {
-                    OAuthToken token = await UserApi.instance
-                        .loginWithKakaoAccount(); // 카카오 로그인
-                    var provider = auth.OAuthProvider('oidc.kakao'); // 제공업체 id
-                    var credential = provider.credential(
-                      idToken: token.idToken, // 카카오 로그인에서 발급된 idToken
-                      accessToken:
-                          token.accessToken, // 카카오 로그인에서 발급된 accessToken
-                    );
-                    await auth.FirebaseAuth.instance
-                        .signInWithCredential(credential);
-                    if (context.mounted) {
-                      await saveFirebaseAccountInfo();
-                      Navigator.pushReplacementNamed(
-                          context, '/home'); // 로그인 성공시 홈으로 이동
-                    }
-                  } catch (error) {
-                    print('카카오계정으로 로그인 실패 $error');
-                  }
-                  await peristalsis();
-                },
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -100,7 +100,7 @@ class _ResumetitleState extends State<Resumetitle> {
                         .setTitle(text);
                   },
                   maxLines: null,
-                  maxLength: 50,
+                  maxLength: 30,
                   decoration: const InputDecoration(
                       hintText: '제목을 입력하세요.',
                       enabledBorder: UnderlineInputBorder(

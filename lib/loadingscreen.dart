@@ -1,3 +1,4 @@
+import 'package:amuze/gathercolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -7,11 +8,11 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      backgroundColor: Colors.transparent,
       body: Center(
         child: SpinKitFadingCube(
-          color: Colors.blue,
-          size: 50.0,
-          duration: Duration(seconds: 2),
+          color: PrimaryColors.basic,
+          size: 30.0,
         ),
       ),
     );

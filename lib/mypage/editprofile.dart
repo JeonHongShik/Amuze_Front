@@ -1,18 +1,15 @@
 import 'dart:io';
-
+import 'package:amuze/loadingscreen.dart';
 import 'package:amuze/main.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
-
 import '../gathercolors.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:dio/dio.dart';
 
 class EditProfile extends StatefulWidget {
@@ -255,6 +252,16 @@ class _EditProfileState extends State<EditProfile> {
               return ElevatedButton(
                   onPressed: hasNameText
                       ? () async {
+                          showGeneralDialog(
+                            context: context,
+                            barrierDismissible:
+                                false, // 다이얼로그 외부 탭으로 닫히지 않도록 설정
+                            barrierColor: Colors.transparent,
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return const LoadingScreen(); // 여기서 LoadingScreen은 StatelessWidget
+                            },
+                          );
                           var userInfoProvider = Provider.of<UserInfoProvider>(
                               context,
                               listen: false);
@@ -263,6 +270,7 @@ class _EditProfileState extends State<EditProfile> {
                           await userInfoProvider
                               .updateUserName(nameController.text);
                           await peristalsis();
+                          Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         }
                       : null,

@@ -122,32 +122,43 @@ class _StagePhotosState extends State<StagePhotos> {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 //otherimages 선택 함수//////////////////////////////////////////////////
-  Future<List<ImageItem>> loadAndConvertImages() async {
-    streamController.add([]);
-    await requestPermissionIfNeeded();
-    final otherImages = await MultiImagePicker.pickImages(
-      selectedAssets: assetOhterImages,
-      cupertinoOptions: const CupertinoOptions(
-        doneButton: UIBarButtonItem(title: 'Confirm'),
-        cancelButton: UIBarButtonItem(title: 'Cancel'),
-        albumButtonColor: PrimaryColors.basic,
-      ),
-      materialOptions: const MaterialOptions(
-        maxImages: 4,
-        enableCamera: true,
-        actionBarTitle: "사진첩",
-        allViewTitle: "All Photos",
-        useDetailsView: true,
-      ),
-    );
-    assetOhterImages = otherImages;
-    //assetMainImage.insert(0, otherImages.first);
+  Future<List<ImageItem>?> loadAndConvertImages() async {
+    try {
+      streamController.add([]);
+      await requestPermissionIfNeeded();
+      final otherImages = await MultiImagePicker.pickImages(
+        selectedAssets: assetOhterImages,
+        cupertinoOptions: const CupertinoOptions(
+          doneButton: UIBarButtonItem(title: 'Confirm'),
+          cancelButton: UIBarButtonItem(title: 'Cancel'),
+          albumButtonColor: PrimaryColors.basic,
+        ),
+        materialOptions: const MaterialOptions(
+          maxImages: 4,
+          enableCamera: true,
+          actionBarTitle: "사진첩",
+          allViewTitle: "All Photos",
+          useDetailsView: true,
+        ),
+      );
+      assetOhterImages = otherImages;
 
-    await convertOtherImagesAssetToFile();
+      await convertOtherImagesAssetToFile();
 
-    streamController.add(fileOtherImages!);
+      streamController.add(fileOtherImages!);
 
-    return fileOtherImages!;
+      return fileOtherImages!;
+    } catch (e) {
+      if (e is NoImagesSelectedException) {
+        // 사용자가 이미지를 선택하지 않고 취소했을 때의 처리
+        print('No images selected');
+        return null;
+      } else {
+        // 다른 예외 처리
+        print('An unexpected error occurred: $e');
+        return null;
+      }
+    }
   }
 ///////////////////////////////////////////////////////////
 
@@ -277,33 +288,43 @@ class _StagePhotosState extends State<StagePhotos> {
                                   color: Colors.grey),
                               child: IconButton(
                                 onPressed: () async {
-                                  await requestPermissionIfNeeded();
-                                  final mainImage =
-                                      await MultiImagePicker.pickImages(
-                                    selectedAssets: assetMainImage,
-                                    cupertinoOptions: const CupertinoOptions(
-                                      doneButton:
-                                          UIBarButtonItem(title: 'Confirm'),
-                                      cancelButton:
-                                          UIBarButtonItem(title: 'Cancel'),
-                                      albumButtonColor: PrimaryColors.basic,
-                                    ),
-                                    materialOptions: const MaterialOptions(
-                                      maxImages: 1,
-                                      enableCamera: true,
-                                      actionBarTitle: "Example App",
-                                      allViewTitle: "All Photos",
-                                      useDetailsView: false,
-                                    ),
-                                  );
-                                  if (mainImage.isNotEmpty) {
-                                    assetMainImage.insert(0, mainImage.first);
-                                    Provider.of<StageWriteProvider>(context,
-                                            listen: false)
-                                        .setAssetMainimage(mainImage);
+                                  try {
+                                    await requestPermissionIfNeeded();
+                                    final mainImage =
+                                        await MultiImagePicker.pickImages(
+                                      selectedAssets: assetMainImage,
+                                      cupertinoOptions: const CupertinoOptions(
+                                        doneButton:
+                                            UIBarButtonItem(title: 'Confirm'),
+                                        cancelButton:
+                                            UIBarButtonItem(title: 'Cancel'),
+                                        albumButtonColor: PrimaryColors.basic,
+                                      ),
+                                      materialOptions: const MaterialOptions(
+                                        maxImages: 1,
+                                        enableCamera: true,
+                                        actionBarTitle: "사진첩",
+                                        allViewTitle: "All Photos",
+                                        useDetailsView: true,
+                                      ),
+                                    );
+                                    if (mainImage.isNotEmpty) {
+                                      assetMainImage.insert(0, mainImage.first);
+                                      Provider.of<StageWriteProvider>(context,
+                                              listen: false)
+                                          .setAssetMainimage(mainImage);
+                                    }
+                                    await convertMainImgageAssetToFile(
+                                        assetMainImage);
+                                  } catch (e) {
+                                    if (e is NoImagesSelectedException) {
+                                      // 사용자가 이미지를 선택하지 않고 취소했을 때의 처리
+                                      print('No images selected');
+                                    } else {
+                                      // 다른 예외 처리
+                                      print('An unexpected error occurred: $e');
+                                    }
                                   }
-                                  await convertMainImgageAssetToFile(
-                                      assetMainImage);
                                 },
                                 icon: const Icon(Icons.photo_camera),
                                 color: Colors.black,

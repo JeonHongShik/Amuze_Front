@@ -109,7 +109,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
                               context: context,
                               builder: (BuildContext context) {
                                 return SizedBox(
-                                  height: 200, // 하단 시트의 높이를 제한합니다.
+                                  height: 400, // 하단 시트의 높이를 제한합니다.
                                   child: ListView(
                                     children: [
                                       '서울',
@@ -187,7 +187,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return SizedBox(
-                                    height: 200, // 하단 시트의 높이를 제한합니다.
+                                    height: 400, // 하단 시트의 높이를 제한합니다.
                                     child: ListView(
                                       children: [
                                         '서울',
