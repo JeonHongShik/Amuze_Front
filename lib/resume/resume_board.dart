@@ -2,6 +2,7 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_post.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
+import 'package:amuze/search/resume_board_search.dart';
 import 'package:amuze/server_communication/get/preview/resume_preview_get_server.dart';
 
 import 'package:flutter/material.dart';
@@ -41,7 +42,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
               onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DummyPage(),
+                    builder: (context) => const ResumeBoardSearch(),
                   )),
               icon: const Icon(
                 Icons.search,

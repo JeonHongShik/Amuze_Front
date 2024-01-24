@@ -2,6 +2,7 @@ import 'package:amuze/community/community_post.dart';
 import 'package:amuze/community/communitywrite/communitywrite.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:amuze/search/community_board_search.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -41,7 +42,7 @@ class _CommunityBoardState extends State<CommunityBoard> {
               onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DummyPage(),
+                    builder: (context) => const CommunityBoardSearch(),
                   )),
               icon: const Icon(
                 Icons.search,

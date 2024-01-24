@@ -1,11 +1,15 @@
+import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/pagelayout/chatbody.dart';
 import 'package:amuze/pagelayout/homebody.dart';
 import 'package:amuze/pagelayout/mypage.dart';
 import 'package:amuze/pagelayout/notifybody.dart';
+import 'package:amuze/resume/resume_board.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'stage/stage_board.dart';
 
 class BottomNavigationProvider extends ChangeNotifier {
   int _currentPage = 0;
@@ -128,10 +132,74 @@ void menuPopup(context) {
   showDialog(
     context: context,
     builder: (context) {
-      return Dialog(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.5,
-          height: 100,
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(70, 0, 70, 0), // dialog 박스 width 조절
+        child: Dialog(
+          alignment: const Alignment(0.0, 0.7),
+          child: SizedBox(
+            height: 150,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const StageBoard()),
+                    );
+                  },
+                  child:
+                      // Container(
+                      //   width: 60,
+                      //   height: 60,
+                      //   decoration: BoxDecoration(
+                      //       color: Colors.red,
+                      //       borderRadius: BorderRadius.circular(50)),
+                      // ),
+                      const Text(
+                    '공고 게시판',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ResumeBoard()),
+                    );
+                  },
+                  child: const Text(
+                    '이력서 게시판',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CommunityBoard()),
+                    );
+                  },
+                  child: const Text(
+                    '커뮤니티 게시판',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       );
     },
