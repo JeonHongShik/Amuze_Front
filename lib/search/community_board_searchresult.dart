@@ -1,6 +1,5 @@
-import 'package:amuze/search/community_board_search.dart';
 import 'package:amuze/server_communication/get/preview/community_preview_get_server.dart';
-import 'package:dio/dio.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 

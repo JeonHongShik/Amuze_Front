@@ -58,7 +58,6 @@ class _ResumeBoardSearchResultState extends State<ResumeBoardSearchResult> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  print(snapshot.hasData);
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     setState(() {
                       // totalcount = snapshot.data!.length;
