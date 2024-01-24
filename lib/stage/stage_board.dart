@@ -1,5 +1,6 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:amuze/search/stage_board_search.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:amuze/server_communication/get/stage_preview_get_server.dart';
 
@@ -40,7 +41,7 @@ class _StageBoardState extends State<StageBoard> {
               onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DummyPage(),
+                    builder: (context) => const StageBoardSearch(),
                   )),
               icon: const Icon(
                 Icons.search,
