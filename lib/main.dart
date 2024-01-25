@@ -1,137 +1,141 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:amuze/message.dart';
 import 'package:amuze/homepage.dart';
+import 'package:amuze/message.dart';
 import 'package:amuze/loginpage.dart';
 import 'package:amuze/server_communication/patch/resume_patch_server.dart';
 import 'package:amuze/server_communication/patch/stage_patch_server.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get_core/get_core.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:logger/logger.dart';
 import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'server_communication/patch/community_patch._server.dart';
 
-late final AndroidNotificationChannel channel;
-final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-//백그라운드 알림 설정
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  //채널 설정
-  AndroidNotificationChannel channel = const AndroidNotificationChannel(
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await setupFlutterNotifications();
+  showFlutterNotification(message);
+
+  print('Handling a background message ${message.messageId}');
+  print("${message}");
+}
+
+///  [AndroidNotificationChannel] 채널생성
+late AndroidNotificationChannel channel;
+
+bool isFlutterLocalNotificationsInitialized = false;
+
+Future<void> setupFlutterNotifications() async {
+  if (isFlutterLocalNotificationsInitialized) {
+    return;
+  }
+  channel = const AndroidNotificationChannel(
     'high_importance_channel', //채널 id
-    'High Importance Notifications', // 채널 이름
-    description: 'This channel is used for important notifications.', //채널 설명
-    importance: Importance.max,
+    'High Importance Notifications', //채널 title
+    description:
+        'This channel is used for important notifications.', // description
+    importance: Importance.high,
   );
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  /// 알림 채널 만들기
+  ///
+  /// AndroidManifest.xml 파일에 채널설정 기본 fcm 설정
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  print("백그라운드 메시지 처리 ${message.notification!.body!}");
-
-  //FCM 메시지 창
-  flutterLocalNotificationsPlugin.show(
-    message.hashCode,
-    '제목'.toString(), //게시글 제목
-    '댓글'.toString(), // 댓글
-
-    // message.notification?.title.toString(),
-    // message.notification?.body.toString(),
-    //알림창 세부 디테일 앱 아이콘 등등.
-    NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          channelDescription: channel.description,
-        ),
-        iOS: const DarwinNotificationDetails(badgeNumber: 1)),
-  );
-
-  //알림 클릭시 이동 이벤트 background
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    print("onMessage ${message.data["action"].toString()}");
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      Navigator.of(GlobalVariable.navState.currentContext!)
-          .push(MaterialPageRoute(builder: (context) => const DummyPage()));
-    });
-    return;
-  });
-  //
-}
-
-void initializeNotification() async {
-  //백그라운드 설정
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  FirebaseMessaging.onMessage.listen((message) {
-    _flutterNotificationShow(message);
-  });
-
-  await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-    ),
-  );
-
+  /// ios 설정
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
+  isFlutterLocalNotificationsInitialized = true;
 }
-//
 
-void _flutterNotificationShow(RemoteMessage message) {
-  flutterLocalNotificationsPlugin.show(
-    message.hashCode,
-    message.data['title'].toString(),
-    message.data['body'].toString(),
-
-    // message.notification?.title.toString(),
-    // message.notification?.body.toString(),
-    NotificationDetails(
+void showFlutterNotification(RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+  if (notification != null && android != null && !kIsWeb) {
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
         android: AndroidNotificationDetails(
           channel.id,
           channel.name,
           channelDescription: channel.description,
-          color: const Color.fromARGB(0, 255, 0, 0),
-          icon: '@mipmap/logo', // 알람 앱바 이미지
-          largeIcon: const DrawableResourceAndroidBitmap(
-              '@mipmap/ico_manager'), // 알람 내 이미지
+          icon: 'launch_background',
         ),
-        iOS: const DarwinNotificationDetails(badgeNumber: 1)),
-  );
+      ),
+    );
+  }
 }
-//
+
+/// [FlutterLocalNotificationsPlugin] package.
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+void initializeNotification() async {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+    var androidNotiDetails = AndroidNotificationDetails(
+      channel.id,
+      channel.name,
+      channelDescription: channel.description,
+    );
+
+    var details = NotificationDetails(android: androidNotiDetails);
+    if (notification != null) {
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        details,
+      );
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    print(message);
+  });
+}
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
 
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   //firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  initializeNotification();
+
+  if (!kIsWeb) {
+    await setupFlutterNotifications();
+  }
 
   //우리 앱의 Key값
   KakaoSdk.init(
@@ -141,9 +145,6 @@ void main() async {
 
   //KakaoSDK로 키 해시 값 받을 때 사용, 키 해시 값 카카오디벨로퍼에 등록해야 함
   //print(await KakaoSdk.origin);
-
-  //알림
-  initializeNotification();
 
   //앱을 세로로 고정
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
@@ -181,16 +182,10 @@ void main() async {
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            primaryColor: Colors.transparent,
+            primaryColor: Colors.white,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
           ),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('ko', 'KR')],
         ),
       ),
     );
