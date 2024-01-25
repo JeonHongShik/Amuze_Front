@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         title: const Text(
-          'Amuze',
+          'amuze',
           style: TextStyle(
               color: PrimaryColors.basic,
               fontWeight: FontWeight.bold,

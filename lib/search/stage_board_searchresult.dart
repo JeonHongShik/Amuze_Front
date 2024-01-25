@@ -173,7 +173,8 @@ class _StageBoardSearchResultState extends State<StageBoardSearchResult> {
                               MaterialPageRoute(
                                 builder: (context) => StagePost(id: data.id),
                               )).then((_) => setState(() {
-                                serverData = stagepreviewfetchData();
+                                serverData = stagesearchpreviewfetchData(
+                                    widget.searchtext!);
                               }));
                         },
                         child: Container(

@@ -1,6 +1,8 @@
 import 'package:amuze/gathercolors.dart';
+import 'package:amuze/homepage.dart';
 import 'package:amuze/loadingscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -13,12 +15,15 @@ Future<void> saveFirebaseAccountInfo() async {
 
   String providerId = user?.providerData[0].providerId ?? '';
 
+  final token = await FirebaseMessaging.instance.getToken(); //fcm 알림토큰
+
   await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
     'providerId': providerId,
     'uid': user?.uid,
     'email': user?.email,
     'displayName': user?.displayName,
     'photoURL': user?.photoURL,
+    'messagingToken': token,
   });
 
   // SecureStorage는 안전한 로컬 저장소
@@ -27,6 +32,7 @@ Future<void> saveFirebaseAccountInfo() async {
   await storage.write(key: 'email', value: user?.email);
   await storage.write(key: 'displayName', value: user?.displayName);
   await storage.write(key: 'photoURL', value: user?.photoURL);
+  await storage.write(key: 'messagingToken', value: token);
 }
 
 Future<void> peristalsis() async {
@@ -76,7 +82,11 @@ class _LoginPageState extends State<LoginPage> {
       await peristalsis();
 
       if (context.mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (Route<dynamic> route) => false, // 모든 이전 페이지 제거
+        );
       }
     } catch (error) {
       print('카카오계정으로 로그인 실패 $error');
@@ -126,10 +136,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 3,
-                                blurRadius: 7,
-                                offset: const Offset(0, 4),
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                offset: const Offset(0, 1),
                               ),
                             ]),
                         width: MediaQuery.of(context).size.width * 0.55,

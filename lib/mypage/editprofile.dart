@@ -3,7 +3,9 @@ import 'package:amuze/loadingscreen.dart';
 import 'package:amuze/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
 import '../gathercolors.dart';
@@ -20,6 +22,7 @@ class EditProfile extends StatefulWidget {
 }
 
 var userInfoProvider = Provider.of<UserInfoProvider>;
+const FlutterSecureStorage storage = FlutterSecureStorage();
 
 class _EditProfileState extends State<EditProfile> {
   File? fileSelectedImage;
@@ -27,27 +30,29 @@ class _EditProfileState extends State<EditProfile> {
   // 이미지 선택 및 변환 메서드
   Future<void> selectAndConvertImage() async {
     await requestPermissionIfNeeded();
-    List<Asset> resultList = await MultiImagePicker.pickImages(
-      cupertinoOptions: const CupertinoOptions(
-        doneButton: UIBarButtonItem(title: 'Confirm'),
-        cancelButton: UIBarButtonItem(title: 'Cancel'),
-        albumButtonColor: PrimaryColors.basic,
-      ),
-      materialOptions: const MaterialOptions(
-        maxImages: 4,
-        enableCamera: true,
-        actionBarTitle: "사진첩",
-        allViewTitle: "All Photos",
-        useDetailsView: true,
-      ),
-    );
+    try {
+      List<Asset> resultList = await MultiImagePicker.pickImages(
+        cupertinoOptions: const CupertinoOptions(
+          doneButton: UIBarButtonItem(title: 'Confirm'),
+          cancelButton: UIBarButtonItem(title: 'Cancel'),
+          albumButtonColor: PrimaryColors.basic,
+        ),
+        materialOptions: const MaterialOptions(
+          maxImages: 1,
+          enableCamera: true,
+          actionBarTitle: "사진첩",
+          allViewTitle: "All Photos",
+          useDetailsView: true,
+        ),
+      );
 
-    if (resultList.isNotEmpty) {
-      File convertedFile = await _assetToFile(resultList.first);
-      setState(() {
-        fileSelectedImage = convertedFile;
-      });
-    }
+      if (resultList.isNotEmpty) {
+        File convertedFile = await _assetToFile(resultList.first);
+        setState(() {
+          fileSelectedImage = convertedFile;
+        });
+      }
+    } on NoImagesSelectedException catch (_) {}
   }
 
   // Asset을 File로 변환하는 메서드
@@ -107,6 +112,38 @@ class _EditProfileState extends State<EditProfile> {
       print("Response status: ${response.statusCode}");
     } catch (e) {
       print("Error making GET request: $e");
+    }
+  }
+
+  Future<String> uploadImageToFile(File imageFile) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final imageRef = storageRef.child('user_images/${user.uid}/profile.jpg');
+      await imageRef.putFile(imageFile);
+      final imageUrl = await imageRef.getDownloadURL();
+      return imageUrl;
+    } else {
+      throw Exception('No user logged in');
+    }
+  }
+
+  Future<void> updateProfileImage(File imageFile) async {
+    final imageUrl = await uploadImageToFile(imageFile);
+
+    // Firebase Auth 프로필 업데이트
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.updatePhotoURL(imageUrl);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'photoURL': imageUrl,
+      });
+
+      await storage.write(key: 'photoURL', value: imageUrl);
     }
   }
 
@@ -181,7 +218,7 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   TextField(
                     controller: nameController, // 이름 컨트롤러
-                    maxLength: 20,
+                    maxLength: 10,
                     style: const TextStyle(
                       height: 1,
                       fontSize: 17,
@@ -252,26 +289,39 @@ class _EditProfileState extends State<EditProfile> {
               return ElevatedButton(
                   onPressed: hasNameText
                       ? () async {
-                          showGeneralDialog(
-                            context: context,
-                            barrierDismissible:
-                                false, // 다이얼로그 외부 탭으로 닫히지 않도록 설정
-                            barrierColor: Colors.transparent,
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return const LoadingScreen(); // 여기서 LoadingScreen은 StatelessWidget
-                            },
-                          );
-                          var userInfoProvider = Provider.of<UserInfoProvider>(
-                              context,
-                              listen: false);
-                          await updateUserNameInAuth(nameController.text);
-                          await updateUserNameInFirestore(nameController.text);
-                          await userInfoProvider
-                              .updateUserName(nameController.text);
-                          await peristalsis();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+                          if ((Provider.of<UserInfoProvider>(context,
+                                          listen: false)
+                                      .displayName !=
+                                  nameController.text) ||
+                              fileSelectedImage != null) {
+                            showGeneralDialog(
+                              context: context,
+                              barrierDismissible:
+                                  false, // 다이얼로그 외부 탭으로 닫히지 않도록 설정
+                              barrierColor: Colors.transparent,
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return const LoadingScreen(); // 여기서 LoadingScreen은 StatelessWidget
+                              },
+                            );
+                            var userInfoProvider =
+                                Provider.of<UserInfoProvider>(context,
+                                    listen: false);
+                            if (fileSelectedImage != null) {
+                              await updateProfileImage(fileSelectedImage!);
+                            }
+                            await updateUserNameInAuth(nameController.text);
+                            await updateUserNameInFirestore(
+                                nameController.text);
+                            await userInfoProvider
+                                .updateUserName(nameController.text);
+                            await peristalsis();
+
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          } else {
+                            Navigator.of(context).pop();
+                          }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

@@ -80,13 +80,13 @@ class _StageBoardSearchState extends State<StageBoardSearch> {
                           cursorColor: TextColors.medium,
                           decoration: InputDecoration(
                             contentPadding:
-                                const EdgeInsets.fromLTRB(10, 18, 0, 0),
-                            hintText: '공고 게시물을 검색해보세요!',
+                                const EdgeInsets.fromLTRB(10, 18, 0, 8),
+                            hintText: '공고 게시물을 검색해보세요!\n',
                             hintStyle:
                                 const TextStyle(color: TextColors.medium),
                             border: InputBorder.none,
                             suffix: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 10, 15, 0),
+                              padding: const EdgeInsets.fromLTRB(0, 15, 15, 0),
                               child: GestureDetector(
                                 onTap: () => controller.clear(),
                                 child: const Icon(
