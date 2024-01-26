@@ -124,7 +124,8 @@ class _MySavedResumesState extends State<MySavedResumes> {
                   return ListView.builder(
                     itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           print(data.id);
@@ -310,7 +311,8 @@ class _MySavedstagesState extends State<MySavedstages> {
                   return ListView.builder(
                     itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           print(data.id);
@@ -502,7 +504,8 @@ class _MySavedcommuitiesState extends State<MySavedcommuities> {
                     shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           print(data.id);

@@ -143,6 +143,7 @@ void menuPopup(context) {
               children: [
                 GestureDetector(
                   onTap: () {
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -167,6 +168,7 @@ void menuPopup(context) {
                 ),
                 GestureDetector(
                   onTap: () {
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -183,6 +185,7 @@ void menuPopup(context) {
                 ),
                 GestureDetector(
                   onTap: () {
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
