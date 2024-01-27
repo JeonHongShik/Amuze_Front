@@ -451,7 +451,7 @@ class _CommunityPostState extends State<CommunityPost> {
                                 if (item.author !=
                                     Provider.of<UserInfoProvider>(context,
                                             listen: false)
-                                        .displayName)
+                                        .uid)
                                   IconButton(
                                     padding: EdgeInsets.zero,
                                     visualDensity: const VisualDensity(
