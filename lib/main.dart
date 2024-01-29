@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:dio/dio.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/homepage.dart';
 import 'package:amuze/message.dart';
@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+//import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -27,12 +27,13 @@ import 'server_communication/patch/community_patch._server.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await setupFlutterNotifications();
-  showFlutterNotification(message);
 
-  print('Handling a background message ${message.messageId}');
-  print("${message}");
+  print('Handling a background message ${message.data}');
+  print("$message");
 }
 
 ///  [AndroidNotificationChannel] 채널생성
@@ -94,36 +95,13 @@ void showFlutterNotification(RemoteMessage message) {
 /// [FlutterLocalNotificationsPlugin] package.
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-void initializeNotification() async {
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-    var androidNotiDetails = AndroidNotificationDetails(
-      channel.id,
-      channel.name,
-      channelDescription: channel.description,
-    );
-
-    var details = NotificationDetails(android: androidNotiDetails);
-    if (notification != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        details,
-      );
-    }
-  });
-
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    print(message);
-  });
-}
-
 void main() async {
-  // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
+  // 웹 환경에서 t카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
+  // foreground 수신처리
+  FirebaseMessaging.onMessage.listen(showFlutterNotification);
 
+  // background 수신처리
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   //firebase 초기화
@@ -131,7 +109,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  initializeNotification();
+  // initializeNotification();
 
   if (!kIsWeb) {
     await setupFlutterNotifications();
