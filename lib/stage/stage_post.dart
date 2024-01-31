@@ -40,34 +40,92 @@ class _StagePostState extends State<StagePost> {
       barrierDismissible: false, // 다이얼로그 외부 터치로 닫히지 않도록 설정
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('정말 삭제하시겠습니까?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-              },
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          title: const Text(
+            '정말 게시물을 삭제하시겠습니까?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: TextColors.high,
             ),
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () async {
-                // 2. 확인 버튼 누를 시 삭제 요청 보내기
-                final bool success = await _deletePost(); // 게시물 삭제 함수 호출
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: const Text(
+              '게시물 삭제 시, 게시물을 복구할 수 없습니다.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          contentTextStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: TextColors.high,
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    // 2. 확인 버튼 누를 시 삭제 요청 보내기
+                    final bool success = await _deletePost(); // 게시물 삭제 함수 호출
 
-                if (success) {
-                  // 삭제 성공 시
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                  Navigator.of(context).pop();
-                } else {
-                  // 삭제 실패 시
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('삭제에 실패했습니다.'),
+                    if (success) {
+                      // 삭제 성공 시
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                      Navigator.of(context).pop();
+                    } else {
+                      // 삭제 실패 시
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('삭제에 실패했습니다.'),
+                        ),
+                      );
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    }
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: backColors.disabled,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  );
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                }
-              },
+                    child: const Text(
+                      '삭제하기',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: TextColors.high,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: PrimaryColors.basic,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );

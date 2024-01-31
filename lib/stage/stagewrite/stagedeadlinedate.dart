@@ -100,7 +100,7 @@ class _StageDeadlineDateState extends State<StageDeadlineDate> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
