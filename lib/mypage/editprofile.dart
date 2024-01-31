@@ -320,7 +320,7 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                         actions: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               GestureDetector(
                                 onTap: () async {
@@ -345,9 +345,6 @@ class _EditProfileState extends State<EditProfile> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.02),
                               GestureDetector(
                                 onTap: () => Navigator.of(context).pop(),
                                 child: Container(

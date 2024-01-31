@@ -56,7 +56,7 @@ class _StageWishTypeState extends State<StageWishType> {
                 ),
                 actions: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -87,7 +87,6 @@ class _StageWishTypeState extends State<StageWishType> {
                           ),
                         ),
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(

@@ -177,7 +177,7 @@ class MyPage extends StatelessWidget {
                     ),
                     actions: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           GestureDetector(
                             onTap: () {
@@ -201,8 +201,6 @@ class MyPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.02),
                           GestureDetector(
                             onTap: () {},
                             child: Container(
@@ -253,7 +251,7 @@ class MyPage extends StatelessWidget {
                   ),
                   actions: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         GestureDetector(
                           onTap: () async {
@@ -279,8 +277,6 @@ class MyPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.02),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
                           child: Container(

@@ -56,7 +56,7 @@ class _StageRegionState extends State<StageRegion> {
                 ),
                 actions: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -85,7 +85,6 @@ class _StageRegionState extends State<StageRegion> {
                           ),
                         ),
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(

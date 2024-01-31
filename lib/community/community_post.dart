@@ -70,7 +70,7 @@ class _CommunityPostState extends State<CommunityPost> {
           ),
           actions: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 GestureDetector(
                   onTap: () async {
@@ -107,7 +107,6 @@ class _CommunityPostState extends State<CommunityPost> {
                     ),
                   ),
                 ),
-                SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(

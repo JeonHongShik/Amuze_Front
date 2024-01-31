@@ -68,7 +68,7 @@ class _StagetitleState extends State<Stagetitle> {
                 ),
                 actions: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -96,7 +96,6 @@ class _StagetitleState extends State<Stagetitle> {
                           ),
                         ),
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(

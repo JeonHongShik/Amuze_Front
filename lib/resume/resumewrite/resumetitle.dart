@@ -66,7 +66,7 @@ class _ResumetitleState extends State<Resumetitle> {
                 ),
                 actions: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -94,7 +94,6 @@ class _ResumetitleState extends State<Resumetitle> {
                           ),
                         ),
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
