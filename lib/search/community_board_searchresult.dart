@@ -1,3 +1,4 @@
+import 'package:amuze/search/community_board_search.dart';
 import 'package:amuze/server_communication/get/preview/community_preview_get_server.dart';
 
 import 'package:flutter/material.dart';
@@ -19,11 +20,17 @@ class CommunityBoardSearchResult extends StatefulWidget {
 class _CommunityBoardSearchResultState
     extends State<CommunityBoardSearchResult> {
   late Future<List<CommunityPreviewServerData>> serverData;
+  // late final String searchtext = searchtext;
 
   @override
   void initState() {
     super.initState();
-    serverData = communitypreviewfetchData();
+    serverData = communitysearchpreviewfetchData(widget.searchtext!);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -33,6 +40,7 @@ class _CommunityBoardSearchResultState
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
+            print('searchtext : ${widget.searchtext}');
           },
           icon: const Icon(Icons.arrow_back),
           color: PrimaryColors.basic,

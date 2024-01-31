@@ -12,7 +12,6 @@ class StageBoardSearch extends StatefulWidget {
 
 class _StageBoardSearchState extends State<StageBoardSearch> {
   final TextEditingController controller = TextEditingController();
-  late String searchtext = controller.text;
   FocusNode searchFocus = FocusNode();
 
   @override
@@ -102,6 +101,7 @@ class _StageBoardSearchState extends State<StageBoardSearch> {
                     IconButton(
                       onPressed: () {
                         if (controller.text.isNotEmpty) {
+                          late String searchtext = controller.text;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -111,7 +111,7 @@ class _StageBoardSearchState extends State<StageBoardSearch> {
                             ),
                           );
                         }
-                        print('검색어 : $searchtext');
+                        print('검색어 : ${controller.text}');
                       },
                       icon: const Icon(
                         Icons.search,

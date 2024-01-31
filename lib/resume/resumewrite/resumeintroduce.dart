@@ -30,26 +30,87 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('작성을 취소하고 나가시겠습니까?'),
-                actions: [
-                  TextButton(
-                    child: const Text('아니요'),
-                    onPressed: () => Navigator.of(context).pop(),
+                backgroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                title: const Text(
+                  '이력서 작성을 취소하시겠습니까?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: TextColors.high,
                   ),
-                  TextButton(
-                    child: const Text('예'),
-                    onPressed: () {
-                      Provider.of<ResumeWriteProvider>(context, listen: false)
-                          .reset();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    },
+                ),
+                content: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: const Text(
+                    '취소 시, 작성하신 내용은 저장되지 않습니다.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                contentTextStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: TextColors.high,
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Provider.of<ResumeWriteProvider>(context,
+                                  listen: false)
+                              .reset();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.33,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: backColors.disabled,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            '취소',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: TextColors.high,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.33,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: PrimaryColors.basic,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Text(
+                            '계속 작성하기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -87,7 +148,7 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
               Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.75,
-                  height: MediaQuery.of(context).size.height * 0.5,
+                  height: MediaQuery.of(context).size.height * 0.3,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 300),
                     child: TextField(
@@ -101,14 +162,16 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
                       },
                       maxLines: 15,
                       maxLength: 3000,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                           hintText: '자기소개를 입력하세요.',
                           enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.disabled)),
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: const BorderSide(
+                                  color: PrimaryColors.disabled)),
                           focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: PrimaryColors.basic))),
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: const BorderSide(
+                                  color: PrimaryColors.basic))),
                     ),
                   ),
                 ),

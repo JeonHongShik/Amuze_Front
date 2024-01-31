@@ -82,6 +82,10 @@ class backColors {
   static const Color disabled = Color(0xFFECECEC);
 }
 
+// class buttonColors {
+//   static const Color disabled = Color(0xFFEDEDED);
+// }
+
 class IconSizes {
   // 사이즈도 정해야 함
 }

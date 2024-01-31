@@ -142,14 +142,167 @@ class MyPage extends StatelessWidget {
                 await intent.launch(); */
               }),
           MypageElement(
-              icon: Icons.headset_mic, text: '문의 (카카오톡 채널상담)', onTap: () {}),
+              icon: Icons.headset_mic,
+              text: '문의 (카카오톡 채널상담)',
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                    title: const Padding(
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 2),
+                      child: Text(
+                        '카카오톡 채널 문의',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.bold,
+                          color: TextColors.high,
+                        ),
+                      ),
+                    ),
+                    content: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: const Text(
+                        '확인을 누르면 카카오톡 채널로 이동합니다!',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    contentTextStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: TextColors.high,
+                    ),
+                    actions: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.33,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: backColors.disabled,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                '취소',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: TextColors.high,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.33,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: PrimaryColors.basic,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: const Text(
+                                '확인',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
           const Spacer(),
           // 로그아웃 버튼
           GestureDetector(
             onTap: () async {
-              await signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login', (Route<dynamic> route) => false);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                  title: Container(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                    child: const Text(
+                      '정말 로그아웃 하시겠습니까?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: TextColors.high,
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await signOut();
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/login', (Route<dynamic> route) => false);
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.33,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: backColors.disabled,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              '로그아웃하기',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: TextColors.high,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.33,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: PrimaryColors.basic,
+                                borderRadius: BorderRadius.circular(8)),
+                            child: const Text(
+                              '취소',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
             },
             child: Container(
               padding: const EdgeInsets.all(25),

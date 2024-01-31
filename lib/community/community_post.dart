@@ -38,32 +38,90 @@ class _CommunityPostState extends State<CommunityPost> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('정말 삭제하시겠습니까?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          title: const Text(
+            '정말 게시물을 삭제하시겠습니까?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: TextColors.high,
             ),
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () async {
-                final bool success = await _deletePost();
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: const Text(
+              '게시물 삭제 시, 게시물을 복구할 수 없습니다.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          contentTextStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: TextColors.high,
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    final bool success = await _deletePost();
 
-                if (success) {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                } else {
-                  // 삭제 실패 시
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('삭제에 실패했습니다.'),
+                    if (success) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    } else {
+                      // 삭제 실패 시
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('삭제에 실패했습니다.'),
+                        ),
+                      );
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    }
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: backColors.disabled,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  );
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                }
-              },
+                    child: const Text(
+                      '삭제하기',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: TextColors.high,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: PrimaryColors.basic,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -129,34 +187,84 @@ class _CommunityPostState extends State<CommunityPost> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('정말 삭제하시겠습니까?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          title: Container(
+            width: MediaQuery.of(context).size.width * 0.75,
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+            child: const Text(
+              '댓글을 삭제하시겠습니까?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: TextColors.high,
+              ),
             ),
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () async {
-                final bool success = await _deleteComment(id);
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    final bool success = await _deleteComment(id);
 
-                if (success) {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    commentserverData = commentfetchData(widget.id!);
-                  });
-                } else {
-                  // 삭제 실패 시
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('삭제에 실패했습니다.'),
+                    if (success) {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        commentserverData = commentfetchData(widget.id!);
+                      });
+                    } else {
+                      // 삭제 실패 시
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('삭제에 실패했습니다.'),
+                        ),
+                      );
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    }
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: backColors.disabled,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  );
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                }
-              },
+                    child: const Text(
+                      '삭제하기',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: TextColors.high,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: PrimaryColors.basic,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -300,8 +408,8 @@ class _CommunityPostState extends State<CommunityPost> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
+                                  // width:
+                                  //     MediaQuery.of(context).size.width * 0.7,
                                   child: Text(
                                     '${item.title}',
                                     style: const TextStyle(
@@ -487,7 +595,7 @@ class _CommunityPostState extends State<CommunityPost> {
             ),
             Container(
               width: MediaQuery.of(context).size.width,
-              height: 50,
+              height: 45,
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: Colors.grey.withOpacity(0.3)),
@@ -502,7 +610,7 @@ class _CommunityPostState extends State<CommunityPost> {
                     child: Text(
                       '댓글 $commenttotal',
                       style: const TextStyle(
-                          color: PrimaryColors.basic, fontSize: 17),
+                          color: PrimaryColors.basic, fontSize: 15),
                     ),
                   ),
                 ],

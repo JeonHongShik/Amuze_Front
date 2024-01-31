@@ -7,6 +7,7 @@ import 'package:amuze/pagelayout/mypage.dart';
 import 'package:amuze/pagelayout/notifybody.dart';
 import 'package:amuze/resume/resume_board.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:provider/provider.dart';
 
 import 'stage/stage_board.dart';
@@ -41,7 +42,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late BottomNavigationProvider _bottomNavigationProvider;
 
-  late IconChangeProvider _iconChangeProvider;
+  // late IconChangeProvider _iconChangeProvider;
 
   @override
   void initState() {
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     _bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context);
-    _iconChangeProvider = Provider.of<IconChangeProvider>(context);
+    // _iconChangeProvider = Provider.of<IconChangeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -106,21 +107,12 @@ class _HomePageState extends State<HomePage> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: PrimaryColors.basic,
-        child: Icon(
-          _iconChangeProvider.isDialogOpen ? Icons.close : Icons.menu,
-          size: 30,
-          color: SecondaryColors.basic,
+      floatingActionButton: SizedBox(
+        width: 60,
+        height: 60,
+        child: FittedBox(
+          child: floatingButton(context),
         ),
-        onPressed: () {
-          if (_iconChangeProvider.isDialogOpen) {
-            Navigator.pop(context);
-          } else {
-            menuPopup(context);
-          }
-          _iconChangeProvider.setDialogOpen(!_iconChangeProvider.isDialogOpen);
-        },
       ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
@@ -128,86 +120,76 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-void menuPopup(context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(70, 0, 70, 0), // dialog 박스 width 조절
-        child: Dialog(
-          alignment: const Alignment(0.0, 0.7),
-          child: SizedBox(
-            height: 150,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const StageBoard()),
-                    );
-                  },
-                  child:
-                      // Container(
-                      //   width: 60,
-                      //   height: 60,
-                      //   decoration: BoxDecoration(
-                      //       color: Colors.red,
-                      //       borderRadius: BorderRadius.circular(50)),
-                      // ),
-                      const Text(
-                    '공고 게시판',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ResumeBoard()),
-                    );
-                  },
-                  child: const Text(
-                    '이력서 게시판',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CommunityBoard()),
-                    );
-                  },
-                  child: const Text(
-                    '커뮤니티 게시판',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+// 플로팅버튼 위젯
+Widget? floatingButton(context) {
+  return SpeedDial(
+    overlayColor: Colors.black26,
+    overlayOpacity: 0.2,
+    animatedIcon: AnimatedIcons.menu_close,
+    curve: Curves.bounceIn,
+    foregroundColor: SecondaryColors.basic,
+    backgroundColor: PrimaryColors.basic,
+    children: [
+      SpeedDialChild(
+        label: '커뮤니티 게시판',
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
         ),
-      );
-    },
-    barrierColor: Colors.black26,
-  ).then(
-    (value) {
-      Provider.of<IconChangeProvider>(context, listen: false)
-          .setDialogOpen(false);
-    },
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.groups,
+          color: Colors.white,
+          size: 31,
+        ),
+        backgroundColor: PrimaryColors.basic,
+        labelBackgroundColor: PrimaryColors.basic,
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const CommunityBoard()));
+        },
+      ),
+      SpeedDialChild(
+        label: '이력서 게시판',
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.assignment_ind,
+          color: Colors.white,
+          size: 29,
+        ),
+        backgroundColor: PrimaryColors.basic,
+        labelBackgroundColor: PrimaryColors.basic,
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const ResumeBoard()));
+        },
+      ),
+      SpeedDialChild(
+        label: '공고 게시판',
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.library_books,
+          color: Colors.white,
+          size: 27,
+        ),
+        backgroundColor: PrimaryColors.basic,
+        labelBackgroundColor: PrimaryColors.basic,
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const StageBoard()));
+        },
+      ),
+    ],
   );
 }

@@ -76,6 +76,7 @@ dependencies:
   logger: ^2.0.2+1
   chat_bubbles: 0.8.1
   flutter_chat_bubble: ^2.0.2
+  flutter_speed_dial: ^7.0.0
 
 
 flutter_native_splash:

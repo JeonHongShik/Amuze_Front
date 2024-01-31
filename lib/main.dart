@@ -32,7 +32,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   showFlutterNotification(message);
 
   print('Handling a background message ${message.messageId}');
-  print("${message}");
+  print("$message");
 }
 
 ///  [AndroidNotificationChannel] 채널생성

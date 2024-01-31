@@ -12,7 +12,6 @@ class ResumeBoardSearch extends StatefulWidget {
 
 class _ResumeBoardSearchState extends State<ResumeBoardSearch> {
   final TextEditingController controller = TextEditingController();
-  late String searchtext = controller.text;
   FocusNode searchFocus = FocusNode();
 
   @override
@@ -99,6 +98,7 @@ class _ResumeBoardSearchState extends State<ResumeBoardSearch> {
                     IconButton(
                       onPressed: () {
                         if (controller.text.isNotEmpty) {
+                          late String searchtext = controller.text;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -108,7 +108,7 @@ class _ResumeBoardSearchState extends State<ResumeBoardSearch> {
                             ),
                           );
                         }
-                        print('검색어 : $searchtext');
+                        print('검색어 : ${controller.text}');
                       },
                       icon: const Icon(
                         Icons.search,

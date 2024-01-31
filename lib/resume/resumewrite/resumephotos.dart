@@ -193,27 +193,88 @@ class _ResumePhotosState extends State<ResumePhotos> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('작성을 취소하고 나가시겠습니까?'),
-                actions: [
-                  TextButton(
-                    child: const Text('아니요'),
-                    onPressed: () => Navigator.of(context).pop(),
+                backgroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                title: const Text(
+                  '이력서 작성을 취소하시겠습니까?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: TextColors.high,
                   ),
-                  TextButton(
-                    child: const Text('예'),
-                    onPressed: () {
-                      Provider.of<ResumeWriteProvider>(context, listen: false)
-                          .reset();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    },
+                ),
+                content: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: const Text(
+                    '취소 시, 작성하신 내용은 저장되지 않습니다.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                contentTextStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: TextColors.high,
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Provider.of<ResumeWriteProvider>(context,
+                                  listen: false)
+                              .reset();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.33,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: backColors.disabled,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            '취소',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: TextColors.high,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.33,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: PrimaryColors.basic,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Text(
+                            '계속 작성하기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -724,6 +785,56 @@ class _ResumePhotosState extends State<ResumePhotos> {
                   for (int i = 0; i < 8; i++) {
                     Navigator.of(context).pop(); // 여러 화면을 한 번에 닫기
                   }
+
+                  // 이력서 등록 성공 알림창
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(15.0))),
+                      title: Container(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                        child: const Text(
+                          '이력서가 정상적으로 등록되었습니다!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: TextColors.high,
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height: 40,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    color: PrimaryColors.basic,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: const Text(
+                                  '확인',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
                 }).catchError((error) {
                   // 에러 처리
                   print('//////////////////Error sending data: $error');

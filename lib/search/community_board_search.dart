@@ -13,7 +13,6 @@ class CommunityBoardSearch extends StatefulWidget {
 
 class _CommunityBoardSearchState extends State<CommunityBoardSearch> {
   final TextEditingController controller = TextEditingController();
-  late String searchtext = controller.text;
   FocusNode searchFocus = FocusNode();
 
   @override
@@ -99,16 +98,16 @@ class _CommunityBoardSearchState extends State<CommunityBoardSearch> {
                     IconButton(
                       onPressed: () {
                         if (controller.text.isNotEmpty) {
+                          late String searchtext = controller.text;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => CommunityBoardSearchResult(
-                                searchtext: searchtext,
-                              ),
+                                  searchtext: searchtext),
                             ),
                           );
                         }
-                        print('검색어 : $searchtext');
+                        print('검색어 : ${controller.text}');
                       },
                       icon: const Icon(
                         Icons.search,

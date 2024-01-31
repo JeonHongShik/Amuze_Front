@@ -252,15 +252,78 @@ class _EditProfileState extends State<EditProfile> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('정말 탈퇴하시겠습니까?'),
-                        actions: [
-                          TextButton(
-                            child: const Text('탈퇴하기'),
-                            onPressed: () {},
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0))),
+                        title: const Text(
+                          '정말 탈퇴하시겠습니까?',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.bold,
+                            color: TextColors.high,
                           ),
-                          TextButton(
-                            child: const Text('취소'),
-                            onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        content: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.75,
+                          child: const Text(
+                            '탈퇴 시, 계정은 삭제되며 복구되지 않습니다.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        contentTextStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: TextColors.high,
+                        ),
+                        actions: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.33,
+                                  height: 40,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: backColors.disabled,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text(
+                                    '탈퇴하기',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: TextColors.high,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () => Navigator.of(context).pop(),
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.33,
+                                  height: 40,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: PrimaryColors.basic,
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: const Text(
+                                    '취소',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
