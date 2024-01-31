@@ -1,6 +1,8 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loadingscreen.dart';
+import 'package:amuze/main.dart';
+import 'package:amuze/mypage/editprofile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
 
 // 로그인 후 secure_storage에 정보 저장
 Future<void> saveFirebaseAccountInfo() async {
@@ -66,6 +69,8 @@ class _LoginPageState extends State<LoginPage> {
         idToken: token.idToken,
         accessToken: token.accessToken,
       );
+      //
+      await storage.write(key: 'idToken', value: token.idToken);
 
       if (context.mounted) {
         showGeneralDialog(
@@ -79,6 +84,8 @@ class _LoginPageState extends State<LoginPage> {
       }
       await auth.FirebaseAuth.instance.signInWithCredential(credential);
       await saveFirebaseAccountInfo();
+      await Provider.of<UserInfoProvider>(context, listen: false)
+          .loadUserInfo();
       await peristalsis();
 
       if (context.mounted) {

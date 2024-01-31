@@ -111,7 +111,7 @@ class MyPage extends StatelessWidget {
               }),
           MypageElement(
               icon: Icons.mode_edit_sharp,
-              text: '댓글 관리',
+              text: '내 댓글 관리',
               onTap: () {
                 Navigator.push(
                     context,

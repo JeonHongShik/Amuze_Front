@@ -256,7 +256,8 @@ class _StageBoardsState extends State<StageBoards> {
                   itemCount:
                       snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    var data = snapshot.data![index];
+                    var reverseIndex = snapshot.data!.length - 1 - index;
+                    var data = snapshot.data![reverseIndex];
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -536,7 +537,8 @@ class _ResumeBoardsState extends State<ResumeBoards> {
                     itemCount:
                         snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -801,7 +803,8 @@ class _ComunityBoardsState extends State<ComunityBoards> {
                     itemCount:
                         snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(

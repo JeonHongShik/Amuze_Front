@@ -119,104 +119,119 @@ class _CommunityBoardState extends State<CommunityBoard> {
                       totalcount = snapshot.data!.length;
                     });
                   });
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
-                      return GestureDetector(
-                        onTap: () {
-                          print(data.id);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    CommunityPost(id: data.id),
-                              ) ////수정 필요///////////
-                              ).then((_) => setState(
-                                () {
-                                  serverData = communitypreviewfetchData();
-                                },
-                              ));
-                        },
-                        child: Container(
-                          height: 120,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              border: Border(
-                                  top: BorderSide(color: backColors.disabled))),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  data.title!,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w500,
-                                    color: TextColors.high,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(right: 20),
-                                  width: MediaQuery.of(context).size.width,
-                                  child: Text(
-                                    data.content!,
-                                    maxLines: 2,
+                  return RefreshIndicator(
+                    color: PrimaryColors.basic,
+                    backgroundColor: Colors.white,
+                    onRefresh: () async {
+                      setState(() {
+                        serverData = communitypreviewfetchData();
+                      });
+                    },
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        var reverseIndex = snapshot.data!.length - 1 - index;
+                        var data = snapshot.data![reverseIndex];
+                        return GestureDetector(
+                          onTap: () {
+                            print(data.id);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CommunityPost(id: data.id),
+                                ) ////수정 필요///////////
+                                ).then((_) => setState(
+                                  () {
+                                    serverData = communitypreviewfetchData();
+                                  },
+                                ));
+                          },
+                          child: Container(
+                            height: 120,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                    top: BorderSide(
+                                        color: backColors.disabled))),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    data.title!,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                      fontSize: 13,
-                                      color: TextColors.medium,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                      color: TextColors.high,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 15, 5),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '공감 8',
-                                        style: TextStyle(
-                                          color: TextColors.medium,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 3,
-                                      ),
-                                      Text(
-                                        '댓글 2',
-                                        style: TextStyle(
-                                          color: TextColors.medium,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        '01/11 08:41',
-                                        style: TextStyle(
-                                          color: TextColors.medium,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(
+                                    height: 10,
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    padding: const EdgeInsets.only(right: 20),
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Text(
+                                      data.content!,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: TextColors.medium,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 15, 5),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          '공감 ${data.likescount}',
+                                          style: const TextStyle(
+                                            color: TextColors.medium,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                        Text(
+                                          '댓글 ${data.commentscount}',
+                                          style: const TextStyle(
+                                            color: TextColors.medium,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        data.createdat != null
+                                            ? Text(
+                                                data.createdat!,
+                                                style: const TextStyle(
+                                                  color: TextColors.medium,
+                                                  fontSize: 11,
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 } else {
                   return const Center(child: Text('아직 커뮤니티 글이 없습니다.'));

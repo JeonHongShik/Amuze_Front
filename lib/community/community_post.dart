@@ -30,6 +30,12 @@ class _CommunityPostState extends State<CommunityPost> {
   bool bookmarked = false;
   int bookmarkId = 0;
   bool ready = true;
+
+  bool liked = false;
+  int likeId = 0;
+  bool likeready = true;
+  int likecount = 0;
+
   int commenttotal = 0;
 
   Future<void> _showPostDeleteDialog(BuildContext context) async {
@@ -313,14 +319,30 @@ class _CommunityPostState extends State<CommunityPost> {
     }
   }
 
+  Future<void> _checkLiked() async {
+    try {
+      final provider = Provider.of<UserInfoProvider>(context, listen: false);
+      final response = await dio.get(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/communities/check_like/${provider.uid}/${widget.id.toString()}/');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setState(() {
+          liked = response.data['check_like'];
+        });
+        print('/////////////$liked');
+      }
+    } catch (e) {
+      print('ChecklkikesError : $e');
+    }
+  }
+
   void _toggleBookmarked() async {
-    // post에 400에러 문제 있음
     final provider = Provider.of<UserInfoProvider>(context, listen: false);
     if (bookmarked == false) {
       try {
         final response = await dio.post(
             'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/bookmarks/bookmark/board/',
-            data: {'uid': provider.uid, 'board': widget.id});
+            data: {'author': provider.uid, 'board': widget.id});
         if (response.statusCode == 200 || response.statusCode == 201) {
           setState(() {
             bookmarked = true;
@@ -349,12 +371,39 @@ class _CommunityPostState extends State<CommunityPost> {
     }
   }
 
+  void _toggleliked() async {
+    final provider = Provider.of<UserInfoProvider>(context, listen: false);
+
+    try {
+      final response = await dio.post(
+          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/communities/like_add_count/${widget.id}/',
+          data: {'uid': provider.uid});
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setState(() {
+          liked = !liked;
+          likeready = !likeready;
+          likecount += liked ? 1 : -1;
+        });
+      }
+    } catch (e) {
+      print('likepostError : $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     serverData = communitydetailfetchData(widget.id!);
+    serverData.then((data) {
+      if (data.isNotEmpty) {
+        setState(() {
+          likecount = data.first.likescount ?? 0;
+        });
+      }
+    });
     commentserverData = commentfetchData(widget.id!);
     _checkBookmarked();
+    _checkLiked();
   }
 
   @override
@@ -396,7 +445,7 @@ class _CommunityPostState extends State<CommunityPost> {
                     );
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     return Column(
                         children: snapshot.data!.map((item) {
                       return Container(
@@ -510,7 +559,7 @@ class _CommunityPostState extends State<CommunityPost> {
                                 if (item.author !=
                                     Provider.of<UserInfoProvider>(context,
                                             listen: false)
-                                        .displayName)
+                                        .uid)
                                   IconButton(
                                     padding: EdgeInsets.zero,
                                     visualDensity: const VisualDensity(
@@ -552,12 +601,19 @@ class _CommunityPostState extends State<CommunityPost> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 GestureDetector(
-                                  onTap: () {},
-                                  child: const Icon(Icons.favorite_border),
+                                  onTap: () {
+                                    _toggleliked();
+                                  },
+                                  child: Icon(
+                                    liked
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: Colors.red.shade400,
+                                  ),
                                 ),
-                                const Text(
-                                  ' 8',
-                                  style: TextStyle(
+                                Text(
+                                  ' $likecount',
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     color: TextColors.disabled,
                                   ),
@@ -569,9 +625,9 @@ class _CommunityPostState extends State<CommunityPost> {
                                   width: 5,
                                 ),
                                 const Spacer(),
-                                const Text(
-                                  '01/12 19:55',
-                                  style: TextStyle(
+                                Text(
+                                  item.createdat!,
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: TextColors.disabled,
                                   ),

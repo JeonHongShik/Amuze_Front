@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:amuze/loadingscreen.dart';
+import 'package:amuze/loginpage.dart';
 import 'package:amuze/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -112,6 +113,46 @@ class _EditProfileState extends State<EditProfile> {
       print("Response status: ${response.statusCode}");
     } catch (e) {
       print("Error making GET request: $e");
+    }
+  }
+
+  Future<void> deleteUserAccountAndData() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final FirebaseStorage storage = FirebaseStorage.instance;
+    const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+    User? user = auth.currentUser;
+    if (user != null) {
+      String uid = user.uid;
+
+      try {
+        // Firestore에서 사용자 데이터 삭제
+        await firestore.collection('users').doc(uid).delete();
+
+        // Firebase Storage에서 사용자 관련 데이터 삭제
+        // 예: 사용자의 프로필 이미지나 업로드된 파일 삭제
+        //await storage.ref('path/to/user/files/$uid').delete();
+
+        // Firebase Auth에서 사용자 계정 삭제
+        await user.delete();
+
+        await peristalsis();
+
+        await secureStorage.delete(key: 'uid');
+        await secureStorage.delete(key: 'displayName');
+        await secureStorage.delete(key: 'photoURL');
+        await secureStorage.delete(key: 'email');
+        await secureStorage.delete(key: 'messagingToken');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } catch (e) {
+        // 오류 처리
+        print("계정 및 데이터 삭제 중 오류 발생: $e");
+      }
     }
   }
 
@@ -282,7 +323,9 @@ class _EditProfileState extends State<EditProfile> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () async {
+                                  await deleteUserAccountAndData();
+                                },
                                 child: Container(
                                   width:
                                       MediaQuery.of(context).size.width * 0.33,
