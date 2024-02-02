@@ -51,6 +51,8 @@ class _CommunityBoardSearchState extends State<CommunityBoardSearch> {
               //   ),
               // ),
               // const SizedBox(height: 10),
+
+              // 뒤로가기 버튼
               IconButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -58,64 +60,100 @@ class _CommunityBoardSearchState extends State<CommunityBoardSearch> {
                 icon: const Icon(Icons.arrow_back),
                 color: Colors.white,
               ),
+              // 검색바, 검색버튼
               Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Row(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.82,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Container(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: TextField(
-                          controller: controller,
-                          focusNode: searchFocus,
-                          decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.fromLTRB(10, 18, 0, 0),
-                              hintText: '게시물을 검색해보세요!',
-                              hintStyle:
-                                  const TextStyle(color: TextColors.medium),
-                              enabledBorder: InputBorder.none,
-                              suffix: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(0, 10, 15, 0),
-                                child: GestureDetector(
-                                  onTap: () => controller.clear(),
-                                  child: const Icon(
-                                    Icons.cancel,
-                                    color: IconColors.disabled,
+                // 검색바 container 패딩 - container 위치 조정
+                padding: const EdgeInsets.fromLTRB(15, 0, 9, 0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.82,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              // textfield 감싸는 패딩 - textfiled 텍스트 위치 조정
+                              padding: const EdgeInsets.fromLTRB(14, 2, 0, 0),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.68,
+                                height: 35,
+                                child: TextField(
+                                  controller: controller,
+                                  focusNode: searchFocus,
+                                  cursorColor: TextColors.medium,
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.only(bottom: 10),
+                                    hintText: '게시물을 검색해보세요!',
+                                    hintStyle:
+                                        TextStyle(color: TextColors.medium),
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    border: InputBorder.none,
                                   ),
                                 ),
-                              )),
+                              ),
+                            ),
+                            ValueListenableBuilder(
+                                valueListenable: controller,
+                                builder: (context, value, child) {
+                                  return Positioned(
+                                    right: 0,
+                                    child: value.text.isNotEmpty
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              controller.clear();
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 7.5, 9, 7.5),
+                                              child: Icon(
+                                                Icons.cancel,
+                                                color: IconColors.disabled,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
+                                  );
+                                }),
+                          ],
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        if (controller.text.isNotEmpty) {
-                          late String searchtext = controller.text;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CommunityBoardSearchResult(
-                                  searchtext: searchtext),
+                      Positioned(
+                        right: 1,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (controller.text.isNotEmpty) {
+                              late String searchtext = controller.text;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CommunityBoardSearchResult(
+                                    searchtext: searchtext,
+                                  ),
+                                ),
+                              );
+                            }
+                            print('검색어 : ${controller.text}');
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: Icon(
+                              Icons.search,
+                              color: Colors.white,
+                              size: 35,
                             ),
-                          );
-                        }
-                        print('검색어 : ${controller.text}');
-                      },
-                      icon: const Icon(
-                        Icons.search,
+                          ),
+                        ),
                       ),
-                      color: Colors.white,
-                      iconSize: 30,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
