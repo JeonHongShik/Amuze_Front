@@ -89,7 +89,10 @@ class _StageBoardSearchState extends State<StageBoardSearch> {
                                 child: TextField(
                                   controller: controller,
                                   focusNode: searchFocus,
-                                  cursorColor: TextColors.medium,
+                                  cursorColor: PrimaryColors.basic,
+                                  cursorWidth: 1.2,
+                                  style:
+                                      const TextStyle(decorationThickness: 0),
                                   decoration: const InputDecoration(
                                     contentPadding: EdgeInsets.only(bottom: 10),
                                     hintText: '공고 게시물을 검색해보세요!',
