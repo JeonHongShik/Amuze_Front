@@ -13,19 +13,6 @@ class StageBoardSearch extends StatefulWidget {
 class _StageBoardSearchState extends State<StageBoardSearch> {
   final TextEditingController controller = TextEditingController();
   FocusNode searchFocus = FocusNode();
-  final String labelText = '';
-  bool isIconVisible = false;
-
-  void deleteEvent(String value) {
-    controller.text = value;
-
-    if (value.isEmpty) {
-      isIconVisible = false;
-    } else {
-      isIconVisible = true;
-    }
-    setState(() {});
-  }
 
   @override
   void initState() {
