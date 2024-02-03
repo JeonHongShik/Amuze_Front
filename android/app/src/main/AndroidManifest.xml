@@ -96,7 +96,9 @@
             </intent-filter>
         </activity>
         
-        
+        <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-2448116528914757~8803368881"/>
 
         <meta-data
             android:name="firebase_messaging_auto_init_enabled"

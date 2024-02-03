@@ -1,4 +1,5 @@
 import 'package:amuze/gathercolors.dart';
+import 'package:amuze/native_ads_test.dart';
 import 'package:amuze/search/stage_board_search.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:amuze/server_communication/get/preview/stage_preview_get_server.dart';
@@ -27,6 +28,7 @@ class _StageBoardState extends State<StageBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -127,156 +129,183 @@ class _StageBoardState extends State<StageBoard> {
                       });
                     },
                     child: ListView.builder(
-                      itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
+                      itemCount:
+                          snapshot.data!.length + (snapshot.data!.length ~/ 5),
                       itemBuilder: (context, index) {
-                        var reverseIndex = snapshot.data!.length - 1 - index;
-                        var data = snapshot.data![reverseIndex];
-                        return GestureDetector(
-                          onTap: () {
-                            print(data.id);
-                            print(data.author);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => StagePost(id: data.id),
-                                )).then((_) => setState(() {
-                                  serverData = stagepreviewfetchData();
-                                }));
-                          },
-                          child: Container(
-                            height: 120,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                    top: BorderSide(
-                                        color: backColors.disabled))),
-                            child: Row(
-                              children: [
-                                (data.mainimage != null)
-                                    ? Container(
-                                        margin: const EdgeInsets.only(left: 10),
-                                        width: 100,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                            color: backColors.disabled,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                  data.mainimage!,
-                                                ),
-                                                fit: BoxFit.fill)),
-                                      )
-                                    : Container(
-                                        margin: const EdgeInsets.only(left: 10),
-                                        width: 100,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: backColors.disabled,
-                                            image: const DecorationImage(
-                                                image: AssetImage(
-                                                    'assets/images/공고임시이미지.png'),
-                                                fit: BoxFit.fill)),
-                                      ),
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 86,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 13),
-                                          height: 42,
-                                          child: data.title != null
-                                              ? Text(
-                                                  data.title!,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                      fontSize: 16.5,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                )
-                                              : const SizedBox.shrink(),
+                        if (index % 6 == 5) {
+                          return Column(
+                            children: [
+                              Container(
+                                height: 1,
+                                color: Colors.grey[200],
+                              ),
+                              const NativeAds(),
+                              Container(
+                                height: 1,
+                                color: Colors.grey[200],
+                              ),
+                            ],
+                          );
+                        } else {
+                          var realIndex = index - (index ~/ 6);
+                          var reverseIndex =
+                              snapshot.data!.length - 1 - realIndex;
+                          var data = snapshot.data![reverseIndex];
+                          return GestureDetector(
+                            onTap: () {
+                              print(data.id);
+                              print(data.author);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        StagePost(id: data.id),
+                                  )).then((_) => setState(() {
+                                    serverData = stagepreviewfetchData();
+                                  }));
+                            },
+                            child: Container(
+                              height: 120,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border(
+                                      top: BorderSide(
+                                          color: backColors.disabled))),
+                              child: Row(
+                                children: [
+                                  (data.mainimage != null)
+                                      ? Container(
+                                          margin:
+                                              const EdgeInsets.only(left: 10),
+                                          width: 100,
+                                          height: 100,
+                                          decoration: BoxDecoration(
+                                              color: backColors.disabled,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    data.mainimage!,
+                                                  ),
+                                                  fit: BoxFit.fill)),
+                                        )
+                                      : Container(
+                                          margin:
+                                              const EdgeInsets.only(left: 10),
+                                          width: 100,
+                                          height: 100,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: backColors.disabled,
+                                              image: const DecorationImage(
+                                                  image: AssetImage(
+                                                      'assets/images/공고임시이미지.png'),
+                                                  fit: BoxFit.fill)),
                                         ),
-                                        SizedBox(
-                                          height: 44,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 13),
-                                                height: 20,
-                                                child: Row(
-                                                  children: [
-                                                    data.pay != null
-                                                        ? Text(
-                                                            '${data.pay}원 · ',
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 13,
-                                                              color: TextColors
-                                                                  .medium,
-                                                            ),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
-                                                    data.type != null
-                                                        ? Text(
-                                                            '${data.type!} · ',
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 13,
-                                                              color: TextColors
-                                                                  .medium,
-                                                            ),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
-                                                    data.region != null
-                                                        ? Text(
-                                                            data.region!,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 13,
-                                                              color: TextColors
-                                                                  .medium,
-                                                            ),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
-                                                  ],
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 13),
-                                                height: 22.5,
-                                                child: Text(
-                                                  '공연 날짜 - ${data.datetime}',
-                                                  style: const TextStyle(
-                                                    fontSize: 13,
-                                                    color: TextColors.medium,
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 86,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.only(left: 13),
+                                            height: 42,
+                                            child: data.title != null
+                                                ? Text(
+                                                    data.title!,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                        fontSize: 16.5,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  )
+                                                : const SizedBox.shrink(),
+                                          ),
+                                          SizedBox(
+                                            height: 44,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 13),
+                                                  height: 20,
+                                                  child: Row(
+                                                    children: [
+                                                      data.pay != null
+                                                          ? Text(
+                                                              '${data.pay}원 · ',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 13,
+                                                                color:
+                                                                    TextColors
+                                                                        .medium,
+                                                              ),
+                                                            )
+                                                          : const SizedBox
+                                                              .shrink(),
+                                                      data.type != null
+                                                          ? Text(
+                                                              '${data.type!} · ',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 13,
+                                                                color:
+                                                                    TextColors
+                                                                        .medium,
+                                                              ),
+                                                            )
+                                                          : const SizedBox
+                                                              .shrink(),
+                                                      data.region != null
+                                                          ? Text(
+                                                              data.region!,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 13,
+                                                                color:
+                                                                    TextColors
+                                                                        .medium,
+                                                              ),
+                                                            )
+                                                          : const SizedBox
+                                                              .shrink(),
+                                                    ],
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 13),
+                                                  height: 22.5,
+                                                  child: Text(
+                                                    '공연 날짜 - ${data.datetime}',
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      color: TextColors.medium,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        } /////
                       },
                     ),
                   );

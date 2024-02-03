@@ -1,15 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/homepage.dart';
-import 'package:amuze/message.dart';
 import 'package:amuze/loginpage.dart';
 import 'package:amuze/server_communication/patch/resume_patch_server.dart';
 import 'package:amuze/server_communication/patch/stage_patch_server.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 //import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -19,11 +15,11 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'server_communication/patch/community_patch._server.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -99,6 +95,10 @@ late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 void main() async {
   // 웹 환경에서 t카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
+
+  //애드몹 초기화
+  MobileAds.instance.initialize();
+
   // foreground 수신처리
   FirebaseMessaging.onMessage.listen(showFlutterNotification);
 

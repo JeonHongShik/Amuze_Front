@@ -78,6 +78,7 @@ dependencies:
   flutter_chat_bubble: ^2.0.2
   flutter_speed_dial: ^7.0.0
   firebase_app_check: ^0.2.1+8
+  google_mobile_ads: ^4.0.0
 
 
 flutter_native_splash:

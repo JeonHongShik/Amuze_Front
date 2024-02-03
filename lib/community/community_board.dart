@@ -1,7 +1,8 @@
 import 'package:amuze/community/community_post.dart';
 import 'package:amuze/community/communitywrite/communitywrite.dart';
 import 'package:amuze/gathercolors.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:amuze/native_ads_test.dart';
+
 import 'package:amuze/search/community_board_search.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -129,107 +130,126 @@ class _CommunityBoardState extends State<CommunityBoard> {
                     },
                     child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
+                      itemCount:
+                          snapshot.data!.length + (snapshot.data!.length ~/ 10),
                       itemBuilder: (context, index) {
-                        var reverseIndex = snapshot.data!.length - 1 - index;
-                        var data = snapshot.data![reverseIndex];
-                        return GestureDetector(
-                          onTap: () {
-                            print(data.id);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      CommunityPost(id: data.id),
-                                ) ////수정 필요///////////
-                                ).then((_) => setState(
-                                  () {
-                                    serverData = communitypreviewfetchData();
-                                  },
-                                ));
-                          },
-                          child: Container(
-                            height: 120,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                    top: BorderSide(
-                                        color: backColors.disabled))),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    data.title!,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500,
-                                      color: TextColors.high,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(right: 20),
-                                    width: MediaQuery.of(context).size.width,
-                                    child: Text(
-                                      data.content!,
-                                      maxLines: 2,
+                        if (index % 11 == 10) {
+                          return Column(
+                            children: [
+                              Container(
+                                height: 1,
+                                color: Colors.grey[200],
+                              ),
+                              const NativeAds(),
+                              Container(
+                                height: 1,
+                                color: Colors.grey[200],
+                              ),
+                            ],
+                          );
+                        } else {
+                          var realIndex = index - (index ~/ 6);
+                          var reverseIndex =
+                              snapshot.data!.length - 1 - realIndex;
+                          var data = snapshot.data![reverseIndex];
+                          return GestureDetector(
+                            onTap: () {
+                              print(data.id);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        CommunityPost(id: data.id),
+                                  )).then((_) => setState(
+                                    () {
+                                      serverData = communitypreviewfetchData();
+                                    },
+                                  ));
+                            },
+                            child: Container(
+                              height: 120,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border(
+                                      top: BorderSide(
+                                          color: backColors.disabled))),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      data.title!,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
-                                        fontSize: 13,
-                                        color: TextColors.medium,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                        color: TextColors.high,
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 15, 5),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '공감 ${data.likescount}',
-                                          style: const TextStyle(
-                                            color: TextColors.medium,
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 3,
-                                        ),
-                                        Text(
-                                          '댓글 ${data.commentscount}',
-                                          style: const TextStyle(
-                                            color: TextColors.medium,
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        data.createdat != null
-                                            ? Text(
-                                                data.createdat!,
-                                                style: const TextStyle(
-                                                  color: TextColors.medium,
-                                                  fontSize: 11,
-                                                ),
-                                              )
-                                            : const SizedBox.shrink(),
-                                      ],
+                                    const SizedBox(
+                                      height: 10,
                                     ),
-                                  ),
-                                ],
+                                    Container(
+                                      padding: const EdgeInsets.only(right: 20),
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Text(
+                                        data.content!,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: TextColors.medium,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 0, 15, 5),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            '공감 ${data.likescount}',
+                                            style: const TextStyle(
+                                              color: TextColors.medium,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          Text(
+                                            '댓글 ${data.commentscount}',
+                                            style: const TextStyle(
+                                              color: TextColors.medium,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          data.createdat != null
+                                              ? Text(
+                                                  data.createdat!,
+                                                  style: const TextStyle(
+                                                    color: TextColors.medium,
+                                                    fontSize: 11,
+                                                  ),
+                                                )
+                                              : const SizedBox.shrink(),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                     ),
                   );

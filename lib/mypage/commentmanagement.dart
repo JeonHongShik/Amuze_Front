@@ -75,9 +75,18 @@ class _CommentManagementState extends State<CommentManagement> {
                                     fontSize: 12, color: TextColors.medium),
                               ),
                             ),
-                            subtitle: Text(
-                              comment.content!,
-                              style: const TextStyle(fontSize: 18),
+                            subtitle: Row(
+                              children: [
+                                const Icon(
+                                  Icons.subdirectory_arrow_right,
+                                  size: 15,
+                                  color: IconColors.inactive,
+                                ),
+                                Text(
+                                  comment.content!,
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                              ],
                             ),
                           ),
                           Container(
