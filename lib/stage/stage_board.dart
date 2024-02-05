@@ -140,10 +140,10 @@ class _StageBoardState extends State<StageBoard> {
                                 color: Colors.grey[200],
                               ),
                               const NativeAds(),
-                              Container(
-                                height: 1,
-                                color: Colors.grey[200],
-                              ),
+                              // Container(
+                              //   height: 1,
+                              //   color: Colors.grey[200],
+                              // ),
                             ],
                           );
                         } else {

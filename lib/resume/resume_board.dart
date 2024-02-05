@@ -1,13 +1,10 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/native_ads_test.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:amuze/resume/resume_post.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
 import 'package:amuze/search/resume_board_search.dart';
 import 'package:amuze/server_communication/get/preview/resume_preview_get_server.dart';
-
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ResumeBoard extends StatefulWidget {
@@ -30,6 +27,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -318,43 +316,46 @@ class ShimmerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 10, // Shimmer 효과를 표시할 아이템 수 (임의로 5개 설정)
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 10, // Shimmer 효과를 표시할 아이템 수
       itemBuilder: (BuildContext context, int index) {
         return Shimmer.fromColors(
           baseColor: Colors.grey[300]!, // 기본 배경색
           highlightColor: Colors.grey[100]!, // 강조 배경색
-          child: Container(
-            height: 120, // 셀의 높이
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey)),
-            ),
-            // Shimmer 효과가 적용될 콘텐츠를 정의
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                  ),
+                  color: Colors.white,
                 ),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: SizedBox(
-                    height: 90,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width / 2,
+                        height: 20,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 3,
+                        height: 20,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        height: 20,
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 ),
               ],

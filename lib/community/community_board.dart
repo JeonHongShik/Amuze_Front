@@ -29,6 +29,7 @@ class _CommunityBoardState extends State<CommunityBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -271,44 +272,44 @@ class ShimmerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 10, // Shimmer 효과를 표시할 아이템 수 (임의로 5개 설정)
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 10, // Shimmer 효과를 표시할 아이템 수
       itemBuilder: (BuildContext context, int index) {
         return Shimmer.fromColors(
           baseColor: Colors.grey[300]!, // 기본 배경색
           highlightColor: Colors.grey[100]!, // 강조 배경색
-          child: Container(
-            height: 120, // 셀의 높이
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey)),
-            ),
-            // Shimmer 효과가 적용될 콘텐츠를 정의
-            child: Row(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 100,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                  ),
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: 20,
+                  color: Colors.white,
                 ),
-                Expanded(
-                  child: SizedBox(
-                    height: 90,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                      ],
+                const SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  height: 20,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 4,
+                      height: 20,
+                      color: Colors.white,
                     ),
-                  ),
+                    const Spacer(),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 4,
+                      height: 20,
+                      color: Colors.white,
+                    ),
+                  ],
                 ),
               ],
             ),

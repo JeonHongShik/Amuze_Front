@@ -2,7 +2,6 @@ import 'package:amuze/gathercolors.dart';
 import 'package:amuze/homepage.dart';
 import 'package:amuze/loadingscreen.dart';
 import 'package:amuze/main.dart';
-import 'package:amuze/mypage/editprofile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:dio/dio.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 // 로그인 후 secure_storage에 정보 저장
@@ -61,22 +61,38 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool ready = true;
 
+  //알람 권한 설정
+  Future<void> requestPermissionIfNeeded() async {
+    if (await Permission.notification.isRestricted ||
+        await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+  }
+
   Future<void> navigateToHome(BuildContext context) async {
     try {
-      OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+      OAuthToken token;
+
+      if (await isKakaoTalkInstalled()) {
+        try {
+          token = await UserApi.instance.loginWithKakaoTalk();
+        } catch (error) {
+          token = await UserApi.instance.loginWithKakaoAccount();
+        }
+      } else {
+        token = await UserApi.instance.loginWithKakaoAccount();
+      }
       var provider = auth.OAuthProvider('oidc.kakao');
       var credential = provider.credential(
         idToken: token.idToken,
         accessToken: token.accessToken,
       );
-      //
-      await storage.write(key: 'idToken', value: token.idToken);
 
       if (context.mounted) {
         showGeneralDialog(
           context: context,
           barrierDismissible: false,
-          barrierColor: Colors.transparent, // 투명한 배경색
+          barrierColor: Colors.transparent,
           pageBuilder: (context, animation1, animation2) {
             return const LoadingScreen();
           },
@@ -92,9 +108,10 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
-          (Route<dynamic> route) => false, // 모든 이전 페이지 제거
+          (Route<dynamic> route) => false,
         );
       }
+      await requestPermissionIfNeeded();
     } catch (error) {
       print('카카오계정으로 로그인 실패 $error');
       if (context.mounted) {

@@ -1,14 +1,12 @@
-import 'package:amuze/ad_helper.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/mypage/commentmanagement.dart';
 import 'package:amuze/mypage/editprofile.dart';
 import 'package:amuze/mypage/postmanagement.dart';
 import 'package:amuze/mypage/savedpost.dart';
-import 'package:amuze/native_ads_test.dart';
-import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:provider/provider.dart';
 
@@ -156,9 +154,12 @@ class MyPage extends StatelessWidget {
                     ),
                     content: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.75,
-                      child: const Text(
-                        '확인을 누르면 카카오톡 채널로 이동합니다!',
-                        textAlign: TextAlign.center,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: const Text(
+                          '확인을 누르면 카카오톡 채널로 이동합니다!',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                     contentTextStyle: const TextStyle(
@@ -193,7 +194,16 @@ class MyPage extends StatelessWidget {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () async {
+                              final url =
+                                  Uri.parse('http://pf.kakao.com/_GDnSG/chat');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                print('Could not launch $url');
+                              }
+                              Navigator.of(context).pop();
+                            },
                             child: Container(
                               width: MediaQuery.of(context).size.width * 0.33,
                               height: 40,

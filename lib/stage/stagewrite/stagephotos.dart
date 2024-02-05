@@ -135,7 +135,7 @@ class _StagePhotosState extends State<StagePhotos> {
         ),
         materialOptions: const MaterialOptions(
           maxImages: 4,
-          enableCamera: true,
+          enableCamera: false,
           actionBarTitle: "사진첩",
           allViewTitle: "All Photos",
           useDetailsView: true,
@@ -164,12 +164,7 @@ class _StagePhotosState extends State<StagePhotos> {
 
 //카메라, 사진첩 권한 체크//////////////////////////////////
   Future<void> requestPermissionIfNeeded() async {
-    var cameraStatus = await Permission.camera.status;
     var storageStatus = await Permission.storage.status;
-
-    if (!cameraStatus.isGranted) {
-      await Permission.camera.request();
-    }
 
     if (!storageStatus.isGranted) {
       await Permission.storage.request();
@@ -362,7 +357,7 @@ class _StagePhotosState extends State<StagePhotos> {
                                       ),
                                       materialOptions: const MaterialOptions(
                                         maxImages: 1,
-                                        enableCamera: true,
+                                        enableCamera: false,
                                         actionBarTitle: "사진첩",
                                         allViewTitle: "All Photos",
                                         useDetailsView: true,

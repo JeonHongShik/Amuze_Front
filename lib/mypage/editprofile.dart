@@ -40,7 +40,7 @@ class _EditProfileState extends State<EditProfile> {
         ),
         materialOptions: const MaterialOptions(
           maxImages: 1,
-          enableCamera: true,
+          enableCamera: false,
           actionBarTitle: "사진첩",
           allViewTitle: "All Photos",
           useDetailsView: true,
@@ -69,12 +69,7 @@ class _EditProfileState extends State<EditProfile> {
 
   //카메라, 사진첩 권한 체크//////////////////////////////////
   Future<void> requestPermissionIfNeeded() async {
-    var cameraStatus = await Permission.camera.status;
     var storageStatus = await Permission.storage.status;
-
-    if (!cameraStatus.isGranted) {
-      await Permission.camera.request();
-    }
 
     if (!storageStatus.isGranted) {
       await Permission.storage.request();
@@ -149,9 +144,68 @@ class _EditProfileState extends State<EditProfile> {
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
-      } catch (e) {
-        // 오류 처리
-        print("계정 및 데이터 삭제 중 오류 발생: $e");
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          Navigator.of(context).pop();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
+              title: const Text(
+                '자동 로그인 사용 중',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.5,
+                  fontWeight: FontWeight.bold,
+                  color: TextColors.high,
+                ),
+              ),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.75,
+                child: const Text(
+                  '안전한 탈퇴를 위해, 로그아웃 후 다시 로그인한 뒤에 탈퇴해 주세요.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              contentTextStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: TextColors.high,
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.66,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: PrimaryColors.basic,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '확인',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
       }
     }
   }
@@ -309,7 +363,7 @@ class _EditProfileState extends State<EditProfile> {
                         content: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.75,
                           child: const Text(
-                            '탈퇴 시, 계정은 삭제되며 복구되지 않습니다.',
+                            '계정과 관련 게시물 및 댓글은 영구적으로 제거되며, 이후 복원이 불가능합니다.',
                             textAlign: TextAlign.center,
                           ),
                         ),

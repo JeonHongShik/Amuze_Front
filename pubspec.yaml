@@ -79,6 +79,7 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   firebase_app_check: ^0.2.1+8
   google_mobile_ads: ^4.0.0
+  url_launcher: ^6.2.4
 
 
 flutter_native_splash:
