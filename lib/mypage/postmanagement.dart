@@ -117,7 +117,9 @@ class _MystagesState extends State<Mystages> {
               future: serverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ShimmerList();
+                  return const Center(
+                    child: Text('내 공고 불러오는 중...'),
+                  );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -231,13 +233,18 @@ class _MystagesState extends State<Mystages> {
                                                         )
                                                       : const SizedBox.shrink(),
                                                   data.region != null
-                                                      ? Text(
-                                                          data.region!,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 13,
-                                                            color: TextColors
-                                                                .medium,
+                                                      ? Expanded(
+                                                          child: Text(
+                                                            data.region!,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 13,
+                                                              color: TextColors
+                                                                  .medium,
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
                                                         )
                                                       : const SizedBox.shrink(),
@@ -309,7 +316,7 @@ class _MyresumesState extends State<Myresumes> {
               future: serverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ShimmerList();
+                  return const Center(child: Text('내 이력서 불러오는 중...'));
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -435,6 +442,8 @@ class _MyresumesState extends State<Myresumes> {
                                                         color:
                                                             TextColors.medium,
                                                       ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     )
                                                   : const SizedBox.shrink(),
                                             ),
@@ -491,7 +500,7 @@ class _MycommunitiesState extends State<Mycommunities> {
               future: serverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ShimmerList();
+                  return const Center(child: Text('내 커뮤니티 불러오는 중...'));
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -517,7 +526,6 @@ class _MycommunitiesState extends State<Mycommunities> {
                               ));
                         },
                         child: Container(
-                          height: 120,
                           decoration: const BoxDecoration(
                               color: Colors.white,
                               border: Border(
@@ -603,60 +611,6 @@ class _MycommunitiesState extends State<Mycommunities> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class ShimmerList extends StatelessWidget {
-  const ShimmerList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 10, // Shimmer 효과를 표시할 아이템 수 (임의로 5개 설정)
-      itemBuilder: (BuildContext context, int index) {
-        return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!, // 기본 배경색
-          highlightColor: Colors.grey[100]!, // 강조 배경색
-          child: Container(
-            height: 120, // 셀의 높이
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey)),
-            ),
-            // Shimmer 효과가 적용될 콘텐츠를 정의
-            child: Row(
-              children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                  ),
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: 90,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

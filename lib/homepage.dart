@@ -53,6 +53,9 @@ class _HomePageState extends State<HomePage> {
         Provider.of<UserInfoProvider>(context, listen: false).uid;
     Provider.of<CommunityWriteProvider>(context, listen: false).uid =
         Provider.of<UserInfoProvider>(context, listen: false).uid;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print(MediaQuery.of(context).size.width);
+    });
   }
 
   @override

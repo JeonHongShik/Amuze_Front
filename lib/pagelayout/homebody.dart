@@ -12,6 +12,8 @@ import 'package:amuze/stage/stage_board.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
@@ -200,7 +202,9 @@ class _StageBoardsState extends State<StageBoards> {
                     context,
                     MaterialPageRoute(builder: (context) => const StageBoard()),
                   ).then((_) {
-                    serverData = stagepreviewfetchData();
+                    setState(() {
+                      serverData = stagepreviewfetchData();
+                    });
                   }),
                 },
                 child: const Text(
@@ -219,18 +223,11 @@ class _StageBoardsState extends State<StageBoards> {
             future: serverData,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 100,
-                  color: Colors.white,
-                  child: const Center(
-                    child: Text('게시물 불러오는 중...'),
-                  ),
-                );
+                return const ShimmerList();
               } else if (snapshot.hasError) {
                 return SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: 100,
+                  height: 200,
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -238,7 +235,10 @@ class _StageBoardsState extends State<StageBoards> {
                         const Text('게시물을 불러오지 못 했습니다.'),
                         const Text('다시 시도'),
                         IconButton(
-                          icon: const Icon(Icons.refresh),
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
                           onPressed: () {
                             setState(() {
                               serverData = stagepreviewfetchData();
@@ -351,7 +351,7 @@ class _StageBoardsState extends State<StageBoards> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  '${data.pay!}원',
+                                                  '${NumberFormat('#,###').format(int.tryParse(data.pay!) ?? 0)}원',
                                                   style: const TextStyle(
                                                     fontSize: 12.5,
                                                     color: TextColors.medium,
@@ -378,11 +378,15 @@ class _StageBoardsState extends State<StageBoards> {
                                                     color: TextColors.medium,
                                                   ),
                                                 ),
-                                                Text(
-                                                  data.region!,
-                                                  style: const TextStyle(
-                                                    fontSize: 12.5,
-                                                    color: TextColors.medium,
+                                                Expanded(
+                                                  child: Text(
+                                                    data.region!,
+                                                    style: const TextStyle(
+                                                      fontSize: 12.5,
+                                                      color: TextColors.medium,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                               ],
@@ -392,7 +396,7 @@ class _StageBoardsState extends State<StageBoards> {
                                             height: 20,
                                             child: data.datetime != ''
                                                 ? Text(
-                                                    '공연 날짜 - ${data.datetime}',
+                                                    '공연 날짜 : ${data.datetime}',
                                                     style: const TextStyle(
                                                       fontSize: 12.5,
                                                       color: TextColors.medium,
@@ -430,6 +434,64 @@ class _StageBoardsState extends State<StageBoards> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class ShimmerList extends StatelessWidget {
+  const ShimmerList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 5, // Shimmer 효과를 표시할 아이템 수
+      itemBuilder: (BuildContext context, int index) {
+        return Column(
+          children: [
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!, // Shimmer 효과의 기본 색상
+              highlightColor: Colors.grey[100]!, // Shimmer 효과의 하이라이트 색상
+              child: Row(
+                children: [
+                  Container(
+                    width: 85,
+                    height: 85,
+                    color: Colors.white,
+                    margin: const EdgeInsets.only(left: 10),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          height: 20,
+                          width: MediaQuery.of(context).size.width * 0.55,
+                          color: Colors.grey,
+                          margin: const EdgeInsets.fromLTRB(10, 0, 0, 12)),
+                      Container(
+                          height: 20,
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          color: Colors.grey,
+                          margin: const EdgeInsets.fromLTRB(10, 0, 0, 12)),
+                      Container(
+                        height: 20,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        color: Colors.grey,
+                        margin: const EdgeInsets.only(left: 10),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
+        );
+      },
     );
   }
 }
@@ -479,7 +541,9 @@ class _ResumeBoardsState extends State<ResumeBoards> {
                     MaterialPageRoute(
                         builder: (context) => const ResumeBoard()),
                   ).then((_) {
-                    resumeserverData = resumepreviewfetchData();
+                    setState(() {
+                      resumeserverData = resumepreviewfetchData();
+                    });
                   }),
                 },
                 child: const Text(
@@ -498,18 +562,11 @@ class _ResumeBoardsState extends State<ResumeBoards> {
               future: resumeserverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 100,
-                    color: Colors.white,
-                    child: const Center(
-                      child: Text('게시물 불러오는 중...'),
-                    ),
-                  );
+                  return const ResumeShimmerList();
                 } else if (snapshot.hasError) {
                   return SizedBox(
                     width: MediaQuery.of(context).size.width,
-                    height: 100,
+                    height: 200,
                     child: Center(
                       child: Column(
                         mainAxisSize:
@@ -518,7 +575,10 @@ class _ResumeBoardsState extends State<ResumeBoards> {
                           const Text('게시물을 불러오지 못 했습니다.'),
                           const Text('다시 시도'),
                           IconButton(
-                            icon: const Icon(Icons.refresh), // 재시도 아이콘
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: PrimaryColors.basic,
+                            ), // 재시도 아이콘
                             onPressed: () {
                               // 아이콘이 눌렸을 때 데이터를 다시 불러오는 로직을 실행합니다.
                               setState(() {
@@ -667,6 +727,8 @@ class _ResumeBoardsState extends State<ResumeBoards> {
                                                           color:
                                                               TextColors.medium,
                                                         ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                       )
                                                     : const SizedBox.shrink(),
                                               ),
@@ -704,6 +766,64 @@ class _ResumeBoardsState extends State<ResumeBoards> {
   }
 }
 
+class ResumeShimmerList extends StatelessWidget {
+  const ResumeShimmerList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 5, // Shimmer 효과를 표시할 아이템 수
+      itemBuilder: (BuildContext context, int index) {
+        return Column(
+          children: [
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!, // Shimmer 효과의 기본 색상
+              highlightColor: Colors.grey[100]!, // Shimmer 효과의 하이라이트 색상
+              child: Row(
+                children: [
+                  Container(
+                    width: 85,
+                    height: 85,
+                    color: Colors.white,
+                    margin: const EdgeInsets.only(left: 10),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          height: 20,
+                          width: MediaQuery.of(context).size.width * 0.55,
+                          color: Colors.grey,
+                          margin: const EdgeInsets.fromLTRB(10, 0, 0, 12)),
+                      Container(
+                          height: 20,
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          color: Colors.grey,
+                          margin: const EdgeInsets.fromLTRB(10, 0, 0, 12)),
+                      Container(
+                        height: 20,
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        color: Colors.grey,
+                        margin: const EdgeInsets.only(left: 10),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
+        );
+      },
+    );
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //커뮤니티게시판들//////////////////////////////////////////////////////////////////////
@@ -729,7 +849,7 @@ class _ComunityBoardsState extends State<ComunityBoards> {
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
+      padding: const EdgeInsets.fromLTRB(23, 20, 25, 5),
       child: Column(
         children: [
           Row(
@@ -748,11 +868,13 @@ class _ComunityBoardsState extends State<ComunityBoards> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const CommunityBoard()),
-                  ),
+                  ).then((_) => setState(() {
+                        serverData = communitypreviewfetchData();
+                      }))
                 },
                 child: const Text(
                   '전체보기',
-                  style: TextStyle(color: TextColors.high),
+                  style: TextStyle(color: TextColors.disabled),
                 ),
               ),
             ],
@@ -764,18 +886,11 @@ class _ComunityBoardsState extends State<ComunityBoards> {
               future: serverData,
               builder: ((context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 100,
-                    color: Colors.white,
-                    child: const Center(
-                      child: Text('게시물 불러오는 중...'),
-                    ),
-                  );
+                  return const CommunityShimmerList();
                 } else if (snapshot.hasError) {
                   return SizedBox(
                     width: MediaQuery.of(context).size.width,
-                    height: 100,
+                    height: 200,
                     child: Center(
                       child: Column(
                         mainAxisSize:
@@ -784,7 +899,10 @@ class _ComunityBoardsState extends State<ComunityBoards> {
                           const Text('게시물을 불러오지 못 했습니다.'),
                           const Text('다시 시도'),
                           IconButton(
-                            icon: const Icon(Icons.refresh), // 재시도 아이콘
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: PrimaryColors.basic,
+                            ), // 재시도 아이콘
                             onPressed: () {
                               // 아이콘이 눌렸을 때 데이터를 다시 불러오는 로직을 실행합니다.
                               setState(() {
@@ -928,6 +1046,52 @@ class _ComunityBoardsState extends State<ComunityBoards> {
               }))
         ],
       ),
+    );
+  }
+}
+
+class CommunityShimmerList extends StatelessWidget {
+  const CommunityShimmerList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 5, // Shimmer 효과를 표시할 아이템 수
+      itemBuilder: (BuildContext context, int index) {
+        return Column(
+          children: [
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!, // Shimmer 효과의 기본 색상
+              highlightColor: Colors.grey[100]!, // Shimmer 효과의 하이라이트 색상
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                      height: 20,
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      color: Colors.grey,
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 12)),
+                  Container(
+                      height: 20,
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      color: Colors.grey,
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 12)),
+                  Container(
+                    height: 20,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    color: Colors.grey,
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
+        );
+      },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:amuze/gathercolors.dart';
+
 import 'package:amuze/main.dart';
 import 'package:amuze/server_communication/get/detail/stage_detail_get_server.dart';
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
@@ -9,6 +10,8 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 import 'package:photo_view/photo_view.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 
 class StagePost extends StatefulWidget {
   final int? id;
@@ -33,6 +36,8 @@ class _StagePostState extends State<StagePost> {
 
   String displayName = '';
   String photoURL = '';
+
+  bool chat = false;
 
   Future<void> _showDeleteDialog(BuildContext context) async {
     return showDialog<void>(
@@ -245,6 +250,8 @@ class _StagePostState extends State<StagePost> {
         fetchUserProfile(data.first.author!);
       }
     });
+    print(widget.id);
+    print(Provider.of<UserInfoProvider>(context, listen: false).uid);
   }
 
   @override
@@ -252,6 +259,7 @@ class _StagePostState extends State<StagePost> {
     double imageHeight = MediaQuery.of(context).size.height / 3;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         controller: _scrollController,
         slivers: <Widget>[
@@ -339,9 +347,7 @@ class _StagePostState extends State<StagePost> {
                               }
                             } else if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const Center(
-                                child: Text('사진 불러오는 중...'),
-                              );
+                              return const Center(child: SizedBox.shrink());
                             } else {
                               return Image.asset('assets/images/김채원.jpg',
                                   fit: BoxFit.cover);
@@ -359,16 +365,30 @@ class _StagePostState extends State<StagePost> {
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                //borderRadius: BorderRadius.circular(15),
               ),
               child: FutureBuilder<List<StageDetailServerData>>(
                 future: serverData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: Text('게시물 불러오는 중...'));
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
+                        const SpinKitFadingCube(
+                          color: PrimaryColors.basic,
+                          size: 30.0,
+                        ),
+                      ],
+                    );
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        chat = true;
+                      });
+                    });
                     return Column(
                       children: snapshot.data!.map((item) {
                         var children2 = <Widget>[
@@ -387,20 +407,20 @@ class _StagePostState extends State<StagePost> {
                                   children: [
                                     // 첫 12글자 표시
                                     Text(
-                                      item.title!.length > 12
-                                          ? item.title!.substring(0, 12)
+                                      item.title!.length > 14
+                                          ? item.title!.substring(0, 14)
                                           : item.title!,
-                                      style: const TextStyle(fontSize: 25),
+                                      style: const TextStyle(fontSize: 21),
                                     ),
                                     // customIcons 표시
                                     customIcons(item, context),
                                   ],
                                 ),
                                 // 12글자를 초과하는 경우 나머지 텍스트 표시
-                                if (item.title!.length > 12)
+                                if (item.title!.length > 14)
                                   Text(
-                                    item.title!.substring(12),
-                                    style: const TextStyle(fontSize: 25),
+                                    item.title!.substring(14),
+                                    style: const TextStyle(fontSize: 21),
                                   ),
                                 const SizedBox(height: 20),
                                 Row(
@@ -442,7 +462,7 @@ class _StagePostState extends State<StagePost> {
                           const postmargin(),
                           buildNullableInfo('공고 마감기한', item.deadline),
                           const postmargin(),
-                          buildNullableInfo('위치', item.region),
+                          buildNullableregionInfo('위치', item.region),
                           const postmargin(),
                           paybuildNullableInfo('페이', item.pay),
                           const postmargin(),
@@ -477,21 +497,23 @@ class _StagePostState extends State<StagePost> {
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: PrimaryColors.basic,
-            foregroundColor: Colors.white,
-            minimumSize: Size(MediaQuery.of(context).size.width, 50),
-          ),
-          child: const Text(
-            '채팅',
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
-      ),
+      bottomNavigationBar: chat == true
+          ? Padding(
+              padding: const EdgeInsets.all(20),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: PrimaryColors.basic,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                ),
+                child: const Text(
+                  '채팅',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            )
+          : const SizedBox.shrink(),
     );
   }
 
@@ -673,6 +695,35 @@ Widget buildNullableInfo(String label, String? value) {
 }
 
 Widget paybuildNullableInfo(String label, String? value) {
+  // 숫자 형식을 확인하고 3자리마다 콤마를 추가합니다.
+  final formattedValue = value != null && value.isNotEmpty
+      ? NumberFormat('#,###').format(int.tryParse(value) ?? 0)
+      : null;
+
+  return formattedValue != null
+      ? Container(
+          margin: const EdgeInsets.only(left: 20),
+          padding: const EdgeInsets.fromLTRB(0, 20, 10, 10), // 하단 패딩 조정
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(color: TextColors.medium, fontSize: 15),
+              ),
+              Text(
+                '$formattedValue원', // 형식이 지정된 값 사용
+                style: const TextStyle(color: TextColors.high, fontSize: 18),
+                overflow: TextOverflow.visible, // 오버플로우 처리 변경
+                softWrap: true, // 자동 줄바꿈 활성화
+              )
+            ],
+          ),
+        )
+      : const SizedBox.shrink();
+}
+
+Widget buildNullableregionInfo(String label, String? value) {
   return value != null && value.isNotEmpty
       ? Container(
           margin: const EdgeInsets.only(left: 20),
@@ -685,11 +736,15 @@ Widget paybuildNullableInfo(String label, String? value) {
                 style: const TextStyle(color: TextColors.medium, fontSize: 15),
               ),
               Text(
-                '$value원',
+                value,
                 style: const TextStyle(color: TextColors.high, fontSize: 18),
                 overflow: TextOverflow.visible, // 오버플로우 처리 변경
                 softWrap: true, // 자동 줄바꿈 활성화
-              )
+              ),
+              const Text(
+                '자세한 위치는 채팅을 통해 물어보세요!',
+                style: TextStyle(color: TextColors.disabled, fontSize: 12),
+              ),
             ],
           ),
         )

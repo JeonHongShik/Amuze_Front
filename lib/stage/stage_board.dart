@@ -113,7 +113,26 @@ class _StageBoardState extends State<StageBoard> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const ShimmerList();
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = stagepreviewfetchData();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     setState(() {
@@ -266,14 +285,19 @@ class _StageBoardState extends State<StageBoard> {
                                                           : const SizedBox
                                                               .shrink(),
                                                       data.region != null
-                                                          ? Text(
-                                                              data.region!,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 13,
-                                                                color:
-                                                                    TextColors
-                                                                        .medium,
+                                                          ? Expanded(
+                                                              child: Text(
+                                                                data.region!,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 13,
+                                                                  color:
+                                                                      TextColors
+                                                                          .medium,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                               ),
                                                             )
                                                           : const SizedBox

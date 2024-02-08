@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../gathercolors.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CommunityPost extends StatefulWidget {
   final int? id;
@@ -37,6 +38,10 @@ class _CommunityPostState extends State<CommunityPost> {
   int likecount = 0;
 
   int commenttotal = 0;
+
+  bool load = false;
+
+  double loadheight = 0.4;
 
   Future<void> _showPostDeleteDialog(BuildContext context) async {
     return showDialog<void>(
@@ -417,6 +422,7 @@ class _CommunityPostState extends State<CommunityPost> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         scrolledUnderElevation: 0,
+        backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),
         leading: IconButton(
           onPressed: () {
@@ -439,12 +445,16 @@ class _CommunityPostState extends State<CommunityPost> {
                 future: serverData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Text('커뮤니티 글 불러오는 중...'),
-                    );
+                    return const Center(child: SizedBox.shrink());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        load = true;
+                        loadheight = 0.25;
+                      });
+                    });
                     return Column(
                         children: snapshot.data!.map((item) {
                       return Container(
@@ -456,10 +466,10 @@ class _CommunityPostState extends State<CommunityPost> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  // width:
-                                  //     MediaQuery.of(context).size.width * 0.7,
                                   child: Text(
-                                    '${item.title}',
+                                    item.title!.length > 12
+                                        ? item.title!.substring(0, 12)
+                                        : item.title!,
                                     style: const TextStyle(
                                       fontSize: 21,
                                       fontWeight: FontWeight.w600,
@@ -583,6 +593,12 @@ class _CommunityPostState extends State<CommunityPost> {
                                   ),
                               ],
                             ),
+                            if (item.title!.length > 12)
+                              Text(
+                                item.title!.substring(12),
+                                style: const TextStyle(
+                                    fontSize: 21, fontWeight: FontWeight.bold),
+                              ),
                             const SizedBox(
                               height: 30,
                             ),
@@ -645,136 +661,178 @@ class _CommunityPostState extends State<CommunityPost> {
                 },
               ),
             ),
-            const SizedBox(
-              height: 1,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 45,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                  top: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                ),
-                color: Colors.white,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(
-                      '댓글 $commenttotal',
-                      style: const TextStyle(
-                          color: PrimaryColors.basic, fontSize: 15),
+            load == true
+                ? Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                        top: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                      ),
+                      color: Colors.white,
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  height: 65,
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: TextFormField(
-                    controller: commentController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0), // 테두리 둥글게
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: Text(
+                            '댓글 $commenttotal',
+                            style: const TextStyle(
+                                color: PrimaryColors.basic, fontSize: 15),
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(8.0), // 활성 상태가 아닐 때 테두리
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1.0),
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            load == true
+                ? Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        height: 65,
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: TextFormField(
+                          controller: commentController,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(8.0), // 테두리 둥글게
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // 활성 상태가 아닐 때 테두리
+                                borderSide: const BorderSide(
+                                    color: Colors.grey, width: 1.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(8.0), // 포커스 상태일 때 테두리
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2.0),
+                              ),
+                              hintText: '댓글 달기'),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(8.0), // 포커스 상태일 때 테두리
-                          borderSide:
-                              const BorderSide(color: Colors.blue, width: 2.0),
-                        ),
-                        hintText: '댓글 달기'),
-                  ),
-                ),
-                IconButton(
-                    onPressed: () {
-                      sendComment();
-                    },
-                    icon: const Icon(Icons.send))
-              ],
-            ),
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            sendComment();
+                          },
+                          icon: const Icon(Icons.send)),
+                    ],
+                  )
+                : const SizedBox.shrink(),
             FutureBuilder<List<CommentServerData>>(
               future: commentserverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: Text('댓글 불러오는 중...'));
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * loadheight,
+                      ),
+                      const SpinKitFadingCube(
+                        color: PrimaryColors.basic,
+                        size: 30.0,
+                      ),
+                    ],
+                  );
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('댓글을 불러오지 못 했습니다.'),
+                      const Text('다시 시도'),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.refresh,
+                          color: PrimaryColors.basic,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            commentserverData = commentfetchData(widget.id!);
+                          });
+                        },
+                      ),
+                    ],
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     setState(() {
                       commenttotal = snapshot.data!.length;
                     });
                   });
-                  return ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      var comment = snapshot.data![index];
-                      final userprovider =
-                          Provider.of<UserInfoProvider>(context, listen: false);
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                  return Column(
+                    children: [
+                      Container(
+                        height: 1,
+                        color: Colors.grey.withOpacity(0.3),
+                      ),
+                      ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          var comment = snapshot.data![index];
+                          final userprovider = Provider.of<UserInfoProvider>(
+                              context,
+                              listen: false);
+                          return Column(
+                            children: [
+                              ListTile(
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      '익명',
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                    if (userprovider.uid == comment.uid) ...[
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await _showCommentDeleteDialog(
-                                              context, comment.id!);
-                                        },
-                                        child: Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: const Icon(
-                                            Icons.delete,
-                                            size: 20,
-                                            color: IconColors.inactive,
-                                          ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          '익명',
+                                          style: TextStyle(fontSize: 15),
                                         ),
-                                      )
-                                    ]
+                                        if (userprovider.uid ==
+                                            comment.uid) ...[
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await _showCommentDeleteDialog(
+                                                  context, comment.id!);
+                                              setState(() {
+                                                commenttotal -= 1;
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10),
+                                              child: const Icon(
+                                                Icons.delete,
+                                                size: 20,
+                                                color: IconColors.inactive,
+                                              ),
+                                            ),
+                                          )
+                                        ]
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                        height: 8), // 여기에서 원하는 간격을 조절합니다.
                                   ],
                                 ),
-                                const SizedBox(
-                                    height: 8), // 여기에서 원하는 간격을 조절합니다.
-                              ],
-                            ),
-                            subtitle: Text(comment.content!),
-                          ),
-                          Container(
-                            color: Colors.grey.withOpacity(0.3),
-                            height: 1,
-                          )
-                        ],
-                      );
-                    },
+                                subtitle: Text(comment.content!),
+                              ),
+                              Container(
+                                color: Colors.grey.withOpacity(0.3),
+                                height: 1,
+                              )
+                            ],
+                          );
+                        },
+                      ),
+                    ],
                   );
                 } else {
-                  return const Center(child: Text('No comments yet.'));
+                  return const SizedBox.shrink();
                 }
               },
             ),

@@ -76,15 +76,19 @@ class _CommentManagementState extends State<CommentManagement> {
                               ),
                             ),
                             subtitle: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Icon(
                                   Icons.subdirectory_arrow_right,
                                   size: 15,
                                   color: IconColors.inactive,
                                 ),
-                                Text(
-                                  comment.content!,
-                                  style: const TextStyle(fontSize: 18),
+                                Expanded(
+                                  child: Text(
+                                    comment.content!,
+                                    style: const TextStyle(fontSize: 16),
+                                    maxLines: null,
+                                  ),
                                 ),
                               ],
                             ),

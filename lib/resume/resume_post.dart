@@ -9,6 +9,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 import 'package:photo_view/photo_view.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ResumePost extends StatefulWidget {
   final int? id;
@@ -33,6 +34,8 @@ class _ResumePostState extends State<ResumePost> {
 
   String displayName = '';
   String photoURL = '';
+
+  bool chat = false;
 
   Future<void> _showDeleteDialog(BuildContext context) async {
     return showDialog<void>(
@@ -253,232 +256,249 @@ class _ResumePostState extends State<ResumePost> {
     //int currentPageIndex = 0;
     double imageHeight = MediaQuery.of(context).size.height / 3;
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: <Widget>[
-          SliverAppBar(
-            scrolledUnderElevation: 0,
-            expandedHeight: imageHeight,
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            flexibleSpace: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                bool isExpanded = constraints.biggest.height > kToolbarHeight;
-                return FlexibleSpaceBar(
-                  background: isExpanded
-                      ? FutureBuilder<List<ResumeDetailServerData>>(
-                          future: serverData,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: Text('이미지를 가져오는 중입니다'),
-                              );
-                            }
-                            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                              var item = snapshot.data!.first;
-                              List<String?> imagePaths = [
-                                item.mainimage,
-                                item.otherimage1,
-                                item.otherimage2,
-                                item.otherimage3,
-                                item.otherimage4,
-                              ].where((path) => path != null).toList();
+        body: CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            SliverAppBar(
+              scrolledUnderElevation: 0,
+              expandedHeight: imageHeight,
+              pinned: true,
+              backgroundColor: Colors.transparent,
+              flexibleSpace: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  bool isExpanded = constraints.biggest.height > kToolbarHeight;
+                  return FlexibleSpaceBar(
+                    background: isExpanded
+                        ? FutureBuilder<List<ResumeDetailServerData>>(
+                            future: serverData,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(child: SizedBox.shrink());
+                              }
+                              if (snapshot.hasData &&
+                                  snapshot.data!.isNotEmpty) {
+                                var item = snapshot.data!.first;
+                                List<String?> imagePaths = [
+                                  item.mainimage,
+                                  item.otherimage1,
+                                  item.otherimage2,
+                                  item.otherimage3,
+                                  item.otherimage4,
+                                ].where((path) => path != null).toList();
 
-                              if (imagePaths.isEmpty) {
-                                // 이미지가 없는 경우 기본 이미지 표시
+                                if (imagePaths.isEmpty) {
+                                  // 이미지가 없는 경우 기본 이미지 표시
+                                  return Image.asset('assets/images/김채원.jpg',
+                                      fit: BoxFit.cover);
+                                } else {
+                                  return PageView.builder(
+                                    itemCount: imagePaths.length,
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
+                                        onTap: () => Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => Scaffold(
+                                              appBar: AppBar(
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                leading:
+                                                    BackButton(onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                }),
+                                                iconTheme: const IconThemeData(
+                                                    color: PrimaryColors.basic),
+                                              ),
+                                              extendBodyBehindAppBar: true,
+                                              body: PhotoViewGallery.builder(
+                                                itemCount: imagePaths.length,
+                                                builder: (context, index) {
+                                                  return PhotoViewGalleryPageOptions(
+                                                    imageProvider: NetworkImage(
+                                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${imagePaths[index]}'),
+                                                    minScale:
+                                                        PhotoViewComputedScale
+                                                            .contained,
+                                                    maxScale:
+                                                        PhotoViewComputedScale
+                                                                .contained *
+                                                            2,
+                                                  );
+                                                },
+                                                scrollPhysics:
+                                                    const BouncingScrollPhysics(),
+                                                backgroundDecoration:
+                                                    const BoxDecoration(
+                                                  color: Colors.transparent,
+                                                ),
+                                                pageController: PageController(
+                                                    initialPage: index),
+                                                enableRotation: false,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        child: Image.network(
+                                          'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${imagePaths[index]}',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                              } else {
                                 return Image.asset('assets/images/김채원.jpg',
                                     fit: BoxFit.cover);
-                              } else {
-                                return PageView.builder(
-                                  itemCount: imagePaths.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => Scaffold(
-                                            appBar: AppBar(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              leading:
-                                                  BackButton(onPressed: () {
-                                                Navigator.of(context).pop();
-                                              }),
-                                              iconTheme: const IconThemeData(
-                                                  color: PrimaryColors.basic),
-                                            ),
-                                            extendBodyBehindAppBar: true,
-                                            body: PhotoViewGallery.builder(
-                                              itemCount: imagePaths.length,
-                                              builder: (context, index) {
-                                                return PhotoViewGalleryPageOptions(
-                                                  imageProvider: NetworkImage(
-                                                      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${imagePaths[index]}'),
-                                                  minScale:
-                                                      PhotoViewComputedScale
-                                                          .contained,
-                                                  maxScale:
-                                                      PhotoViewComputedScale
-                                                              .contained *
-                                                          2,
-                                                );
-                                              },
-                                              scrollPhysics:
-                                                  const BouncingScrollPhysics(),
-                                              backgroundDecoration:
-                                                  const BoxDecoration(
-                                                color: Colors.transparent,
-                                              ),
-                                              pageController: PageController(
-                                                  initialPage: index),
-                                              enableRotation: false,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      child: Image.network(
-                                        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/${imagePaths[index]}',
-                                        fit: BoxFit.cover,
-                                      ),
-                                    );
-                                  },
-                                );
                               }
-                            } else {
-                              return Image.asset('assets/images/김채원.jpg',
-                                  fit: BoxFit.cover);
-                            }
-                          },
-                        )
-                      : Container(
-                          color: Colors.grey.shade300,
-                        ),
-                );
-              },
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                //borderRadius: BorderRadius.circular(15),
-              ),
-              child: FutureBuilder<List<ResumeDetailServerData>>(
-                future: serverData,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: Text('게시물 불러오는 중...'));
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    return Column(
-                      children: snapshot.data!.map((item) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                decoration: const BoxDecoration(
-                                    border: Border(
-                                        bottom:
-                                            BorderSide(color: Colors.grey))),
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 10, 0, 0),
-                                width: MediaQuery.of(context).size.width,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        // 첫 12글자 표시
-                                        Text(
-                                          item.title!.length > 12
-                                              ? item.title!.substring(0, 12)
-                                              : item.title!,
-                                          style: const TextStyle(fontSize: 25),
-                                        ),
-                                        // customIcons 표시
-                                        customIcons(item, context),
-                                      ],
-                                    ),
-                                    // 12글자를 초과하는 경우 나머지 텍스트 표시
-                                    if (item.title!.length > 12)
-                                      Text(
-                                        item.title!.substring(12),
-                                        style: const TextStyle(fontSize: 25),
-                                      ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Row(
-                                      children: [
-                                        if (photoURL.isNotEmpty)
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                                25), // 이미지를 원형으로 만들기 위한 경계 반지름
-                                            child: Image.network(
-                                              photoURL,
-                                              width: 40,
-                                              height: 40,
-                                            ),
-                                          ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 5),
-                                          child: Text(
-                                            displayName,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                  ],
-                                )),
-                            buildNullableInfo('나이', item.age),
-                            buildNullableInfo('성별', item.gender),
-                            listNullableInfo('학력', item.educations),
-                            listNullableInfo('활동지역', item.regions),
-                            listNullableInfo('경력', item.careers),
-                            listNullableInfo('수상', item.awards),
-                            listNullableInfo('수료', item.completions),
-                            buildNullableInfo('자기소개서', item.introduce),
-                          ],
-                        );
-                      }).toList(),
-                    );
-                  } else {
-                    return const Center(child: Text('No Data Available'));
-                  }
+                            },
+                          )
+                        : Container(
+                            color: Colors.grey.shade300,
+                          ),
+                  );
                 },
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: PrimaryColors.basic,
-            foregroundColor: Colors.white,
-            minimumSize: Size(MediaQuery.of(context).size.width, 50),
-          ),
-          child: const Text(
-            '채팅',
-            style: TextStyle(fontSize: 18),
-          ),
+            SliverToBoxAdapter(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  //borderRadius: BorderRadius.circular(15),
+                ),
+                child: FutureBuilder<List<ResumeDetailServerData>>(
+                  future: serverData,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.1,
+                          ),
+                          const SpinKitFadingCube(
+                            color: PrimaryColors.basic,
+                            size: 30.0,
+                          ),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          chat = true;
+                        });
+                      });
+                      return Column(
+                        children: snapshot.data!.map((item) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                          bottom:
+                                              BorderSide(color: Colors.grey))),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 10, 0, 0),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // 첫 12글자 표시
+                                          Text(
+                                            item.title!.length > 14
+                                                ? item.title!.substring(0, 14)
+                                                : item.title!,
+                                            style:
+                                                const TextStyle(fontSize: 21),
+                                          ),
+                                          // customIcons 표시
+                                          customIcons(item, context),
+                                        ],
+                                      ),
+                                      // 12글자를 초과하는 경우 나머지 텍스트 표시
+                                      if (item.title!.length > 14)
+                                        Text(
+                                          item.title!.substring(14),
+                                          style: const TextStyle(fontSize: 21),
+                                        ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        children: [
+                                          if (photoURL.isNotEmpty)
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(
+                                                  25), // 이미지를 원형으로 만들기 위한 경계 반지름
+                                              child: Image.network(
+                                                photoURL,
+                                                width: 40,
+                                                height: 40,
+                                              ),
+                                            ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 5),
+                                            child: Text(
+                                              displayName,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                    ],
+                                  )),
+                              buildNullableInfo('나이', item.age),
+                              buildNullableInfo('성별', item.gender),
+                              listNullableInfo('학력', item.educations),
+                              listNullableInfo('활동지역', item.regions),
+                              listNullableInfo('경력', item.careers),
+                              listNullableInfo('수상', item.awards),
+                              listNullableInfo('수료', item.completions),
+                              buildNullableInfo('자기소개서', item.introduce),
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    } else {
+                      return const Center(child: Text('No Data Available'));
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-    );
+        bottomNavigationBar: chat == true
+            ? Padding(
+                padding: const EdgeInsets.all(20),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: PrimaryColors.basic,
+                    foregroundColor: Colors.white,
+                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                  ),
+                  child: const Text(
+                    '채팅',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink());
   }
 
   Widget customIcons(ResumeDetailServerData item, BuildContext context) {
