@@ -121,7 +121,26 @@ class _MystagesState extends State<Mystages> {
                     child: Text('내 공고 불러오는 중...'),
                   );
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = mystagefetchData(uid);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
                     itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
@@ -318,7 +337,26 @@ class _MyresumesState extends State<Myresumes> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('내 이력서 불러오는 중...'));
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = myresumefetchData(uid);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
                     itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
@@ -502,7 +540,26 @@ class _MycommunitiesState extends State<Mycommunities> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('내 커뮤니티 불러오는 중...'));
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = mycommunityfetchData(uid);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,

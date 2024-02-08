@@ -47,7 +47,26 @@ class _CommentManagementState extends State<CommentManagement> {
                 child: Text('내 댓글 불러오는 중...'),
               );
             } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('내 댓글을 불러오지 못 했습니다.'),
+                    const Text('다시 시도'),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.refresh,
+                        color: PrimaryColors.basic,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          serverData = mycommentfetchData(uid);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              );
             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               return ListView.builder(
                   itemCount: snapshot.data!.length,

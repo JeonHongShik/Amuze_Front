@@ -346,6 +346,8 @@ class _ResumePostState extends State<ResumePost> {
                                     },
                                   );
                                 }
+                              } else if (snapshot.hasError) {
+                                return const SizedBox.shrink();
                               } else {
                                 return Image.asset('assets/images/김채원.jpg',
                                     fit: BoxFit.cover);
@@ -381,7 +383,29 @@ class _ResumePostState extends State<ResumePost> {
                         ],
                       );
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
+                      return Center(
+                        child: Column(
+                          mainAxisSize:
+                              MainAxisSize.min, // 아이콘과 텍스트를 중앙에 배치하기 위해 사용
+                          children: [
+                            const Text('게시물을 불러오지 못 했습니다.'),
+                            const Text('다시 시도'),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.refresh,
+                                color: PrimaryColors.basic,
+                              ), // 재시도 아이콘
+                              onPressed: () {
+                                // 아이콘이 눌렸을 때 데이터를 다시 불러오는 로직을 실행합니다.
+                                setState(() {
+                                  serverData =
+                                      resumedetailfetchData(widget.id!);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      );
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         setState(() {
@@ -604,7 +628,10 @@ class _ResumePostState extends State<ResumePost> {
                       });
                     });
                   },
-                  icon: const Icon(Icons.edit)),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: IconColors.inactive,
+                  )),
               IconButton(
                   onPressed: () async {
                     await _showDeleteDialog(context);
