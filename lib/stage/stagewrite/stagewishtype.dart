@@ -42,9 +42,9 @@ class _StageWishTypeState extends State<StageWishType> {
                     color: TextColors.high,
                   ),
                 ),
-                content: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: const Text(
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
                     '취소 시, 작성하신 내용은 저장되지 않습니다.',
                     textAlign: TextAlign.center,
                   ),
@@ -70,7 +70,7 @@ class _StageWishTypeState extends State<StageWishType> {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class _StageWishTypeState extends State<StageWishType> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
-                            '취소',
+                            '나가기',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -90,7 +90,7 @@ class _StageWishTypeState extends State<StageWishType> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -133,6 +133,20 @@ class _StageWishTypeState extends State<StageWishType> {
                     TextSpan(text: '4. 원하는 무용 종류를 \n'),
                     TextSpan(text: '     입력해주세요.'),
                   ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 50),
+              child: Text(
+                '예시)  한국무용, 현대무용, 발레',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: TextColors.disabled,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

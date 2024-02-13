@@ -271,9 +271,9 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                     color: TextColors.high,
                   ),
                 ),
-                content: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: const Text(
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
                     '취소 시, 작성하신 내용은 저장되지 않습니다.',
                     textAlign: TextAlign.center,
                   ),
@@ -301,7 +301,7 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -309,7 +309,7 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
-                            '취소',
+                            '나가기',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -321,7 +321,7 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -368,7 +368,26 @@ class _ResumeAwardsCompletionsState extends State<ResumeAwardsCompletions> {
               ),
             ),
             const SizedBox(
-              height: 80,
+              height: 15,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 50),
+              child: RichText(
+                text: const TextSpan(
+                  children: <TextSpan>[
+                    TextSpan(text: '수상 예시) OO콩쿨 OO상 수상 \n'),
+                    TextSpan(text: '수료 예시) OO자격증 소지, OO과정 수료'),
+                  ],
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: TextColors.disabled,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 35,
             ),
             Center(
               child: Column(

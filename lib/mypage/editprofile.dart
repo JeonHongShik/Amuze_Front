@@ -360,9 +360,9 @@ class _EditProfileState extends State<EditProfile> {
                             color: TextColors.high,
                           ),
                         ),
-                        content: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          child: const Text(
+                        content: const SizedBox(
+                          width: 280,
+                          child: Text(
                             '계정과 관련 게시물 및 댓글은 영구적으로 제거되며, 이후 복원이 불가능합니다.',
                             textAlign: TextAlign.center,
                           ),
@@ -381,8 +381,7 @@ class _EditProfileState extends State<EditProfile> {
                                   await deleteUserAccountAndData();
                                 },
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.33,
+                                  width: 125,
                                   height: 40,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
@@ -402,8 +401,7 @@ class _EditProfileState extends State<EditProfile> {
                               GestureDetector(
                                 onTap: () => Navigator.of(context).pop(),
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.33,
+                                  width: 125,
                                   height: 40,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
