@@ -52,9 +52,9 @@ class _ResumetitleState extends State<Resumetitle> {
                     color: TextColors.high,
                   ),
                 ),
-                content: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: const Text(
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
                     '취소 시, 작성하신 내용은 저장되지 않습니다.',
                     textAlign: TextAlign.center,
                   ),
@@ -77,7 +77,7 @@ class _ResumetitleState extends State<Resumetitle> {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -85,7 +85,7 @@ class _ResumetitleState extends State<Resumetitle> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
-                            '취소',
+                            '나가기',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class _ResumetitleState extends State<Resumetitle> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -138,9 +138,23 @@ class _ResumetitleState extends State<Resumetitle> {
                       fontSize: 25,
                       fontWeight: FontWeight.bold),
                   children: <TextSpan>[
-                    TextSpan(text: '1. 게시물 제목을\n'),
+                    TextSpan(text: '1. 이력서 제목을\n'),
                     TextSpan(text: '     입력해주세요.'),
                   ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 13,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 50),
+              child: Text(
+                '제목)  자신을 어필할 수 있는 한 문장을 적어주세요!',
+                style: TextStyle(
+                  fontSize: 14.5,
+                  color: TextColors.disabled,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

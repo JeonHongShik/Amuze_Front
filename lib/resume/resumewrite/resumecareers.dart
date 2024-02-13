@@ -172,9 +172,9 @@ class _ResumeCareersState extends State<ResumeCareers> {
                     color: TextColors.high,
                   ),
                 ),
-                content: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: const Text(
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
                     '취소 시, 작성하신 내용은 저장되지 않습니다.',
                     textAlign: TextAlign.center,
                   ),
@@ -201,7 +201,7 @@ class _ResumeCareersState extends State<ResumeCareers> {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -209,7 +209,7 @@ class _ResumeCareersState extends State<ResumeCareers> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
-                            '취소',
+                            '나가기',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -221,7 +221,7 @@ class _ResumeCareersState extends State<ResumeCareers> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -264,6 +264,20 @@ class _ResumeCareersState extends State<ResumeCareers> {
                     TextSpan(text: '5. 경력을\n'),
                     TextSpan(text: '     입력해주세요.'),
                   ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 50),
+              child: Text(
+                '예시)  OO무용단 출신,  OO무용학원 운영',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: TextColors.disabled,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

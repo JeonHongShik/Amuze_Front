@@ -43,9 +43,9 @@ class _StagePayState extends State<StagePay> {
                     color: TextColors.high,
                   ),
                 ),
-                content: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: const Text(
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
                     '취소 시, 작성하신 내용은 저장되지 않습니다.',
                     textAlign: TextAlign.center,
                   ),
@@ -72,7 +72,7 @@ class _StagePayState extends State<StagePay> {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -80,7 +80,7 @@ class _StagePayState extends State<StagePay> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
-                            '취소',
+                            '나가기',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -92,7 +92,7 @@ class _StagePayState extends State<StagePay> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.33,
+                          width: 125,
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(

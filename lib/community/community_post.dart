@@ -61,9 +61,9 @@ class _CommunityPostState extends State<CommunityPost> {
               color: TextColors.high,
             ),
           ),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.75,
-            child: const Text(
+          content: const SizedBox(
+            width: 280,
+            child: Text(
               '게시물 삭제 시, 게시물을 복구할 수 없습니다.',
               textAlign: TextAlign.center,
             ),
@@ -95,7 +95,7 @@ class _CommunityPostState extends State<CommunityPost> {
                     }
                   },
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.33,
+                    width: 125,
                     height: 40,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -115,7 +115,7 @@ class _CommunityPostState extends State<CommunityPost> {
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.33,
+                    width: 125,
                     height: 40,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -201,7 +201,7 @@ class _CommunityPostState extends State<CommunityPost> {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(15.0))),
           title: Container(
-            width: MediaQuery.of(context).size.width * 0.75,
+            width: 280,
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
             child: const Text(
               '댓글을 삭제하시겠습니까?',
@@ -237,7 +237,7 @@ class _CommunityPostState extends State<CommunityPost> {
                     }
                   },
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.33,
+                    width: 125,
                     height: 40,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -258,7 +258,7 @@ class _CommunityPostState extends State<CommunityPost> {
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.33,
+                    width: 125,
                     height: 40,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(

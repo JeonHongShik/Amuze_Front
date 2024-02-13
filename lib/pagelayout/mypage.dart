@@ -153,7 +153,7 @@ class MyPage extends StatelessWidget {
                       ),
                     ),
                     content: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.75,
+                      width: 280,
                       child: GestureDetector(
                         onTap: () {},
                         child: const Text(
@@ -176,7 +176,7 @@ class MyPage extends StatelessWidget {
                               Navigator.of(context).pop();
                             },
                             child: Container(
-                              width: MediaQuery.of(context).size.width * 0.33,
+                              width: 125,
                               height: 40,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -205,7 +205,7 @@ class MyPage extends StatelessWidget {
                               Navigator.of(context).pop();
                             },
                             child: Container(
-                              width: MediaQuery.of(context).size.width * 0.33,
+                              width: 125,
                               height: 40,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -238,7 +238,7 @@ class MyPage extends StatelessWidget {
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15.0))),
                   title: Container(
-                    width: MediaQuery.of(context).size.width * 0.75,
+                    width: 280,
                     padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
                     child: const Text(
                       '정말 로그아웃 하시겠습니까?',
@@ -261,7 +261,7 @@ class MyPage extends StatelessWidget {
                                 '/login', (Route<dynamic> route) => false);
                           },
                           child: Container(
-                            width: MediaQuery.of(context).size.width * 0.33,
+                            width: 125,
                             height: 40,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
@@ -281,7 +281,7 @@ class MyPage extends StatelessWidget {
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
                           child: Container(
-                            width: MediaQuery.of(context).size.width * 0.33,
+                            width: 125,
                             height: 40,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
