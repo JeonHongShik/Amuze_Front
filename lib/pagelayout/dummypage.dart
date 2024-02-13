@@ -9,8 +9,12 @@ class DummyPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Dummy Page'),
       ),
-      body: const Center(
-        child: Text('This is a dummy page.'),
+      body: Center(
+        child: Container(
+          width: 300,
+          height: 100,
+          color: Colors.amber,
+        ),
       ),
     );
   }

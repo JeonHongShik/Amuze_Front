@@ -4,6 +4,7 @@ import 'package:amuze/mypage/commentmanagement.dart';
 import 'package:amuze/mypage/editprofile.dart';
 import 'package:amuze/mypage/postmanagement.dart';
 import 'package:amuze/mypage/savedpost.dart';
+import 'package:amuze/pagelayout/dummypage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -129,7 +130,17 @@ class MyPage extends StatelessWidget {
                       builder: (context) => const SavedPost(),
                     ));
               }),
-          MypageElement(icon: Icons.notifications, text: '알림 설정', onTap: () {}),
+          MypageElement(
+              icon: Icons.notifications,
+              text: '알림 설정',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DummyPage(), // 프로필 수정 페이지로 이동
+                  ),
+                );
+              }),
           MypageElement(
               icon: Icons.headset_mic,
               text: '문의 (카카오톡 채널상담)',

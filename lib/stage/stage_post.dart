@@ -250,8 +250,6 @@ class _StagePostState extends State<StagePost> {
         fetchUserProfile(data.first.author!);
       }
     });
-    print(widget.id);
-    print(Provider.of<UserInfoProvider>(context, listen: false).uid);
   }
 
   @override
