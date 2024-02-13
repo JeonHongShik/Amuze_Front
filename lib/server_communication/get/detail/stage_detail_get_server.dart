@@ -63,7 +63,17 @@ class StageDetailServerData {
 
 Future<List<StageDetailServerData>> stagedetailfetchData(int id) async {
   var dio = Dio();
-  final response = await dio.get(
-      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/${id.toString()}/');
-  return [StageDetailServerData.fromJson(response.data)];
+  try {
+    final response = await dio.get(
+        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/${id.toString()}/');
+
+    return [StageDetailServerData.fromJson(response.data)];
+  } on DioException catch (e) {
+    if (e.response?.statusCode == 404) {
+      print('e : $e');
+      throw Exception('NotFound');
+    } else {
+      throw Exception('Error');
+    }
+  }
 }

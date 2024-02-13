@@ -3,6 +3,7 @@ import 'package:amuze/native_ads_test.dart';
 import 'package:amuze/resume/resume_post.dart';
 import 'package:amuze/resume/resumewrite/resumetitle.dart';
 import 'package:amuze/search/resume_board_search.dart';
+import 'package:amuze/server_communication/get/detail/resume_detail_get_server.dart';
 import 'package:amuze/server_communication/get/preview/resume_preview_get_server.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -173,8 +174,6 @@ class _ResumeBoardState extends State<ResumeBoard> {
                           var data = snapshot.data![reverseIndex];
                           return GestureDetector(
                             onTap: () {
-                              print(data.id);
-                              print(data.author);
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

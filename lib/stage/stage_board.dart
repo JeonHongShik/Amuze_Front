@@ -1,10 +1,12 @@
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/native_ads_test.dart';
 import 'package:amuze/search/stage_board_search.dart';
+import 'package:amuze/server_communication/get/detail/stage_detail_get_server.dart';
 import 'package:amuze/stage/stage_post.dart';
 import 'package:amuze/server_communication/get/preview/stage_preview_get_server.dart';
 
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -18,6 +20,58 @@ class StageBoard extends StatefulWidget {
 class _StageBoardState extends State<StageBoard> {
   late Future<List<StagePreviewServerData>> serverData;
   int totalcount = 0;
+
+  void navigateToPageOrShowError(BuildContext context, int id) async {
+    try {
+      await stagedetailfetchData(id);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StagePost(id: id),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      if (error.toString().contains('NotFound')) {
+        // 404 에러일 때 팝업창 표시
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("삭제된 게시물입니다."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("확인"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("오류"),
+              content: const Text("데이터를 가져오는 중 오류가 발생했습니다."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("확인"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -159,10 +213,6 @@ class _StageBoardState extends State<StageBoard> {
                                 color: Colors.grey[200],
                               ),
                               const NativeAds(),
-                              // Container(
-                              //   height: 1,
-                              //   color: Colors.grey[200],
-                              // ),
                             ],
                           );
                         } else {
@@ -172,16 +222,7 @@ class _StageBoardState extends State<StageBoard> {
                           var data = snapshot.data![reverseIndex];
                           return GestureDetector(
                             onTap: () {
-                              print(data.id);
-                              print(data.author);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        StagePost(id: data.id),
-                                  )).then((_) => setState(() {
-                                    serverData = stagepreviewfetchData();
-                                  }));
+                              navigateToPageOrShowError(context, data.id!);
                             },
                             child: Container(
                               height: 120,

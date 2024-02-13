@@ -102,7 +102,7 @@ class MyPage extends StatelessWidget {
           ),
           MypageElement(
               icon: Icons.article_rounded,
-              text: '나의 게시물 관리',
+              text: '내 게시물 관리',
               onTap: () {
                 Navigator.push(
                     context,
@@ -130,17 +130,17 @@ class MyPage extends StatelessWidget {
                       builder: (context) => const SavedPost(),
                     ));
               }),
-          MypageElement(
-              icon: Icons.notifications,
-              text: '알림 설정',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DummyPage(), // 프로필 수정 페이지로 이동
-                  ),
-                );
-              }),
+          // MypageElement(
+          //     icon: Icons.notifications,
+          //     text: '알림 설정',
+          //     onTap: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => const DummyPage(),
+          //         ),
+          //       );
+          //     }),
           MypageElement(
               icon: Icons.headset_mic,
               text: '문의 (카카오톡 채널상담)',
