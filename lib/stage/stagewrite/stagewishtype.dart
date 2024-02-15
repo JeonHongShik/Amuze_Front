@@ -20,6 +20,7 @@ class _StageWishTypeState extends State<StageWishType> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(

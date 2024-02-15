@@ -20,6 +20,7 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -147,7 +148,7 @@ class _ResumeIntroduceState extends State<ResumeIntroduce> {
               Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.75,
-                  height: MediaQuery.of(context).size.height * 0.3,
+                  height: MediaQuery.of(context).size.height * 0.6,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 300),
                     child: TextField(

@@ -254,7 +254,6 @@ class _CommunityPostState extends State<CommunityPost> {
                     ),
                   ),
                 ),
-                SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
@@ -731,13 +730,13 @@ class _CommunityPostState extends State<CommunityPost> {
                                 borderRadius: BorderRadius.circular(
                                     8.0), // 활성 상태가 아닐 때 테두리
                                 borderSide: const BorderSide(
-                                    color: Colors.grey, width: 1.0),
+                                    color: PrimaryColors.disabled, width: 1.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.circular(8.0), // 포커스 상태일 때 테두리
                                 borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2.0),
+                                    color: PrimaryColors.hover, width: 1.0),
                               ),
                               hintText: '댓글 달기'),
                         ),
@@ -746,7 +745,10 @@ class _CommunityPostState extends State<CommunityPost> {
                           onPressed: () {
                             sendComment();
                           },
-                          icon: const Icon(Icons.send)),
+                          icon: const Icon(
+                            Icons.send,
+                            color: PrimaryColors.basic,
+                          )),
                     ],
                   )
                 : const SizedBox.shrink(),

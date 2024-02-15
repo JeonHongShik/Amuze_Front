@@ -37,6 +37,7 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -160,6 +161,7 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
                   GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
+                          backgroundColor: Colors.white,
                           context: context,
                           builder: (BuildContext context) {
                             return Wrap(
@@ -218,15 +220,16 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
                   GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
+                          backgroundColor: Colors.white,
                           context: context,
                           builder: (BuildContext context) {
                             return SizedBox(
-                              height: 200, // 하단 시트의 높이를 제한합니다.
+                              height: 400, // 하단 시트의 높이를 제한합니다.
                               child: ListView.builder(
-                                itemCount: 101,
+                                itemCount: 100,
                                 itemBuilder: (BuildContext context, int index) {
                                   return ListTile(
-                                    title: Text('$index살'),
+                                    title: Text('${index + 1}살'),
                                     onTap: () {
                                       final age = '$index살';
                                       Provider.of<ResumeWriteProvider>(context,
@@ -245,9 +248,7 @@ class _ResumeGenderAgeState extends State<ResumeGenderAge> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.75,
                         child: TextField(
-                          controller:
-                              ageController, // 여기를 ageController로 변경했습니다.
-
+                          controller: ageController,
                           maxLines: null,
                           maxLength: null,
                           decoration: const InputDecoration(

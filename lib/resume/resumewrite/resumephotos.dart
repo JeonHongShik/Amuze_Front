@@ -183,6 +183,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -718,9 +719,71 @@ class _ResumePhotosState extends State<ResumePhotos> {
                                     color: Colors.grey),
                                 child: IconButton(
                                   onPressed: () async {
-                                    //이미지 선택 로직 들어갈 자리
-
-                                    await loadAndConvertImages();
+                                    if (fileMainImage.isNotEmpty) {
+                                      await loadAndConvertImages();
+                                    } else {
+                                      showDialog<void>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(15.0))),
+                                            title: Container(
+                                              width: 280,
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      0, 20, 0, 20),
+                                              child: const Text(
+                                                '메인 사진을 먼저 선택해주세요.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: TextColors.high,
+                                                ),
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                    child: Container(
+                                                      width: 200,
+                                                      height: 40,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                          color: PrimaryColors
+                                                              .basic,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8)),
+                                                      child: const Text(
+                                                        '확인',
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                   icon: const Icon(Icons.photo_camera),
                                   color: Colors.black,

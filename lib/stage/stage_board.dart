@@ -23,6 +23,7 @@ class _StageBoardState extends State<StageBoard> {
 
   void navigateToPageOrShowError(BuildContext context, int id) async {
     try {
+      print('여긴가?1');
       await stagedetailfetchData(id);
       if (!mounted) return;
       Navigator.push(
@@ -32,9 +33,12 @@ class _StageBoardState extends State<StageBoard> {
         ),
       );
     } catch (error) {
+      print('여긴가?5');
       if (!mounted) return;
+      print('여긴가?6');
       if (error.toString().contains('NotFound')) {
-        // 404 에러일 때 팝업창 표시
+        print('여긴가?7');
+        //404 에러일 때 팝업창 표시
         showDialog(
           context: context,
           builder: (BuildContext context) {

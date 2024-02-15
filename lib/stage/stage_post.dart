@@ -266,6 +266,7 @@ class _StagePostState extends State<StagePost> {
             expandedHeight: imageHeight,
             pinned: true,
             backgroundColor: Colors.transparent,
+            iconTheme: const IconThemeData(color: PrimaryColors.basic),
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 bool isExpanded = constraints.biggest.height > kToolbarHeight;

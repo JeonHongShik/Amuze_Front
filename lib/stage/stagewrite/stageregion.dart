@@ -313,6 +313,7 @@ class _StageRegionState extends State<StageRegion> {
   void _showSubRegionModal(
       BuildContext context, String mainRegion, List<String> subRegions) {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       builder: (BuildContext context) {
         return SizedBox(
@@ -358,6 +359,7 @@ class _StageRegionState extends State<StageRegion> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -483,6 +485,7 @@ class _StageRegionState extends State<StageRegion> {
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
+                              backgroundColor: Colors.white,
                               context: context,
                               builder: (BuildContext context) {
                                 return SizedBox(

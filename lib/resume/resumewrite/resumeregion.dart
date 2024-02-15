@@ -314,6 +314,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
   void _showSubRegionModal(
       BuildContext context, String mainRegion, List<String> subRegions) {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       builder: (BuildContext context) {
         return SizedBox(
@@ -353,6 +354,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
   void _showSubRegionPlusModal(
       BuildContext context, String mainRegion, List<String> subRegions) {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       builder: (BuildContext context) {
         return SizedBox(
@@ -413,6 +415,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -539,6 +542,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
+                              backgroundColor: Colors.white,
                               context: context,
                               builder: (BuildContext context) {
                                 return SizedBox(
@@ -582,6 +586,7 @@ class _ResumeRegionState extends State<ResumeRegion> {
                         onTap: () {
                           if (regionController.text.isNotEmpty) {
                             showModalBottomSheet(
+                                backgroundColor: Colors.white,
                                 context: context,
                                 builder: (BuildContext context) {
                                   return SizedBox(
@@ -600,18 +605,56 @@ class _ResumeRegionState extends State<ResumeRegion> {
                                   );
                                 });
                           } else {
-                            showDialog(
+                            showDialog<void>(
                               context: context,
+                              barrierDismissible: false,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: const Text('알림'),
-                                  content: const Text('첫 번째 활동 지역을 먼저 입력해주세요'),
+                                  backgroundColor: Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(15.0))),
+                                  title: Container(
+                                    width: 280,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                                    child: const Text(
+                                      '첫 번째 활동 지역을 먼저 입력해주세요.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: TextColors.high,
+                                      ),
+                                    ),
+                                  ),
                                   actions: <Widget>[
-                                    TextButton(
-                                      child: const Text('확인'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Container(
+                                            width: 200,
+                                            height: 40,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: PrimaryColors.basic,
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            child: const Text(
+                                              '확인',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 );

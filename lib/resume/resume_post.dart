@@ -264,6 +264,7 @@ class _ResumePostState extends State<ResumePost> {
               expandedHeight: imageHeight,
               pinned: true,
               backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: PrimaryColors.basic),
               flexibleSpace: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
                   bool isExpanded = constraints.biggest.height > kToolbarHeight;
