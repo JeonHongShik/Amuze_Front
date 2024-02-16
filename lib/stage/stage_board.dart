@@ -21,62 +21,6 @@ class _StageBoardState extends State<StageBoard> {
   late Future<List<StagePreviewServerData>> serverData;
   int totalcount = 0;
 
-  void navigateToPageOrShowError(BuildContext context, int id) async {
-    try {
-      print('여긴가?1');
-      await stagedetailfetchData(id);
-      if (!mounted) return;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StagePost(id: id),
-        ),
-      );
-    } catch (error) {
-      print('여긴가?5');
-      if (!mounted) return;
-      print('여긴가?6');
-      if (error.toString().contains('NotFound')) {
-        print('여긴가?7');
-        //404 에러일 때 팝업창 표시
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("삭제된 게시물입니다."),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text("확인"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("오류"),
-              content: const Text("데이터를 가져오는 중 오류가 발생했습니다."),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text("확인"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -226,7 +170,16 @@ class _StageBoardState extends State<StageBoard> {
                           var data = snapshot.data![reverseIndex];
                           return GestureDetector(
                             onTap: () {
-                              navigateToPageOrShowError(context, data.id!);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        StagePost(id: data.id),
+                                  )).then((_) => setState(
+                                    () {
+                                      serverData = stagepreviewfetchData();
+                                    },
+                                  ));
                             },
                             child: Container(
                               height: 120,

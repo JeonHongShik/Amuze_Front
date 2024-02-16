@@ -136,9 +136,6 @@ void main() async {
             create: (c) => UserInfoProvider(),
           ),
           ChangeNotifierProvider(
-            create: (c) => BottomNavigationProvider(),
-          ),
-          ChangeNotifierProvider(
             create: (c) => IconChangeProvider(),
           ),
           ChangeNotifierProvider(
