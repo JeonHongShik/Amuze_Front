@@ -218,7 +218,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
                                               color: backColors.disabled,
                                               image: const DecorationImage(
                                                   image: AssetImage(
-                                                      'assets/images/공고임시이미지.png'),
+                                                      'assets/images/이력서게시물없음이미지.png'),
                                                   fit: BoxFit.fill)),
                                         ),
                                   Expanded(

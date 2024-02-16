@@ -217,7 +217,7 @@ class _StageBoardState extends State<StageBoard> {
                                               color: backColors.disabled,
                                               image: const DecorationImage(
                                                   image: AssetImage(
-                                                      'assets/images/공고임시이미지.png'),
+                                                      'assets/images/공고게시물없음이미지.jpg'),
                                                   fit: BoxFit.fill)),
                                         ),
                                   Expanded(
