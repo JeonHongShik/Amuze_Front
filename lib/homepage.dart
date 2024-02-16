@@ -12,16 +12,6 @@ import 'package:provider/provider.dart';
 
 import 'stage/stage_board.dart';
 
-class BottomNavigationProvider extends ChangeNotifier {
-  int _currentPage = 0;
-  int get currentPage => _currentPage;
-
-  setCurrentPage(int index) {
-    _currentPage = index;
-    notifyListeners();
-  }
-}
-
 class IconChangeProvider extends ChangeNotifier {
   bool _isDialogOpen = false;
   bool get isDialogOpen => _isDialogOpen;
@@ -40,9 +30,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late BottomNavigationProvider _bottomNavigationProvider;
+  int currentPage = 0;
 
-  // late IconChangeProvider _iconChangeProvider;
+  final List pages = [
+    const HomeBody(),
+    const NotifyBody(),
+    const SizedBox(),
+    //To.준희 ChatBody 대신 너가 만든 페이지 넣으면 될 듯.
+    const ChatBody(),
+    const MyPage()
+  ];
+
+  void onItemTapped(int index) {
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MyPage()),
+      );
+    } else {
+      setState(() {
+        currentPage = index;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -53,16 +63,10 @@ class _HomePageState extends State<HomePage> {
         Provider.of<UserInfoProvider>(context, listen: false).uid;
     Provider.of<CommunityWriteProvider>(context, listen: false).uid =
         Provider.of<UserInfoProvider>(context, listen: false).uid;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print(MediaQuery.of(context).size.width);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    _bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context);
-    // _iconChangeProvider = Provider.of<IconChangeProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0,
@@ -75,41 +79,28 @@ class _HomePageState extends State<HomePage> {
               fontSize: 25),
         ),
       ),
-      body: const [
-        HomeBody(),
-        NotifyBody(),
-        SizedBox(), //가운데 비게 하기 위함.
-        ChatBody(),
-        MyPage(),
-      ].elementAt(_bottomNavigationProvider.currentPage),
+      body: pages.elementAt(currentPage),
       bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        selectedItemColor: SecondaryColors.basic,
-        showUnselectedLabels: false,
-        unselectedItemColor: SecondaryColors.basic,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: TertiaryColors.basic,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: ''),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications, size: 30), label: ''),
-          BottomNavigationBarItem(
-              icon: InkWell(child: SizedBox.shrink()), label: ''),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble, size: 25), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person, size: 30), label: '')
-        ],
-        currentIndex: _bottomNavigationProvider._currentPage,
-        onTap: (index) {
-          if (index == 2) {
-          } else if (index == 4) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const MyPage()));
-          } else {
-            _bottomNavigationProvider.setCurrentPage(index);
-          }
-        },
-      ),
+          showSelectedLabels: false,
+          selectedItemColor: SecondaryColors.basic,
+          showUnselectedLabels: false,
+          unselectedItemColor: SecondaryColors.basic,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home, size: 30), label: ''),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.notifications, size: 30), label: ''),
+            BottomNavigationBarItem(
+                icon: InkWell(child: SizedBox.shrink()), label: ''),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.chat_bubble, size: 25), label: ''),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person, size: 30), label: '')
+          ],
+          currentIndex: currentPage,
+          onTap: onItemTapped),
       floatingActionButton: SizedBox(
         width: 60,
         height: 60,

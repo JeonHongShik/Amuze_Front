@@ -290,7 +290,8 @@ class _ResumePostState extends State<ResumePost> {
 
                                 if (imagePaths.isEmpty) {
                                   // 이미지가 없는 경우 기본 이미지 표시
-                                  return Image.asset('assets/images/김채원.jpg',
+                                  return Image.asset(
+                                      'assets/images/이력서게시물없음이미지.png',
                                       fit: BoxFit.cover);
                                 } else {
                                   return PageView.builder(

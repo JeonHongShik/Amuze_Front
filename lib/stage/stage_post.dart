@@ -287,7 +287,8 @@ class _StagePostState extends State<StagePost> {
 
                               if (imagePaths.isEmpty) {
                                 // 이미지가 없는 경우 기본 이미지 표시
-                                return Image.asset('assets/images/김채원.jpg',
+                                return Image.asset(
+                                    'assets/images/공고게시물없음이미지.jpg',
                                     fit: BoxFit.cover);
                               } else {
                                 return PageView.builder(
