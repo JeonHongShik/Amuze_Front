@@ -35,17 +35,17 @@ class HomeBody extends StatelessWidget {
                   TopBoardRowBlank(),
                   TopBoard(
                     label: '공고 게시판',
-                    imagePath: 'assets/images/공고_게시판_이미지.png',
+                    imagePath: 'assets/images/공고_게시판_이미지_2.png',
                   ),
                   TopBoardRowBlank(),
                   TopBoard(
                     label: '이력서 게시판',
-                    imagePath: 'assets/images/이력서_게시판_이미지_다른버전.png',
+                    imagePath: 'assets/images/이력서_게시판_이미지_2.png',
                   ),
                   TopBoardRowBlank(),
                   TopBoard(
                     label: '커뮤니티',
-                    imagePath: 'assets/images/커뮤니티_게시판_이미지.png',
+                    imagePath: 'assets/images/커뮤니티_게시판.png',
                   ),
                   TopBoardRowBlank()
                 ],
