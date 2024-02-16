@@ -717,31 +717,37 @@ class _CommunityPostState extends State<CommunityPost> {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
-                        height: 65,
-                        width: MediaQuery.of(context).size.width * 0.85,
+                        height: 62,
+                        width: MediaQuery.of(context).size.width * 0.88,
                         child: TextFormField(
                           controller: commentController,
+                          cursorColor: PrimaryColors.basic,
+                          style: const TextStyle(decorationThickness: 0),
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8.0), // 테두리 둥글게
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // 활성 상태가 아닐 때 테두리
-                                borderSide: const BorderSide(
-                                    color: PrimaryColors.disabled, width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8.0), // 포커스 상태일 때 테두리
-                                borderSide: const BorderSide(
-                                    color: PrimaryColors.hover, width: 1.0),
-                              ),
-                              hintText: '댓글 달기'),
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(12, 5, 0, 0),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8.0), // 테두리 둥글게
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8.0), // 활성 상태가 아닐 때 테두리
+                              borderSide: const BorderSide(
+                                  color: PrimaryColors.basic, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8.0), // 포커스 상태일 때 테두리
+                              borderSide: const BorderSide(
+                                  color: PrimaryColors.basic, width: 1.0),
+                            ),
+                            hintText: '댓글을 작성해보세요!',
+                          ),
                         ),
                       ),
                       IconButton(
+                          padding: EdgeInsets.zero,
                           onPressed: () {
                             sendComment();
                           },
