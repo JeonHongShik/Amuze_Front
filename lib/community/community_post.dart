@@ -718,7 +718,7 @@ class _CommunityPostState extends State<CommunityPost> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         height: 62,
-                        width: MediaQuery.of(context).size.width * 0.88,
+                        width: MediaQuery.of(context).size.width * 0.87,
                         child: TextFormField(
                           controller: commentController,
                           cursorColor: PrimaryColors.basic,
@@ -749,7 +749,9 @@ class _CommunityPostState extends State<CommunityPost> {
                       IconButton(
                           padding: EdgeInsets.zero,
                           onPressed: () {
-                            sendComment();
+                            if (commentController.text.isNotEmpty) {
+                              sendComment();
+                            }
                           },
                           icon: const Icon(
                             Icons.send,

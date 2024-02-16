@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
           showSelectedLabels: false,
           selectedItemColor: SecondaryColors.basic,
           showUnselectedLabels: false,
-          unselectedItemColor: SecondaryColors.basic,
+          unselectedItemColor: SecondaryColors.disabled,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
           items: const <BottomNavigationBarItem>[
