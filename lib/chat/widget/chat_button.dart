@@ -1,3 +1,4 @@
+import 'package:amuze/gathercolors.dart';
 import 'package:flutter/material.dart';
 import '../../service/chat_service.dart';
 
@@ -8,19 +9,25 @@ class ChatButton extends StatelessWidget {
   const ChatButton({
     required this.otherEmail,
     required this.onPressed,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final ChatService chatService = ChatService();
 
     return ElevatedButton(
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(PrimaryColors.basic),
+          minimumSize: MaterialStateProperty.all(const Size(200, 50))),
       onPressed: () async {
         final String chatRoomId = await chatService.makeChatroomId(otherEmail);
         onPressed(chatRoomId);
       },
-      child: Text('Chat with $otherEmail'),
+      child: const Text(
+        '채팅',
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
     );
   }
 }
