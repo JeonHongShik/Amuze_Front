@@ -20,6 +20,14 @@ class ChatRoom {
   // Firestore 문서 스냅샷에서 ChatRoom 객체로 변환하는 생성자
   factory ChatRoom.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
+    final user1Data = data['user1'] as Map<String, dynamic>;
+    final user2Data = data['user2'] as Map<String, dynamic>;
+
+    final user1 = ChatMember.fromJson(user1Data);
+    final user2 = ChatMember.fromJson(user2Data);
+
+    // 프로필 사진과 닉네임을 가져옵니다.
+
     return ChatRoom(
       chatRoomId: data['chatRoomId'],
       user1: ChatMember.fromJson(data['user1']),

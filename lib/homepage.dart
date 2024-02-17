@@ -1,25 +1,20 @@
+import "package:flutter_speed_dial/flutter_speed_dial.dart";
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import "package:amuze/chat/widget/chat_list.dart";
 import 'package:amuze/chat/screen/chatTest.dart';
+import 'package:amuze/chat/widget/chat_list.dart';
 import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
+import 'package:amuze/pagelayout/chatbody.dart';
 import 'package:amuze/pagelayout/homebody.dart';
 import 'package:amuze/pagelayout/mypage.dart';
 import 'package:amuze/pagelayout/notifybody.dart';
 import 'package:amuze/resume/resume_board.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'stage/stage_board.dart';
-import 'package:amuze/chat/screen/chatlist_screen.dart';
-
-class BottomNavigationProvider extends ChangeNotifier {
-  int _currentPage = 0;
-  int get currentPage => _currentPage;
-
-  setCurrentPage(int index) {
-    _currentPage = index;
-    notifyListeners();
-  }
-}
 
 class IconChangeProvider extends ChangeNotifier {
   bool _isDialogOpen = false;
@@ -39,9 +34,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late BottomNavigationProvider _bottomNavigationProvider;
+  int currentPage = 0;
 
-  late IconChangeProvider _iconChangeProvider;
+  final List pages = [
+    const HomeBody(),
+    const NotifyBody(),
+    const SizedBox(),
+    //To.준희 ChatBody 대신 너가 만든 페이지 넣으면 될 듯.
+
+    const OtherScreen(),
+    const MyPage()
+  ];
+
+  void onItemTapped(int index) {
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MyPage()),
+      );
+    } else {
+      setState(() {
+        currentPage = index;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -56,37 +72,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _bottomNavigationProvider = Provider.of<BottomNavigationProvider>(context);
-    _iconChangeProvider = Provider.of<IconChangeProvider>(context);
-
-    return Center(
-      child: Scaffold(
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          backgroundColor: Colors.white,
-          title: const Text(
-            'amuze',
-            style: TextStyle(
-                color: PrimaryColors.basic,
-                fontWeight: FontWeight.bold,
-                fontSize: 25),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          'amuze',
+          style: TextStyle(
+              color: PrimaryColors.basic,
+              fontWeight: FontWeight.bold,
+              fontSize: 25),
         ),
-        body: const [
-          HomeBody(),
-          NotifyBody(),
-          SizedBox(), //가운데 비게 하기 위함.
-          OtherScreen(),
-          MyPage(),
-        ].elementAt(_bottomNavigationProvider.currentPage),
-        bottomNavigationBar: BottomNavigationBar(
+      ),
+      body: pages.elementAt(currentPage),
+      bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           selectedItemColor: SecondaryColors.basic,
           showUnselectedLabels: false,
-          unselectedItemColor: SecondaryColors.basic,
+          unselectedItemColor: SecondaryColors.disabled,
           type: BottomNavigationBarType.fixed,
-          backgroundColor: TertiaryColors.basic,
-          items: const [
+          backgroundColor: Colors.white,
+          items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
                 icon: Icon(Icons.home, size: 30), label: ''),
             BottomNavigationBarItem(
@@ -98,121 +104,91 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.person, size: 30), label: '')
           ],
-          currentIndex: _bottomNavigationProvider._currentPage,
-          onTap: (index) {
-            if (index == 2) {
-            } else if (index == 4) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MyPage()));
-            } else {
-              _bottomNavigationProvider.setCurrentPage(index);
-            }
-          },
+          currentIndex: currentPage,
+          onTap: onItemTapped),
+      floatingActionButton: SizedBox(
+        width: 60,
+        height: 60,
+        child: FittedBox(
+          child: floatingButton(context),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: PrimaryColors.basic,
-          child: Icon(
-            _iconChangeProvider.isDialogOpen ? Icons.close : Icons.menu,
-            size: 30,
-            color: SecondaryColors.basic,
-          ),
-          onPressed: () {
-            if (_iconChangeProvider.isDialogOpen) {
-              Navigator.pop(context);
-            } else {
-              menuPopup(context);
-            }
-            _iconChangeProvider
-                .setDialogOpen(!_iconChangeProvider.isDialogOpen);
-          },
-        ),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.miniCenterDocked,
       ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterDocked,
     );
   }
 }
 
-void menuPopup(context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(70, 0, 70, 0), // dialog 박스 width 조절
-        child: Dialog(
-          alignment: const Alignment(0.0, 0.7),
-          child: SizedBox(
-            height: 150,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const StageBoard()),
-                    );
-                  },
-                  child:
-                      // Container(
-                      //   width: 60,
-                      //   height: 60,
-                      //   decoration: BoxDecoration(
-                      //       color: Colors.red,
-                      //       borderRadius: BorderRadius.circular(50)),
-                      // ),
-                      const Text(
-                    '공고 게시판',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ResumeBoard()),
-                    );
-                  },
-                  child: const Text(
-                    '이력서 게시판',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CommunityBoard()),
-                    );
-                  },
-                  child: const Text(
-                    '커뮤니티 게시판',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+// 플로팅버튼 위젯
+Widget? floatingButton(context) {
+  return SpeedDial(
+    overlayColor: Colors.black26,
+    overlayOpacity: 0.2,
+    animatedIcon: AnimatedIcons.menu_close,
+    curve: Curves.bounceIn,
+    foregroundColor: SecondaryColors.basic,
+    backgroundColor: PrimaryColors.basic,
+    children: [
+      SpeedDialChild(
+        label: '커뮤니티 게시판',
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
         ),
-      );
-    },
-    barrierColor: Colors.black26,
-  ).then(
-    (value) {
-      Provider.of<IconChangeProvider>(context, listen: false)
-          .setDialogOpen(false);
-    },
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.groups,
+          color: Colors.white,
+          size: 31,
+        ),
+        backgroundColor: PrimaryColors.basic,
+        labelBackgroundColor: PrimaryColors.basic,
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const CommunityBoard()));
+        },
+      ),
+      SpeedDialChild(
+        label: '이력서 게시판',
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.assignment_ind,
+          color: Colors.white,
+          size: 29,
+        ),
+        backgroundColor: PrimaryColors.basic,
+        labelBackgroundColor: PrimaryColors.basic,
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const ResumeBoard()));
+        },
+      ),
+      SpeedDialChild(
+        label: '공고 게시판',
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.library_books,
+          color: Colors.white,
+          size: 27,
+        ),
+        backgroundColor: PrimaryColors.basic,
+        labelBackgroundColor: PrimaryColors.basic,
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const StageBoard()));
+        },
+      ),
+    ],
   );
 }

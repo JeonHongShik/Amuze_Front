@@ -148,6 +148,7 @@ class _ResumeEducationState extends State<ResumeEducation> {
       // 이전 코드를 유지하면서, 맨 아래에 새로운 TextField들(_fields)와 추가 버튼을 추가합니다.
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -158,23 +159,83 @@ class _ResumeEducationState extends State<ResumeEducation> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('작성을 취소하고 나가시겠습니까?'),
-                actions: [
-                  TextButton(
-                    child: const Text('아니요'),
-                    onPressed: () => Navigator.of(context).pop(),
+                backgroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                title: const Text(
+                  '이력서 작성을 취소하시겠습니까?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: TextColors.high,
                   ),
-                  TextButton(
-                    child: const Text('예'),
-                    onPressed: () {
-                      Provider.of<ResumeWriteProvider>(context, listen: false)
-                          .reset();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    },
+                ),
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
+                    '취소 시, 작성하신 내용은 저장되지 않습니다.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                contentTextStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: TextColors.high,
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Provider.of<ResumeWriteProvider>(context,
+                                  listen: false)
+                              .reset();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          width: 125,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: backColors.disabled,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            '나가기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: TextColors.high,
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 125,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: PrimaryColors.basic,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Text(
+                            '계속 작성하기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -205,7 +266,21 @@ class _ResumeEducationState extends State<ResumeEducation> {
               ),
             ),
             const SizedBox(
-              height: 80,
+              height: 15,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 50),
+              child: Text(
+                '예시)  OO대학교 OO학과 졸업',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: TextColors.disabled,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 50,
             ),
             Center(
               child: Column(

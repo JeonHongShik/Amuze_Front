@@ -1,3 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/mypage/commentmanagement.dart';
@@ -5,10 +10,6 @@ import 'package:amuze/mypage/editprofile.dart';
 import 'package:amuze/mypage/postmanagement.dart';
 import 'package:amuze/mypage/savedpost.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-
-import 'package:provider/provider.dart';
 
 class MyPage extends StatelessWidget {
   const MyPage({super.key});
@@ -101,7 +102,7 @@ class MyPage extends StatelessWidget {
           ),
           MypageElement(
               icon: Icons.article_rounded,
-              text: '나의 게시물 관리',
+              text: '내 게시물 관리',
               onTap: () {
                 Navigator.push(
                     context,
@@ -111,7 +112,7 @@ class MyPage extends StatelessWidget {
               }),
           MypageElement(
               icon: Icons.mode_edit_sharp,
-              text: '댓글 관리',
+              text: '내 댓글 관리',
               onTap: () {
                 Navigator.push(
                     context,
@@ -129,27 +130,189 @@ class MyPage extends StatelessWidget {
                       builder: (context) => const SavedPost(),
                     ));
               }),
+          // MypageElement(
+          //     icon: Icons.notifications,
+          //     text: '알림 설정',
+          //     onTap: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => const DummyPage(),
+          //         ),
+          //       );
+          //     }),
           MypageElement(
-              icon: Icons.notifications,
-              text: '알림 설정',
-              onTap: () async {
-                // 알림 설정 페이지로 가는 코드 현재 오류
-                /* PackageInfo packageInfo = await PackageInfo.fromPlatform();
-                String packageName = packageInfo.packageName;
-                var intent = AndroidIntent(
-                    action: 'android.settings.APPLICATION_SETTINGS',
-                    data: 'package:$packageName');
-                await intent.launch(); */
+              icon: Icons.headset_mic,
+              text: '문의 (카카오톡 채널상담)',
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                    title: const Padding(
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 2),
+                      child: Text(
+                        '카카오톡 채널 문의',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.bold,
+                          color: TextColors.high,
+                        ),
+                      ),
+                    ),
+                    content: SizedBox(
+                      width: 280,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: const Text(
+                          '확인을 누르면 카카오톡 채널로 이동합니다!',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    contentTextStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: TextColors.high,
+                    ),
+                    actions: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Container(
+                              width: 125,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: backColors.disabled,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                '취소',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: TextColors.high,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final url =
+                                  Uri.parse('http://pf.kakao.com/_GDnSG/chat');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                print('Could not launch $url');
+                              }
+                              Navigator.of(context).pop();
+                            },
+                            child: Container(
+                              width: 125,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: PrimaryColors.basic,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: const Text(
+                                '확인',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
               }),
-          MypageElement(
-              icon: Icons.headset_mic, text: '문의 (카카오톡 채널상담)', onTap: () {}),
           const Spacer(),
           // 로그아웃 버튼
           GestureDetector(
             onTap: () async {
-              await signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login', (Route<dynamic> route) => false);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                  title: Container(
+                    width: 280,
+                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                    child: const Text(
+                      '정말 로그아웃 하시겠습니까?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: TextColors.high,
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await signOut();
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/login', (Route<dynamic> route) => false);
+                          },
+                          child: Container(
+                            width: 125,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: backColors.disabled,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              '로그아웃하기',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: TextColors.high,
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: 125,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: PrimaryColors.basic,
+                                borderRadius: BorderRadius.circular(8)),
+                            child: const Text(
+                              '취소',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
             },
             child: Container(
               padding: const EdgeInsets.all(25),

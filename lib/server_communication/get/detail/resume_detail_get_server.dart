@@ -95,6 +95,7 @@ class ResumeDetailServerData {
 
 Future<List<ResumeDetailServerData>> resumedetailfetchData(int id) async {
   var dio = Dio();
+
   final response = await dio.get(
       'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/resumes/resume/${id.toString()}/');
   return [ResumeDetailServerData.fromJson(response.data)];

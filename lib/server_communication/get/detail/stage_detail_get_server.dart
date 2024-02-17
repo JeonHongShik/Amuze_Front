@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class StageDetailServerData {
   int? id;
@@ -63,7 +64,19 @@ class StageDetailServerData {
 
 Future<List<StageDetailServerData>> stagedetailfetchData(int id) async {
   var dio = Dio();
-  final response = await dio.get(
-      'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/${id.toString()}/');
-  return [StageDetailServerData.fromJson(response.data)];
+  try {
+    print('여긴가?2');
+    final response = await dio.get(
+        'http://ec2-3-39-21-42.ap-northeast-2.compute.amazonaws.com/posts/post/${id.toString()}/');
+
+    return [StageDetailServerData.fromJson(response.data)];
+  } on DioException catch (e) {
+    print('여긴가?3');
+    if (e.response?.statusCode == 404) {
+      print('여긴가?4');
+      throw Exception('NotFound');
+    } else {
+      throw Exception('Error');
+    }
+  }
 }

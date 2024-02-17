@@ -22,6 +22,7 @@ class ChatList extends StatelessWidget {
         child: Text("No chats available"),
       );
     }
+    final userData = FirebaseAuth.instance.currentUser;
     final userInfoProvider =
         Provider.of<UserInfoProvider>(context, listen: false);
     onProfilePressed(BuildContext context, String email) async {

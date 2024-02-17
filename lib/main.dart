@@ -1,17 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:dio/dio.dart';
 import 'package:amuze/homepage.dart';
-import 'package:amuze/message.dart';
 import 'package:amuze/loginpage.dart';
 import 'package:amuze/server_communication/patch/resume_patch_server.dart';
 import 'package:amuze/server_communication/patch/stage_patch_server.dart';
-import 'package:amuze/service/member.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+//import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:multi_image_picker_plus/multi_image_picker_plus.dart';
 import 'package:provider/provider.dart';
@@ -19,36 +15,33 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:amuze/service/member.dart';
 import 'server_communication/patch/community_patch._server.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 @pragma('vm:entry-point')
-//백그라운드 알림 설정
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await setupFlutterNotifications(); //기본 알림 설정
+  await setupFlutterNotifications();
 
+  print('Handling a background message ${message.messageId}');
   print('Handling a background message ${message.data}');
   print("$message");
 }
 
-///  [AndroidNotificationChannel] 알림 채널생성
+///  [AndroidNotificationChannel] 채널생성
 late AndroidNotificationChannel channel;
 
 bool isFlutterLocalNotificationsInitialized = false;
 
-//알림 설정
 Future<void> setupFlutterNotifications() async {
   if (isFlutterLocalNotificationsInitialized) {
     return;
   }
-  //fcm 알림을 받기위한 채널 설정
   channel = const AndroidNotificationChannel(
     'high_importance_channel', //채널 id
     'High Importance Notifications', //채널 title
@@ -76,19 +69,48 @@ Future<void> setupFlutterNotifications() async {
   isFlutterLocalNotificationsInitialized = true;
 }
 
+void showFlutterNotification(RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+  if (notification != null && android != null && !kIsWeb) {
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          icon: 'launch_background',
+        ),
+      ),
+    );
+  }
+}
+
 /// [FlutterLocalNotificationsPlugin] package.
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 void main() async {
-  // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
+  // 웹 환경에서 t카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
   WidgetsFlutterBinding.ensureInitialized();
 
+  //애드몹 초기화
+  MobileAds.instance.initialize();
+
+  // foreground 수신처리
+  FirebaseMessaging.onMessage.listen(showFlutterNotification);
+
+  // background 수신처리
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   //firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // initializeNotification();
 
   if (!kIsWeb) {
     await setupFlutterNotifications();
@@ -112,9 +134,6 @@ void main() async {
         providers: [
           ChangeNotifierProvider(
             create: (c) => UserInfoProvider(),
-          ),
-          ChangeNotifierProvider(
-            create: (c) => BottomNavigationProvider(),
           ),
           ChangeNotifierProvider(
             create: (c) => IconChangeProvider(),
@@ -158,10 +177,6 @@ class UserInfoProvider extends ChangeNotifier {
   String? photoURL;
   String? email;
 
-  get nickname => null;
-
-  get role => null;
-
   Future<void> updateUserName(String newName) async {
     // FlutterSecureStorage에 새로운 이름 저장
     await storage.write(key: 'displayName', value: newName);
@@ -185,9 +200,9 @@ class UserInfoProvider extends ChangeNotifier {
 
   Future<Member> getMemberInfo(String email) async {
     Member member = Member(
-      name: 'John Doe', // 사용자의 이름
+      name: displayName ?? "", // 사용자의 이름
       email: email, // 사용자의 이메일
-      photoURL: 'https://example.com/profile.jpg', // 사용자의 프로필 이미지 URL
+      photoURL: photoURL ?? "", // 사용자의 프로필 이미지 URL
       // 필요한 경우 더 많은 사용자 정보를 여기에 추가할 수 있습니다.
     );
     return member;

@@ -20,7 +20,7 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
     final chatList = ref.watch(chatListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat List1'),
+        title: Text(''),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
@@ -29,6 +29,7 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
           children: [
             // const Text('Recent Chats', style: TextStyles.titleTextStyle),
             const SizedBox(height: 20),
+
             chatList.when(
               data: (item) => item.isEmpty
                   ? Expanded(

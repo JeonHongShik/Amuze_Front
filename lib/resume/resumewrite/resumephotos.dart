@@ -183,6 +183,7 @@ class _ResumePhotosState extends State<ResumePhotos> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(
@@ -193,27 +194,87 @@ class _ResumePhotosState extends State<ResumePhotos> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('작성을 취소하고 나가시겠습니까?'),
-                actions: [
-                  TextButton(
-                    child: const Text('아니요'),
-                    onPressed: () => Navigator.of(context).pop(),
+                backgroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                title: const Text(
+                  '이력서 작성을 취소하시겠습니까?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: TextColors.high,
                   ),
-                  TextButton(
-                    child: const Text('예'),
-                    onPressed: () {
-                      Provider.of<ResumeWriteProvider>(context, listen: false)
-                          .reset();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    },
+                ),
+                content: const SizedBox(
+                  width: 280,
+                  child: Text(
+                    '취소 시, 작성하신 내용은 저장되지 않습니다.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                contentTextStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: TextColors.high,
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Provider.of<ResumeWriteProvider>(context,
+                                  listen: false)
+                              .reset();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          width: 125,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: backColors.disabled,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            '나가기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: TextColors.high,
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 125,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: PrimaryColors.basic,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Text(
+                            '계속 작성하기',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -658,9 +719,71 @@ class _ResumePhotosState extends State<ResumePhotos> {
                                     color: Colors.grey),
                                 child: IconButton(
                                   onPressed: () async {
-                                    //이미지 선택 로직 들어갈 자리
-
-                                    await loadAndConvertImages();
+                                    if (fileMainImage.isNotEmpty) {
+                                      await loadAndConvertImages();
+                                    } else {
+                                      showDialog<void>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(15.0))),
+                                            title: Container(
+                                              width: 280,
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      0, 20, 0, 20),
+                                              child: const Text(
+                                                '메인 사진을 먼저 선택해주세요.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: TextColors.high,
+                                                ),
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                    child: Container(
+                                                      width: 200,
+                                                      height: 40,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                          color: PrimaryColors
+                                                              .basic,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8)),
+                                                      child: const Text(
+                                                        '확인',
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                   icon: const Icon(Icons.photo_camera),
                                   color: Colors.black,
@@ -724,6 +847,56 @@ class _ResumePhotosState extends State<ResumePhotos> {
                   for (int i = 0; i < 8; i++) {
                     Navigator.of(context).pop(); // 여러 화면을 한 번에 닫기
                   }
+
+                  // 이력서 등록 성공 알림창
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(15.0))),
+                      title: Container(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                        child: const Text(
+                          '이력서가 정상적으로 등록되었습니다!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: TextColors.high,
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height: 40,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    color: PrimaryColors.basic,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: const Text(
+                                  '확인',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
                 }).catchError((error) {
                   // 에러 처리
                   print('//////////////////Error sending data: $error');

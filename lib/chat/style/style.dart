@@ -83,7 +83,7 @@ class TextStyles {
       TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w600);
   static const TextStyle chatNotMeBubbleTextStyle = TextStyle(
       fontSize: 17,
-      color: Color.fromARGB(255, 255, 255, 255),
+      color: Color.fromARGB(255, 0, 0, 0),
       fontWeight: FontWeight.w400);
   static const TextStyle classWeekContentDetailTextStyle = TextStyle(
       color: Colors.black,

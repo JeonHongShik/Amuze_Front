@@ -5,16 +5,18 @@ class CommunityDetailServerData {
   String? author; // 게시물 작성자명
   String? title;
   String? content;
-  // String? likes;
-  // String? date;
+  String? createdat;
+  int? likescount;
+  int? commentscount;
 
   CommunityDetailServerData({
     required this.id,
     required this.author,
     required this.title,
     required this.content,
-    // required this.likes,
-    // required this.date,
+    required this.createdat,
+    required this.likescount,
+    required this.commentscount,
   });
 
   factory CommunityDetailServerData.fromJson(Map<String, dynamic> json) {
@@ -24,8 +26,9 @@ class CommunityDetailServerData {
         author: json['author'],
         title: json['title'],
         content: json['content'],
-        //likes: json['likes'],
-        //date: json['date'],
+        createdat: json['created_at'],
+        likescount: json['likes_count'],
+        commentscount: json['comments_count'],
       );
     } catch (e) {
       print("Error during JSON parsing: $e");

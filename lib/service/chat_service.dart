@@ -50,7 +50,7 @@ class ChatService {
       }
 
       final snapshot =
-          await _firestore.collection('users').doc(_userEmail).get();
+          await _firestore.collection('usersChat').doc(_userEmail).get();
       if (snapshot.exists) {
         final List<MyChat> chats = [];
         (snapshot.data() as Map).entries.forEach((entry) {
@@ -72,7 +72,7 @@ class ChatService {
         await _getUserEmail();
       }
       final data = _firestore
-          .collection('users')
+          .collection('usersChat')
           .doc(_userEmail)
           .snapshots()
           .map((event) {
@@ -132,14 +132,14 @@ class ChatService {
   Future<void> _saveLastMessage(
       String id, String chatRoomId, Message message) async {
     try {
-      final snapshot = await _firestore.collection('users').doc(id).get();
+      final snapshot = await _firestore.collection('usersChat').doc(id).get();
       if (snapshot.exists) {
         final chat = MyChat.fromJson(snapshot.data()![chatRoomId]);
         chat.lastMessage =
             message.content.contains('image@') ? '사진' : message.content;
         chat.lastTime = message.createdAt;
         await _firestore
-            .collection('users')
+            .collection('usersChat')
             .doc(id)
             .update({chatRoomId: chat.toJson()});
       } else {
@@ -156,7 +156,7 @@ class ChatService {
           lastTime: message.createdAt,
         );
         await _firestore
-            .collection('users')
+            .collection('usersChat')
             .doc(id)
             .set({chatRoomId: chat.toJson()});
       }
@@ -175,7 +175,7 @@ class ChatService {
           lastTime: message.createdAt,
         );
         await _firestore
-            .collection('users')
+            .collection('usersChat')
             .doc(id)
             .set({chatRoomId: chat.toJson()});
       } else {
@@ -231,22 +231,22 @@ class ChatService {
   // 사용자의 채팅 목록을 저장하는 메서드입니다.
   Future<void> _saveUserChatlist(String id, MyChat chat) async {
     try {
-      final snapshot = await _firestore.collection('users').doc(id).get();
+      final snapshot = await _firestore.collection('usersChat').doc(id).get();
       if (snapshot.exists && snapshot.data() != null) {
         await _firestore
-            .collection('users')
+            .collection('usersChat')
             .doc(id)
             .update({chat.chatRoomId: chat.toJson()});
       } else {
         await _firestore
-            .collection('users')
+            .collection('usersChat')
             .doc(id)
             .set({chat.chatRoomId: chat.toJson()});
       }
     } catch (e) {
       if (e is FirebaseException && e.code == 'not-found') {
         await _firestore
-            .collection('users')
+            .collection('usersChat')
             .doc(id)
             .set({chat.chatRoomId: chat.toJson()});
       } else {

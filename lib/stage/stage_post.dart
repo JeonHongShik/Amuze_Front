@@ -1,18 +1,20 @@
-import 'package:amuze/chat/screen/chat_screen.dart';
-import 'package:amuze/chat/widget/chat_button.dart';
 import 'package:amuze/gathercolors.dart';
+
 import 'package:amuze/main.dart';
 import 'package:amuze/server_communication/get/detail/stage_detail_get_server.dart';
-import 'package:amuze/service/chat_service.dart';
-import 'package:amuze/service/member.dart';
 import 'package:amuze/stage/stagewrite/stagetitle.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
-
+import 'package:amuze/chat/screen/chat_screen.dart';
+import 'package:amuze/chat/widget/chat_button.dart';
+import 'package:amuze/service/chat_service.dart';
+import 'package:amuze/service/member.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 
 class StagePost extends StatefulWidget {
   final int? id;
@@ -39,40 +41,99 @@ class _StagePostState extends State<StagePost> {
   String photoURL = '';
   String email = '';
 
+  bool chat = false;
+
   Future<void> _showDeleteDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // 다이얼로그 외부 터치로 닫히지 않도록 설정
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('정말 삭제하시겠습니까?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-              },
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          title: const Text(
+            '정말 게시물을 삭제하시겠습니까?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: TextColors.high,
             ),
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () async {
-                // 2. 확인 버튼 누를 시 삭제 요청 보내기
-                final bool success = await _deletePost(); // 게시물 삭제 함수 호출
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: const Text(
+              '게시물 삭제 시, 게시물을 복구할 수 없습니다.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          contentTextStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: TextColors.high,
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    // 2. 확인 버튼 누를 시 삭제 요청 보내기
+                    final bool success = await _deletePost(); // 게시물 삭제 함수 호출
 
-                if (success) {
-                  // 삭제 성공 시
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                  Navigator.of(context).pop();
-                } else {
-                  // 삭제 실패 시
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('삭제에 실패했습니다.'),
+                    if (success) {
+                      // 삭제 성공 시
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                      Navigator.of(context).pop();
+                    } else {
+                      // 삭제 실패 시
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('삭제에 실패했습니다.'),
+                        ),
+                      );
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    }
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: backColors.disabled,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  );
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                }
-              },
+                    child: const Text(
+                      '삭제하기',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: TextColors.high,
+                      ),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: PrimaryColors.basic,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -201,6 +262,7 @@ class _StagePostState extends State<StagePost> {
     double imageHeight = MediaQuery.of(context).size.height / 3;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         controller: _scrollController,
         slivers: <Widget>[
@@ -209,6 +271,7 @@ class _StagePostState extends State<StagePost> {
             expandedHeight: imageHeight,
             pinned: true,
             backgroundColor: Colors.transparent,
+            iconTheme: const IconThemeData(color: PrimaryColors.basic),
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 bool isExpanded = constraints.biggest.height > kToolbarHeight;
@@ -229,7 +292,8 @@ class _StagePostState extends State<StagePost> {
 
                               if (imagePaths.isEmpty) {
                                 // 이미지가 없는 경우 기본 이미지 표시
-                                return Image.asset('assets/images/김채원.jpg',
+                                return Image.asset(
+                                    'assets/images/공고게시물없음이미지.jpg',
                                     fit: BoxFit.cover);
                               } else {
                                 return PageView.builder(
@@ -288,9 +352,9 @@ class _StagePostState extends State<StagePost> {
                               }
                             } else if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const Center(
-                                child: Text('사진 불러오는 중...'),
-                              );
+                              return const Center(child: SizedBox.shrink());
+                            } else if (snapshot.hasError) {
+                              return const SizedBox.shrink();
                             } else {
                               return Image.asset('assets/images/김채원.jpg',
                                   fit: BoxFit.cover);
@@ -308,16 +372,51 @@ class _StagePostState extends State<StagePost> {
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                //borderRadius: BorderRadius.circular(15),
               ),
               child: FutureBuilder<List<StageDetailServerData>>(
                 future: serverData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: Text('게시물 불러오는 중...'));
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
+                        const SpinKitFadingCube(
+                          color: PrimaryColors.basic,
+                          size: 30.0,
+                        ),
+                      ],
+                    );
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                      child: Column(
+                        mainAxisSize:
+                            MainAxisSize.min, // 아이콘과 텍스트를 중앙에 배치하기 위해 사용
+                        children: [
+                          const Text('게시물을 불러오지 못 했습니다.'),
+                          const Text('다시 시도'),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: PrimaryColors.basic,
+                            ), // 재시도 아이콘
+                            onPressed: () {
+                              // 아이콘이 눌렸을 때 데이터를 다시 불러오는 로직을 실행합니다.
+                              setState(() {
+                                serverData = stagedetailfetchData(widget.id!);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    );
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        chat = true;
+                      });
+                    });
                     return Column(
                       children: snapshot.data!.map((item) {
                         var children2 = <Widget>[
@@ -336,20 +435,20 @@ class _StagePostState extends State<StagePost> {
                                   children: [
                                     // 첫 12글자 표시
                                     Text(
-                                      item.title!.length > 12
-                                          ? item.title!.substring(0, 12)
+                                      item.title!.length > 14
+                                          ? item.title!.substring(0, 14)
                                           : item.title!,
-                                      style: const TextStyle(fontSize: 25),
+                                      style: const TextStyle(fontSize: 21),
                                     ),
                                     // customIcons 표시
                                     customIcons(item, context),
                                   ],
                                 ),
                                 // 12글자를 초과하는 경우 나머지 텍스트 표시
-                                if (item.title!.length > 12)
+                                if (item.title!.length > 14)
                                   Text(
-                                    item.title!.substring(12),
-                                    style: const TextStyle(fontSize: 25),
+                                    item.title!.substring(14),
+                                    style: const TextStyle(fontSize: 21),
                                   ),
                                 const SizedBox(height: 20),
                                 Row(
@@ -391,7 +490,7 @@ class _StagePostState extends State<StagePost> {
                           const postmargin(),
                           buildNullableInfo('공고 마감기한', item.deadline),
                           const postmargin(),
-                          buildNullableInfo('위치', item.region),
+                          buildNullableregionInfo('위치', item.region),
                           const postmargin(),
                           paybuildNullableInfo('페이', item.pay),
                           const postmargin(),
@@ -426,47 +525,51 @@ class _StagePostState extends State<StagePost> {
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ChatButton(
-          otherEmail: email,
-          onPressed: (chatroomId) async {
-            final chatList = await ChatService().getChatList();
-            bool isExist =
-                chatList.map((e) => e.chatRoomId).toList().contains(chatroomId);
-            if (isExist) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                            chatroomId: chatroomId,
-                            isNew: false,
-                            other: Member(
-                                name: displayName,
-                                email: email,
-                                photoURL: photoURL),
-                          )));
-              // 기존 채팅방으로 이동
-              print('있다');
-            } else {
-              // 새로운 채팅방으로 이동
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                            chatroomId: chatroomId,
-                            isNew: true,
-                            other: Member(
-                                name: displayName,
-                                email: email,
-                                photoURL: photoURL),
-                          )));
-              print('없다 ${email} 이다');
-            }
-            return '';
-          },
-        ),
-      ),
+      bottomNavigationBar: chat == true
+          ? Padding(
+              padding: const EdgeInsets.all(20),
+              child: ChatButton(
+                otherEmail: email,
+                onPressed: (chatroomId) async {
+                  final chatList = await ChatService().getChatList();
+                  bool isExist = chatList
+                      .map((e) => e.chatRoomId)
+                      .toList()
+                      .contains(chatroomId);
+                  if (isExist) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                                  chatroomId: chatroomId,
+                                  isNew: false,
+                                  other: Member(
+                                      name: displayName,
+                                      email: email,
+                                      photoURL: photoURL),
+                                )));
+                    // 기존 채팅방으로 이동
+                    print('있다');
+                  } else {
+                    // 새로운 채팅방으로 이동
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                                  chatroomId: chatroomId,
+                                  isNew: true,
+                                  other: Member(
+                                      name: displayName,
+                                      email: email,
+                                      photoURL: photoURL),
+                                )));
+                    print('없다 ${email} 이다');
+                  }
+                  return '';
+                },
+              ),
+            )
+          : const SizedBox.shrink(),
     );
   }
 
@@ -648,6 +751,35 @@ Widget buildNullableInfo(String label, String? value) {
 }
 
 Widget paybuildNullableInfo(String label, String? value) {
+  // 숫자 형식을 확인하고 3자리마다 콤마를 추가합니다.
+  final formattedValue = value != null && value.isNotEmpty
+      ? NumberFormat('#,###').format(int.tryParse(value) ?? 0)
+      : null;
+
+  return formattedValue != null
+      ? Container(
+          margin: const EdgeInsets.only(left: 20),
+          padding: const EdgeInsets.fromLTRB(0, 20, 10, 10), // 하단 패딩 조정
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(color: TextColors.medium, fontSize: 15),
+              ),
+              Text(
+                '$formattedValue원', // 형식이 지정된 값 사용
+                style: const TextStyle(color: TextColors.high, fontSize: 18),
+                overflow: TextOverflow.visible, // 오버플로우 처리 변경
+                softWrap: true, // 자동 줄바꿈 활성화
+              )
+            ],
+          ),
+        )
+      : const SizedBox.shrink();
+}
+
+Widget buildNullableregionInfo(String label, String? value) {
   return value != null && value.isNotEmpty
       ? Container(
           margin: const EdgeInsets.only(left: 20),
@@ -660,11 +792,15 @@ Widget paybuildNullableInfo(String label, String? value) {
                 style: const TextStyle(color: TextColors.medium, fontSize: 15),
               ),
               Text(
-                '$value원',
+                value,
                 style: const TextStyle(color: TextColors.high, fontSize: 18),
                 overflow: TextOverflow.visible, // 오버플로우 처리 변경
                 softWrap: true, // 자동 줄바꿈 활성화
-              )
+              ),
+              const Text(
+                '자세한 위치는 채팅을 통해 물어보세요!',
+                style: TextStyle(color: TextColors.disabled, fontSize: 12),
+              ),
             ],
           ),
         )

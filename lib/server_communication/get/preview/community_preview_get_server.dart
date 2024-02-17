@@ -5,22 +5,30 @@ class CommunityPreviewServerData {
   // String? author;
   String? title;
   String? content;
+  String? createdat;
+  int? likescount;
+  int? commentscount;
 
   CommunityPreviewServerData({
     required this.id,
     // required this.author,
     required this.title,
     required this.content,
+    required this.createdat,
+    required this.likescount,
+    required this.commentscount,
   });
 
   factory CommunityPreviewServerData.fromJson(Map<String, dynamic> json) {
     try {
       return CommunityPreviewServerData(
-        id: json['id'],
-        // author: json['author'],
-        title: json['title'],
-        content: json['content'],
-      );
+          id: json['id'],
+          // author: json['author'],
+          title: json['title'],
+          content: json['content'],
+          createdat: json['created_at'],
+          likescount: json['likes_count'],
+          commentscount: json['comments_count']);
     } catch (e) {
       print("Error during JSON parsing: $e");
       rethrow;

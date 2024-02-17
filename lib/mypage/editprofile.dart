@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:amuze/loadingscreen.dart';
+import 'package:amuze/loginpage.dart';
 import 'package:amuze/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,7 +40,7 @@ class _EditProfileState extends State<EditProfile> {
         ),
         materialOptions: const MaterialOptions(
           maxImages: 1,
-          enableCamera: true,
+          enableCamera: false,
           actionBarTitle: "사진첩",
           allViewTitle: "All Photos",
           useDetailsView: true,
@@ -68,12 +69,7 @@ class _EditProfileState extends State<EditProfile> {
 
   //카메라, 사진첩 권한 체크//////////////////////////////////
   Future<void> requestPermissionIfNeeded() async {
-    var cameraStatus = await Permission.camera.status;
     var storageStatus = await Permission.storage.status;
-
-    if (!cameraStatus.isGranted) {
-      await Permission.camera.request();
-    }
 
     if (!storageStatus.isGranted) {
       await Permission.storage.request();
@@ -112,6 +108,105 @@ class _EditProfileState extends State<EditProfile> {
       print("Response status: ${response.statusCode}");
     } catch (e) {
       print("Error making GET request: $e");
+    }
+  }
+
+  Future<void> deleteUserAccountAndData() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final FirebaseStorage storage = FirebaseStorage.instance;
+    const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+    User? user = auth.currentUser;
+    if (user != null) {
+      String uid = user.uid;
+
+      try {
+        // Firestore에서 사용자 데이터 삭제
+        await firestore.collection('users').doc(uid).delete();
+
+        // Firebase Storage에서 사용자 관련 데이터 삭제
+        // 예: 사용자의 프로필 이미지나 업로드된 파일 삭제
+        //await storage.ref('path/to/user/files/$uid').delete();
+
+        // Firebase Auth에서 사용자 계정 삭제
+        await user.delete();
+
+        await peristalsis();
+
+        await secureStorage.delete(key: 'uid');
+        await secureStorage.delete(key: 'displayName');
+        await secureStorage.delete(key: 'photoURL');
+        await secureStorage.delete(key: 'email');
+        await secureStorage.delete(key: 'messagingToken');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          Navigator.of(context).pop();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
+              title: const Text(
+                '자동 로그인 사용 중',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.5,
+                  fontWeight: FontWeight.bold,
+                  color: TextColors.high,
+                ),
+              ),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.75,
+                child: const Text(
+                  '안전한 탈퇴를 위해, 로그아웃 후 다시 로그인한 뒤에 탈퇴해 주세요.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              contentTextStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: TextColors.high,
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.66,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: PrimaryColors.basic,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '확인',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -252,15 +347,77 @@ class _EditProfileState extends State<EditProfile> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('정말 탈퇴하시겠습니까?'),
-                        actions: [
-                          TextButton(
-                            child: const Text('탈퇴하기'),
-                            onPressed: () {},
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0))),
+                        title: const Text(
+                          '정말 탈퇴하시겠습니까?',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.bold,
+                            color: TextColors.high,
                           ),
-                          TextButton(
-                            child: const Text('취소'),
-                            onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        content: const SizedBox(
+                          width: 280,
+                          child: Text(
+                            '계정과 관련 게시물 및 댓글은 영구적으로 제거되며, 이후 복원이 불가능합니다.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        contentTextStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: TextColors.high,
+                        ),
+                        actions: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await deleteUserAccountAndData();
+                                },
+                                child: Container(
+                                  width: 125,
+                                  height: 40,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: backColors.disabled,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text(
+                                    '탈퇴하기',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: TextColors.high,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => Navigator.of(context).pop(),
+                                child: Container(
+                                  width: 125,
+                                  height: 40,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: PrimaryColors.basic,
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: const Text(
+                                    '취소',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

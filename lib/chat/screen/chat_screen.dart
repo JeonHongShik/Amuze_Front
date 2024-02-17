@@ -62,7 +62,7 @@ class ChatScreenState extends State<ChatScreen> {
               backgroundColor: Colors.white,
               elevation: 0,
               title: const Text(
-                'ChatTest',
+                '',
                 style: TextStyles.appbarTextStyle,
               ),
               leading: IconButton(
@@ -117,7 +117,7 @@ class ChatScreenState extends State<ChatScreen> {
         boxShadow: [
           BoxShadow(color: Color.fromARGB(18, 0, 0, 0), blurRadius: 10)
         ],
-        color: Colors.white,
+        color: Color(0xFFFFFFFF),
       ),
       padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
       child: Row(children: [
@@ -144,14 +144,14 @@ class ChatScreenState extends State<ChatScreen> {
               color: Colors.blue,
               iconSize: 25,
             ),
-            hintText: "Type your message here",
+            hintText: "",
             hintMaxLines: 1,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
             hintStyle: const TextStyle(
               fontSize: 16,
             ),
-            fillColor: Colors.white,
+            fillColor: Color(0xFFFFFFFF),
             filled: true,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
@@ -213,7 +213,7 @@ class ChatScreenState extends State<ChatScreen> {
             nickname: widget.other.name,
             email: widget.other.email,
             photoUrl: widget.other.photoURL,
-            role: widget.other.role ?? 'MENTOR'),
+            role: widget.other.role ?? ''),
         user2: ChatMember(
             nickname: userName,
             email: userId,

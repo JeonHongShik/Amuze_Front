@@ -117,14 +117,34 @@ class _MySavedResumesState extends State<MySavedResumes> {
               future: serverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ShimmerList();
+                  return const Center(child: Text('저장한 이력서 불러오는 중...'));
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = savedresumefetchData(uid);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
                     itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           print(data.id);
@@ -303,14 +323,34 @@ class _MySavedstagesState extends State<MySavedstages> {
               future: serverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ShimmerList();
+                  return const Center(child: Text('저장한 공고 불러오는 중...'));
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = savedstagefetchData(uid);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
                     itemCount: snapshot.data!.length, // 데이터의 전체 길이를 사용합니다.
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           print(data.id);
@@ -494,15 +534,35 @@ class _MySavedcommuitiesState extends State<MySavedcommuities> {
               future: serverData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ShimmerList();
+                  return const Center(child: Text('저장한 커뮤니티 불러오는 중...'));
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('게시물을 불러오지 못 했습니다.'),
+                        const Text('다시 시도'),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.refresh,
+                            color: PrimaryColors.basic,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              serverData = savedcommunityfetchData(uid);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      var data = snapshot.data![index];
+                      var reverseIndex = snapshot.data!.length - 1 - index;
+                      var data = snapshot.data![reverseIndex];
                       return GestureDetector(
                         onTap: () {
                           print(data.id);
@@ -519,7 +579,6 @@ class _MySavedcommuitiesState extends State<MySavedcommuities> {
                               ));
                         },
                         child: Container(
-                          height: 120,
                           decoration: const BoxDecoration(
                               color: Colors.white,
                               border: Border(
@@ -605,60 +664,6 @@ class _MySavedcommuitiesState extends State<MySavedcommuities> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class ShimmerList extends StatelessWidget {
-  const ShimmerList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 10, // Shimmer 효과를 표시할 아이템 수 (임의로 5개 설정)
-      itemBuilder: (BuildContext context, int index) {
-        return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!, // 기본 배경색
-          highlightColor: Colors.grey[100]!, // 강조 배경색
-          child: Container(
-            height: 120, // 셀의 높이
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey)),
-            ),
-            // Shimmer 효과가 적용될 콘텐츠를 정의
-            child: Row(
-              children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                  ),
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: 90,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                        Container(
-                          height: 45,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

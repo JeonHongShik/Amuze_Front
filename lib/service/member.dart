@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
@@ -17,9 +18,9 @@ class Member {
 
   factory Member.fromJson(Map<String, dynamic> json) => Member(
         // id: json["id"],
-        name: json[UserInfoProvider().displayName],
-        email: json[UserInfoProvider().email],
-        photoURL: json[UserInfoProvider().photoURL],
+        name: json["name"],
+        email: json["email"],
+        photoURL: json["photoURL"],
         role: json["role"],
       );
 

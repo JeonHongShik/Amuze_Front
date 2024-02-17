@@ -1,15 +1,20 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:amuze/model/chat.dart'; // 채팅과 관련된 모델을 가져옵니다.
 import 'package:chat_bubbles/bubbles/bubble_normal_image.dart'; // 이미지 메시지를 표시하기 위해 BubbleNormalImage 위젯을 가져옵니다.
 import 'package:chat_bubbles/bubbles/bubble_special_one.dart'; // 텍스트 메시지를 표시하기 위해 BubbleSpecialOne 위젯을 가져옵니다.
+import 'package:provider/provider.dart';
 import '../../service/member.dart'; // 상대방 정보를 가져오기 위해 Member 서비스를 가져옵니다.
 import '../style/profile_screen.dart'; // 프로필 화면을 가져옵니다.
 import '../style/style.dart'; // 스타일을 가져옵니다.
 import '../style/profile_button.dart'; // 프로필 버튼을 가져옵니다.
 import 'chat_time_format.dart'; // 채팅 시간 포맷을 가져옵니다.
 import '../../main.dart'; // UserInfoProvider를 가져옵니다.
+import '../../model/chat.dart';
+import '../screen/chat_screen.dart';
 
 class ChatBubbles extends StatelessWidget {
   const ChatBubbles(this.message, this.isMe, this.member, {Key? key})
@@ -21,7 +26,11 @@ class ChatBubbles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userInfoProvider = UserInfoProvider(); // UserInfoProvider 인스턴스 생성
+    final userInfoProvider = Provider.of<UserInfoProvider>(context,
+        listen: false); // UserInfoProvider 인스턴스 생성
+    final user = FirebaseAuth.instance.currentUser;
+    final userData =
+        FirebaseFirestore.instance.collection('users').doc(user!.email).get();
 
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -39,17 +48,20 @@ class ChatBubbles extends StatelessWidget {
                     dataTimeFormat(message.createdAt), // 메시지 시간을 표시합니다.
                     style: TextStyles.shadowTextStyle,
                   ),
-                  SizedBox(
-                    width: 220,
-                    height: 190,
-                    child: BubbleNormalImage(
-                      id: '1',
-                      color: Colors.amber,
-                      image: Image.network(
-                        message.content
-                            .split('@')[1], // 이미지 URL을 가져와서 이미지를 표시합니다.
-                        width: 250,
-                        height: 250,
+                  Padding(
+                    padding: EdgeInsets.only(right: 0),
+                    child: SizedBox(
+                      width: 220,
+                      height: 190,
+                      child: BubbleNormalImage(
+                        id: '1',
+                        color: Colors.amber,
+                        image: Image.network(
+                          message.content
+                              .split('@')[1], // 이미지 URL을 가져와서 이미지를 표시합니다.
+                          width: 180,
+                          height: 250,
+                        ),
                       ),
                     ),
                   ),
@@ -70,7 +82,7 @@ class ChatBubbles extends StatelessWidget {
                   BubbleSpecialOne(
                     text: message.content, // 메시지 내용을 표시합니다.
                     isSender: true,
-                    color: Colors.blue, // 버블의 배경색을 설정합니다.
+                    color: Color.fromARGB(255, 27, 129, 212), // 버블의 배경색을 설정합니다.
                     textStyle:
                         TextStyles.blueBottonTextStyle, // 버블의 텍스트 스타일을 설정합니다.
                   ),
@@ -88,15 +100,14 @@ class ChatBubbles extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfileButton(
-                    nickname:
-                        userInfoProvider.displayName ?? '', // 멤버의 닉네임을 표시합니다.
-                    path: userInfoProvider.photoURL ?? '', // 멤버의 프로필 사진을 표시합니다.
-                    onProfilePressed:
-                        onProfilePressed, // 프로필 버튼을 눌렀을 때의 이벤트 처리기를 설정합니다.
-                  ),
+                  // ProfileButton(
+                  //   nickname: '' ?? '', // 멤버의 닉네임을 표시합니다.
+                  //   path: member.photoURL ?? '', // 멤버의 프로필 사진을 표시합니다.
+                  //   onProfilePressed:
+                  //       onProfilePressed, // 프로필 버튼을 눌렀을 때의 이벤트 처리기를 설정합니다.
+                  // ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 40),
+                    padding: const EdgeInsets.only(left: 15),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -109,7 +120,7 @@ class ChatBubbles extends StatelessWidget {
                             image: Image.network(
                               message.content
                                   .split('@')[1], // 이미지 URL을 가져와서 이미지를 표시합니다.
-                              width: 250,
+                              width: 180,
                               height: 250,
                             ),
                           ),
@@ -131,23 +142,22 @@ class ChatBubbles extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfileButton(
-                    nickname:
-                        userInfoProvider.displayName ?? '', // 멤버의 닉네임을 표시합니다.
-                    path: userInfoProvider.photoURL ?? '', // 멤버의 프로필 사진을 표시합니다.
-                    onProfilePressed:
-                        onProfilePressed, // 프로필 버튼을 눌렀을 때의 이벤트 처리기를 설정합니다.
-                  ),
+                  // ProfileButton(
+                  //   nickname: '' ?? '테스트', // 멤버의 닉네임을 표시합니다.
+                  //   path: member.photoURL ?? '', // 멤버의 프로필 사진을 표시합니다.
+                  //   onProfilePressed:
+                  //       onProfilePressed, // 프로필 버튼을 눌렀을 때의 이벤트 처리기를 설정합니다.
+                  // ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 40),
+                    padding: const EdgeInsets.only(left: 15),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         BubbleSpecialOne(
                           text: message.content, // 메시지 내용을 표시합니다.
                           isSender: false,
-                          color:
-                              Colors.amber.withOpacity(0.3), // 버블의 배경색을 설정합니다.
+                          color: const Color.fromARGB(255, 122, 122, 121)
+                              .withOpacity(0.3), // 버블의 배경색을 설정합니다.
                           textStyle: TextStyles
                               .chatNotMeBubbleTextStyle, // 버블의 텍스트 스타일을 설정합니다.
                         ),
@@ -168,7 +178,7 @@ class ChatBubbles extends StatelessWidget {
   }
 
   // 프로필 화면으로 이동하는 메서드
-  void onProfilePressed(BuildContext context) {
+  void onProfilePressed(BuildContext context, Member member) {
     Navigator.push(
       context,
       MaterialPageRoute(
