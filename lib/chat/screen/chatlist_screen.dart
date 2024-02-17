@@ -1,62 +1,60 @@
+import 'package:amuze/model/chat.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import '../widget/chat_list.dart';
-import 'package:amuze/service/chat_service.dart'; // 이 부분을 수정하셔야 합니다.
+import 'package:amuze/service/chat_service.dart';
 import '../style/style.dart';
 
-final chatListProvider =
-    StreamProvider.autoDispose((ref) => ChatService().getChatListData());
-
-class ChatListScreen extends ConsumerStatefulWidget {
+class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
 
   @override
-  ChatListScreenState createState() => ChatListScreenState();
+  _ChatListScreenState createState() => _ChatListScreenState();
 }
 
-class ChatListScreenState extends ConsumerState<ChatListScreen> {
+class _ChatListScreenState extends State<ChatListScreen> {
+  late Stream<List<MyChat>?> _chatListStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatListStream = ChatService().getChatListData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final chatList = ref.watch(chatListProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
       ),
-      body: Container(
+      body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // const Text('Recent Chats', style: TextStyles.titleTextStyle),
-            const SizedBox(height: 20),
-
-            chatList.when(
-              data: (item) => item.isEmpty
-                  ? Expanded(
-                      child: Center(
-                        child: Text(
-                          'No chats yet',
-                          style: TextStyles.shadowTextStyle,
-                        ),
-                      ),
-                    )
-                  : Expanded(
-                      child: ChatList(
-                        chats: item,
-                      ),
-                    ),
-              error: (e, st) => Expanded(
-                child: Center(
-                  child: Text('Error: $e'),
+        child: StreamBuilder<List<MyChat>?>(
+          stream: _chatListStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text(
+                  'No chats yet',
+                  style: TextStyles.shadowTextStyle,
                 ),
-              ),
-              loading: () => Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            ),
-          ],
+              );
+            } else {
+              return ListView(
+                children: [
+                  ChatList(chats: snapshot.data!),
+                ],
+              );
+            }
+          },
         ),
       ),
     );

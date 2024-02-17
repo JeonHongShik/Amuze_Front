@@ -1,9 +1,4 @@
-import "package:flutter_speed_dial/flutter_speed_dial.dart";
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import "package:amuze/chat/widget/chat_list.dart";
-import 'package:amuze/chat/screen/chatTest.dart';
+import 'package:amuze/chat/screen/chatlist_screen.dart';
 import 'package:amuze/chat/widget/chat_list.dart';
 import 'package:amuze/community/community_board.dart';
 import 'package:amuze/gathercolors.dart';
@@ -13,7 +8,10 @@ import 'package:amuze/pagelayout/homebody.dart';
 import 'package:amuze/pagelayout/mypage.dart';
 import 'package:amuze/pagelayout/notifybody.dart';
 import 'package:amuze/resume/resume_board.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:provider/provider.dart';
+import "package:amuze/chat/widget/chat_list.dart";
 import 'stage/stage_board.dart';
 
 class IconChangeProvider extends ChangeNotifier {
@@ -42,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     const SizedBox(),
     //To.준희 ChatBody 대신 너가 만든 페이지 넣으면 될 듯.
 
-    const OtherScreen(),
+    const ChatListScreen(),
     const MyPage()
   ];
 

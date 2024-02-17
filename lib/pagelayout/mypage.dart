@@ -1,8 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:amuze/gathercolors.dart';
 import 'package:amuze/main.dart';
 import 'package:amuze/mypage/commentmanagement.dart';
@@ -10,6 +5,11 @@ import 'package:amuze/mypage/editprofile.dart';
 import 'package:amuze/mypage/postmanagement.dart';
 import 'package:amuze/mypage/savedpost.dart';
 import 'package:amuze/pagelayout/dummypage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:provider/provider.dart';
 
 class MyPage extends StatelessWidget {
   const MyPage({super.key});
