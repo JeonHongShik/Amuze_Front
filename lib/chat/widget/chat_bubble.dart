@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:amuze/gathercolors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,15 +11,11 @@ import 'package:provider/provider.dart';
 import '../../service/member.dart'; // 상대방 정보를 가져오기 위해 Member 서비스를 가져옵니다.
 import '../style/profile_screen.dart'; // 프로필 화면을 가져옵니다.
 import '../style/style.dart'; // 스타일을 가져옵니다.
-import '../style/profile_button.dart'; // 프로필 버튼을 가져옵니다.
 import 'chat_time_format.dart'; // 채팅 시간 포맷을 가져옵니다.
 import '../../main.dart'; // UserInfoProvider를 가져옵니다.
-import '../../model/chat.dart';
-import '../screen/chat_screen.dart';
 
 class ChatBubbles extends StatelessWidget {
-  const ChatBubbles(this.message, this.isMe, this.member, {Key? key})
-      : super(key: key);
+  const ChatBubbles(this.message, this.isMe, this.member, {super.key});
 
   final Message message; // 메시지 객체
   final Member member; // 멤버 객체
@@ -43,25 +40,25 @@ class ChatBubbles extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    dataTimeFormat(message.createdAt), // 메시지 시간을 표시합니다.
-                    style: TextStyles.shadowTextStyle,
-                  ),
+                  // Text(
+                  //   dataTimeFormat(message.createdAt), // 메시지 시간을 표시합니다.
+                  //   style: TextStyles.shadowTextStyle,
+                  // ),
                   Padding(
-                    padding: EdgeInsets.only(right: 0),
+                    padding: const EdgeInsets.only(right: 0),
                     child: SizedBox(
                       width: 220,
                       height: 190,
                       child: BubbleNormalImage(
                         id: '1',
-                        color: Colors.amber,
+                        color: PrimaryColors.basic,
                         image: Image.network(
-                          message.content
-                              .split('@')[1], // 이미지 URL을 가져와서 이미지를 표시합니다.
-                          width: 180,
-                          height: 250,
+                          message.content.split('@')[1],
+                          fit: BoxFit.cover, // 이미지 URL을 가져와서 이미지를 표시합니다.
                         ),
+                        onTap: () {},
                       ),
                     ),
                   ),
@@ -82,9 +79,11 @@ class ChatBubbles extends StatelessWidget {
                   BubbleSpecialOne(
                     text: message.content, // 메시지 내용을 표시합니다.
                     isSender: true,
-                    color: Color.fromARGB(255, 27, 129, 212), // 버블의 배경색을 설정합니다.
-                    textStyle:
-                        TextStyles.blueBottonTextStyle, // 버블의 텍스트 스타일을 설정합니다.
+                    color: PrimaryColors.basic, // 버블의 배경색을 설정합니다.
+                    textStyle: TextStyles.blueBottonTextStyle,
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width *
+                            0.4), // 버블의 텍스트 스타일을 설정합니다.
                   ),
                 ],
               ),
@@ -116,13 +115,13 @@ class ChatBubbles extends StatelessWidget {
                           height: 190,
                           child: BubbleNormalImage(
                             id: '1',
-                            color: Colors.amber,
+                            color: const Color.fromARGB(255, 122, 122, 121)
+                                .withOpacity(0.3),
                             image: Image.network(
-                              message.content
-                                  .split('@')[1], // 이미지 URL을 가져와서 이미지를 표시합니다.
-                              width: 180,
-                              height: 250,
+                              message.content.split('@')[1],
+                              fit: BoxFit.cover, // 이미지 URL을 가져와서 이미지를 표시합니다.
                             ),
+                            onTap: () {},
                           ),
                         ),
                         Text(
@@ -158,8 +157,10 @@ class ChatBubbles extends StatelessWidget {
                           isSender: false,
                           color: const Color.fromARGB(255, 122, 122, 121)
                               .withOpacity(0.3), // 버블의 배경색을 설정합니다.
-                          textStyle: TextStyles
-                              .chatNotMeBubbleTextStyle, // 버블의 텍스트 스타일을 설정합니다.
+                          textStyle: TextStyles.chatNotMeBubbleTextStyle,
+                          constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width *
+                                  0.4), // 버블의 텍스트 스타일을 설정합니다.
                         ),
                         Text(
                           dataTimeFormat(message.createdAt), // 메시지 시간을 표시합니다.

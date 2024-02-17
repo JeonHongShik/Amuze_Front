@@ -563,7 +563,7 @@ class _StagePostState extends State<StagePost> {
                                       email: email,
                                       photoURL: photoURL),
                                 )));
-                    print('없다 ${email} 이다');
+                    print('없다 $email 이다');
                   }
                   return '';
                 },

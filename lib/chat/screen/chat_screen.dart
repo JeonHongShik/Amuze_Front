@@ -1,3 +1,4 @@
+import 'package:amuze/gathercolors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../service/member.dart';
@@ -59,19 +60,21 @@ class ChatScreenState extends State<ChatScreen> {
         },
         child: Scaffold(
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              iconTheme: const IconThemeData(color: Colors.white),
+              backgroundColor: PrimaryColors.basic,
               elevation: 0,
-              title: const Text(
-                '', //여기에 상대방 이름
-                style: TextStyles.appbarTextStyle,
+              title: Text(
+                widget.other.name,
+                //여기에 상대방 이름
+                style: const TextStyle(color: Colors.white),
               ),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_sharp,
-                    color: Colors.black54),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
+              // leading: IconButton(
+              //   icon:
+              //       const Icon(Icons.arrow_back_ios_sharp, color: Colors.white),
+              //   onPressed: () {
+              //     Navigator.of(context).pop();
+              //   },
+              // ),
             ),
             backgroundColor: Colors.white,
             extendBodyBehindAppBar: false,
@@ -124,7 +127,10 @@ class ChatScreenState extends State<ChatScreen> {
         IconButton(
           padding: EdgeInsets.zero,
           onPressed: onSendImagePressed,
-          icon: const Icon(Icons.camera_alt),
+          icon: const Icon(
+            Icons.camera_alt,
+            color: PrimaryColors.basic,
+          ),
           color: Colors.blue,
           iconSize: 25,
         ),
@@ -140,7 +146,10 @@ class ChatScreenState extends State<ChatScreen> {
           decoration: InputDecoration(
             suffixIcon: IconButton(
               onPressed: onSendMessage,
-              icon: const Icon(Icons.send),
+              icon: const Icon(
+                Icons.send,
+                color: PrimaryColors.basic,
+              ),
               color: Colors.blue,
               iconSize: 25,
             ),

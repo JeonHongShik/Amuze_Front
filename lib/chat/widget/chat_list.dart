@@ -18,11 +18,10 @@ class ChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (chats == null || chats!.isEmpty) {
-      return Center(
-        child: Text("No chats available"),
+      return const Center(
+        child: Text("대화중인 채팅이 없습니다."),
       );
     }
-    final userData = FirebaseAuth.instance.currentUser;
     final userInfoProvider =
         Provider.of<UserInfoProvider>(context, listen: false);
     onProfilePressed(BuildContext context, String email) async {
@@ -99,8 +98,15 @@ class ChatList extends StatelessWidget {
                                 const SizedBox(
                                   height: 5,
                                 ),
-                                Text(chats![index].lastMessage,
-                                    style: TextStyles.chatbodyText),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  child: Text(
+                                    chats![index].lastMessage,
+                                    style: TextStyles.chatbodyText,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ],
                             ),
                           ]),
