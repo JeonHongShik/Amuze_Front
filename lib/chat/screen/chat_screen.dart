@@ -62,7 +62,7 @@ class ChatScreenState extends State<ChatScreen> {
               backgroundColor: Colors.white,
               elevation: 0,
               title: const Text(
-                '',
+                '', //여기에 상대방 이름
                 style: TextStyles.appbarTextStyle,
               ),
               leading: IconButton(
@@ -151,7 +151,7 @@ class ChatScreenState extends State<ChatScreen> {
             hintStyle: const TextStyle(
               fontSize: 16,
             ),
-            fillColor: Color(0xFFFFFFFF),
+            fillColor: const Color(0xFFFFFFFF),
             filled: true,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),

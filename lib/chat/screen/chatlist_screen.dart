@@ -6,7 +6,7 @@ import 'package:amuze/service/chat_service.dart';
 import '../style/style.dart';
 
 class ChatListScreen extends StatefulWidget {
-  const ChatListScreen({Key? key}) : super(key: key);
+  const ChatListScreen({super.key});
 
   @override
   _ChatListScreenState createState() => _ChatListScreenState();
@@ -24,16 +24,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(''),
-      ),
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: StreamBuilder<List<MyChat>?>(
           stream: _chatListStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             } else if (snapshot.hasError) {
@@ -41,7 +39,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 child: Text('Error: ${snapshot.error}'),
               );
             } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text(
                   'No chats yet',
                   style: TextStyles.shadowTextStyle,
