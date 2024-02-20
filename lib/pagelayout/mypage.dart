@@ -22,6 +22,7 @@ class MyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var userInfoProvider = Provider.of<UserInfoProvider>(context);
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),

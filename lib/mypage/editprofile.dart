@@ -249,6 +249,7 @@ class _EditProfileState extends State<EditProfile> {
         text: "${userInfoProvider.displayName}"); // 이름 컨트롤러 - 초기값 : 기존 카카오톡 닉네임
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
         iconTheme: const IconThemeData(color: PrimaryColors.basic),

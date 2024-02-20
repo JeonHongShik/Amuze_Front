@@ -435,8 +435,8 @@ class _StagePostState extends State<StagePost> {
                                   children: [
                                     // 첫 12글자 표시
                                     Text(
-                                      item.title!.length > 14
-                                          ? item.title!.substring(0, 14)
+                                      item.title!.length > 16
+                                          ? item.title!.substring(0, 16)
                                           : item.title!,
                                       style: const TextStyle(fontSize: 21),
                                     ),
@@ -445,9 +445,9 @@ class _StagePostState extends State<StagePost> {
                                   ],
                                 ),
                                 // 12글자를 초과하는 경우 나머지 텍스트 표시
-                                if (item.title!.length > 14)
+                                if (item.title!.length > 16)
                                   Text(
-                                    item.title!.substring(14),
+                                    item.title!.substring(16),
                                     style: const TextStyle(fontSize: 21),
                                   ),
                                 const SizedBox(height: 20),

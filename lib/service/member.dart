@@ -1,5 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
 class Member {
   String name;
   String email;
@@ -21,16 +19,4 @@ class Member {
         photoURL: json["photoURL"],
         role: json["role"],
       );
-
-  // savePreference(Member member) async {
-  //   final SharedPreferences pref = await SharedPreferences.getInstance();
-  //   // pref.setInt('id', member.id);
-  //   pref.setString('name', member.name);
-  //   pref.setString('email', member.email);
-  //   pref.setString('photoURL', member.photoURL);
-  //   pref.setString('role', member.role ?? "");
-  //   // member.userRole == 'ROLE_USER'
-  //   //     ? pref.setInt('interest', member.interest!)
-  //   //     : pref.setInt('major', member.major!);
-  // }
 }

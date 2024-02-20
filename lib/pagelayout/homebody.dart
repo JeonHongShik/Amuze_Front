@@ -210,7 +210,7 @@ class _StageBoardsState extends State<StageBoards> {
                 child: const Text(
                   '전체보기',
                   style: TextStyle(
-                    color: TextColors.disabled,
+                    color: TextColors.medium,
                   ),
                 ),
               ),
@@ -426,7 +426,10 @@ class _StageBoardsState extends State<StageBoards> {
                   height: 100,
                   color: Colors.white,
                   child: const Center(
-                    child: Text('게시물이 없습니다...'),
+                    child: Text(
+                      '게시물이 없습니다...',
+                      style: TextStyle(color: TextColors.disabled),
+                    ),
                   ),
                 );
               }
@@ -549,7 +552,7 @@ class _ResumeBoardsState extends State<ResumeBoards> {
                 child: const Text(
                   '전체보기',
                   style: TextStyle(
-                    color: TextColors.disabled,
+                    color: TextColors.medium,
                   ),
                 ),
               ),
@@ -755,7 +758,10 @@ class _ResumeBoardsState extends State<ResumeBoards> {
                     height: 100,
                     color: Colors.white,
                     child: const Center(
-                      child: Text('게시물이 없습니다...'),
+                      child: Text(
+                        '게시물이 없습니다...',
+                        style: TextStyle(color: TextColors.disabled),
+                      ),
                     ),
                   );
                 }
@@ -874,7 +880,7 @@ class _ComunityBoardsState extends State<ComunityBoards> {
                 },
                 child: const Text(
                   '전체보기',
-                  style: TextStyle(color: TextColors.disabled),
+                  style: TextStyle(color: TextColors.medium),
                 ),
               ),
             ],
@@ -992,29 +998,29 @@ class _ComunityBoardsState extends State<ComunityBoards> {
                                     const SizedBox(
                                       height: 4,
                                     ),
-                                    const Row(
+                                    Row(
                                       children: [
                                         Text(
-                                          '공감 3',
-                                          style: TextStyle(
+                                          '공감 ${data.likescount}',
+                                          style: const TextStyle(
                                             fontSize: 10,
                                             color: TextColors.disabled,
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 8,
                                         ),
                                         Text(
-                                          '댓글 2',
-                                          style: TextStyle(
+                                          '댓글 ${data.commentscount}',
+                                          style: const TextStyle(
                                             fontSize: 10,
                                             color: TextColors.disabled,
                                           ),
                                         ),
-                                        Spacer(),
+                                        const Spacer(),
                                         Text(
-                                          '01/13 10:05',
-                                          style: TextStyle(
+                                          data.createdat!,
+                                          style: const TextStyle(
                                             fontSize: 10,
                                             color: TextColors.disabled,
                                           ),
@@ -1039,7 +1045,10 @@ class _ComunityBoardsState extends State<ComunityBoards> {
                     height: 100,
                     color: Colors.white,
                     child: const Center(
-                      child: Text('게시물이 없습니다...'),
+                      child: Text(
+                        '게시물이 없습니다...',
+                        style: TextStyle(color: TextColors.disabled),
+                      ),
                     ),
                   );
                 }

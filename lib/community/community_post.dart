@@ -493,8 +493,8 @@ class _CommunityPostState extends State<CommunityPost> {
                               children: [
                                 SizedBox(
                                   child: Text(
-                                    item.title!.length > 12
-                                        ? item.title!.substring(0, 12)
+                                    item.title!.length > 17
+                                        ? item.title!.substring(0, 17)
                                         : item.title!,
                                     style: const TextStyle(
                                       fontSize: 21,
@@ -619,11 +619,14 @@ class _CommunityPostState extends State<CommunityPost> {
                                   ),
                               ],
                             ),
-                            if (item.title!.length > 12)
+                            if (item.title!.length > 17)
                               Text(
-                                item.title!.substring(12),
+                                item.title!.substring(17),
                                 style: const TextStyle(
-                                    fontSize: 21, fontWeight: FontWeight.bold),
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.w600,
+                                  color: TextColors.high,
+                                ),
                               ),
                             const SizedBox(
                               height: 30,

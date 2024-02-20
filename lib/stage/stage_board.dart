@@ -9,6 +9,7 @@ import 'package:amuze/stage/stagewrite/stagetitle.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
 
 class StageBoard extends StatefulWidget {
   const StageBoard({super.key});
@@ -151,9 +152,9 @@ class _StageBoardState extends State<StageBoard> {
                     },
                     child: ListView.builder(
                       itemCount:
-                          snapshot.data!.length + (snapshot.data!.length ~/ 5),
+                          snapshot.data!.length + (snapshot.data!.length ~/ 7),
                       itemBuilder: (context, index) {
-                        if (index % 6 == 5) {
+                        if (index % 8 == 7) {
                           return Column(
                             children: [
                               Container(
@@ -164,7 +165,7 @@ class _StageBoardState extends State<StageBoard> {
                             ],
                           );
                         } else {
-                          var realIndex = index - (index ~/ 6);
+                          var realIndex = index - (index ~/ 8);
                           var reverseIndex =
                               snapshot.data!.length - 1 - realIndex;
                           var data = snapshot.data![reverseIndex];
@@ -258,7 +259,7 @@ class _StageBoardState extends State<StageBoard> {
                                                     children: [
                                                       data.pay != null
                                                           ? Text(
-                                                              '${data.pay}원 · ',
+                                                              '${NumberFormat('#,###').format(int.tryParse(data.pay!) ?? 0)}원 · ',
                                                               style:
                                                                   const TextStyle(
                                                                 fontSize: 13,

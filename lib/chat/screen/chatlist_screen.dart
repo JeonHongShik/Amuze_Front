@@ -1,9 +1,11 @@
+import 'package:amuze/gathercolors.dart';
 import 'package:amuze/model/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widget/chat_list.dart';
 import 'package:amuze/service/chat_service.dart';
 import '../style/style.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -32,7 +34,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: SpinKitFadingCube(
+                  color: PrimaryColors.basic,
+                  size: 30.0,
+                ),
               );
             } else if (snapshot.hasError) {
               return Center(
@@ -41,11 +46,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
             } else if (snapshot.data == null || snapshot.data!.isEmpty) {
               return const Center(
                 child: Text(
-                  'No chats yet',
-                  style: TextStyles.shadowTextStyle,
+                  '대화 중인 채팅방이 없습니다.',
+                  style: TextStyle(color: TextColors.disabled),
                 ),
               );
             } else {
+              print('////////////////${snapshot.data.toString()}');
               return ListView(
                 children: [
                   ChatList(chats: snapshot.data!),

@@ -40,7 +40,7 @@ class _PostManagementState extends State<PostManagement>
         iconTheme: const IconThemeData(color: PrimaryColors.basic),
         backgroundColor: Colors.white,
         title: const Text(
-          '나의 게시물 관리',
+          '내 게시물 관리',
           style: TextStyle(
             color: PrimaryColors.basic,
             fontSize: 20,
@@ -110,6 +110,7 @@ class _MystagesState extends State<Mystages> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Expanded(
@@ -192,7 +193,7 @@ class _MystagesState extends State<Mystages> {
                                           color: backColors.disabled,
                                           image: const DecorationImage(
                                               image: AssetImage(
-                                                  'assets/images/공고임시이미지.png'),
+                                                  'assets/images/공고게시물없음이미지.jpg'),
                                               fit: BoxFit.fill)),
                                     ),
                               Expanded(
@@ -296,7 +297,11 @@ class _MystagesState extends State<Mystages> {
                     },
                   );
                 } else {
-                  return const Center(child: Text('작성한 공고 게시글이 없습니다.'));
+                  return const Center(
+                      child: Text(
+                    '작성한 공고 게시글이 없습니다.',
+                    style: TextStyle(color: TextColors.disabled),
+                  ));
                 }
               },
             ),
@@ -328,6 +333,7 @@ class _MyresumesState extends State<Myresumes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Expanded(
@@ -407,7 +413,7 @@ class _MyresumesState extends State<Myresumes> {
                                           color: backColors.disabled,
                                           image: const DecorationImage(
                                               image: AssetImage(
-                                                  'assets/images/공고임시이미지.png'),
+                                                  'assets/images/이력서게시물없음이미지.png'),
                                               fit: BoxFit.fill)),
                                     ),
                               Expanded(
@@ -499,7 +505,11 @@ class _MyresumesState extends State<Myresumes> {
                     },
                   );
                 } else {
-                  return const Center(child: Text('작성한 이력서가 없습니다.'));
+                  return const Center(
+                      child: Text(
+                    '작성한 이력서가 없습니다.',
+                    style: TextStyle(color: TextColors.disabled),
+                  ));
                 }
               },
             ),
@@ -531,6 +541,7 @@ class _MycommunitiesState extends State<Mycommunities> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Expanded(
@@ -621,35 +632,38 @@ class _MycommunitiesState extends State<Mycommunities> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 15, 5),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 15, 5),
                                   child: Row(
                                     children: [
                                       Text(
-                                        '공감 8',
-                                        style: TextStyle(
+                                        '공감 ${data.likescount}',
+                                        style: const TextStyle(
                                           color: TextColors.medium,
                                           fontSize: 11,
                                         ),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 3,
                                       ),
                                       Text(
-                                        '댓글 2',
-                                        style: TextStyle(
+                                        '댓글 ${data.commentscount}',
+                                        style: const TextStyle(
                                           color: TextColors.medium,
                                           fontSize: 11,
                                         ),
                                       ),
-                                      Spacer(),
-                                      Text(
-                                        '01/11 08:41',
-                                        style: TextStyle(
-                                          color: TextColors.medium,
-                                          fontSize: 11,
-                                        ),
-                                      ),
+                                      const Spacer(),
+                                      data.createdat != null
+                                          ? Text(
+                                              data.createdat!,
+                                              style: const TextStyle(
+                                                color: TextColors.medium,
+                                                fontSize: 11,
+                                              ),
+                                            )
+                                          : const SizedBox.shrink()
                                     ],
                                   ),
                                 ),
@@ -661,7 +675,11 @@ class _MycommunitiesState extends State<Mycommunities> {
                     },
                   );
                 } else {
-                  return const Center(child: Text('작성한 커뮤니티 글이 없습니다.'));
+                  return const Center(
+                      child: Text(
+                    '작성한 커뮤니티 글이 없습니다.',
+                    style: TextStyle(color: TextColors.disabled),
+                  ));
                 }
               },
             ),

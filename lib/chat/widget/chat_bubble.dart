@@ -23,12 +23,6 @@ class ChatBubbles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userInfoProvider = Provider.of<UserInfoProvider>(context,
-        listen: false); // UserInfoProvider 인스턴스 생성
-    final user = FirebaseAuth.instance.currentUser;
-    final userData =
-        FirebaseFirestore.instance.collection('users').doc(user!.email).get();
-
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
@@ -58,7 +52,7 @@ class ChatBubbles extends StatelessWidget {
                           message.content.split('@')[1],
                           fit: BoxFit.cover, // 이미지 URL을 가져와서 이미지를 표시합니다.
                         ),
-                        onTap: () {},
+                        //onTap: () {},
                       ),
                     ),
                   ),
@@ -83,7 +77,7 @@ class ChatBubbles extends StatelessWidget {
                     textStyle: TextStyles.blueBottonTextStyle,
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width *
-                            0.4), // 버블의 텍스트 스타일을 설정합니다.
+                            0.5), // 버블의 텍스트 스타일을 설정합니다.
                   ),
                 ],
               ),
@@ -160,7 +154,7 @@ class ChatBubbles extends StatelessWidget {
                           textStyle: TextStyles.chatNotMeBubbleTextStyle,
                           constraints: BoxConstraints(
                               maxWidth: MediaQuery.of(context).size.width *
-                                  0.4), // 버블의 텍스트 스타일을 설정합니다.
+                                  0.5), // 버블의 텍스트 스타일을 설정합니다.
                         ),
                         Text(
                           dataTimeFormat(message.createdAt), // 메시지 시간을 표시합니다.

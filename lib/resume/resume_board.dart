@@ -150,9 +150,9 @@ class _ResumeBoardState extends State<ResumeBoard> {
                     },
                     child: ListView.builder(
                       itemCount:
-                          snapshot.data!.length + (snapshot.data!.length ~/ 5),
+                          snapshot.data!.length + (snapshot.data!.length ~/ 7),
                       itemBuilder: (context, index) {
-                        if (index % 6 == 5) {
+                        if (index % 8 == 7) {
                           return Column(
                             children: [
                               Container(
@@ -167,7 +167,7 @@ class _ResumeBoardState extends State<ResumeBoard> {
                             ],
                           );
                         } else {
-                          var realIndex = index - (index ~/ 6);
+                          var realIndex = index - (index ~/ 8);
                           var reverseIndex =
                               snapshot.data!.length - 1 - realIndex;
                           var data = snapshot.data![reverseIndex];

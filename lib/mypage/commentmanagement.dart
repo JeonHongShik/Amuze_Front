@@ -27,6 +27,7 @@ class _CommentManagementState extends State<CommentManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           centerTitle: true,
           iconTheme: const IconThemeData(color: PrimaryColors.basic),
@@ -34,7 +35,7 @@ class _CommentManagementState extends State<CommentManagement> {
           title: const Text(
             '내 댓글 관리',
             style: TextStyle(
-              color: TextColors.high,
+              color: PrimaryColors.basic,
               fontSize: 20,
             ),
           ),
@@ -75,13 +76,16 @@ class _CommentManagementState extends State<CommentManagement> {
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CommunityPost(
-                                    id: comment.board,
-                                  ),
-                                ))
-                            .then((_) => serverData = mycommentfetchData(uid));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CommunityPost(
+                                id: comment.board,
+                              ),
+                            )).then((_) {
+                          setState(() {
+                            serverData = mycommentfetchData(uid);
+                          });
+                        });
                       },
                       child: Column(
                         children: [
@@ -121,7 +125,11 @@ class _CommentManagementState extends State<CommentManagement> {
                     );
                   });
             } else {
-              return const Center(child: Text('작성한 댓글이 없습니다.'));
+              return const Center(
+                  child: Text(
+                '작성한 댓글이 없습니다.',
+                style: TextStyle(color: TextColors.disabled),
+              ));
             }
           },
         ));

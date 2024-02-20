@@ -5,6 +5,7 @@ import 'package:amuze/server_communication/get/alarm_get_server.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class NotifyBody extends StatefulWidget {
   const NotifyBody({super.key});
@@ -83,7 +84,10 @@ class _NotifyBodyState extends State<NotifyBody> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
-                  child: Text('알람 불러오는 중...'),
+                  child: SpinKitFadingCube(
+                    color: PrimaryColors.basic,
+                    size: 30.0,
+                  ),
                 );
               } else if (snapshot.hasError) {
                 return Center(
@@ -198,7 +202,7 @@ class _NotifyBodyState extends State<NotifyBody> {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.only(left: 8),
+                                  padding: const EdgeInsets.only(left: 12),
                                   width: MediaQuery.of(context).size.width,
                                   child: Text(alarm.messagebody!),
                                 ),
@@ -213,7 +217,11 @@ class _NotifyBodyState extends State<NotifyBody> {
                   ],
                 );
               } else {
-                return const Center(child: Text('알람이 없습니다.'));
+                return const Center(
+                    child: Text(
+                  '알람이 없습니다.',
+                  style: TextStyle(color: TextColors.disabled),
+                ));
               }
             }));
   }

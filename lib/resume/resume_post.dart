@@ -117,7 +117,7 @@ class _ResumePostState extends State<ResumePost> {
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.33,
+                    width: MediaQuery.of(context).size.width * 0.3,
                     height: 40,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -443,8 +443,8 @@ class _ResumePostState extends State<ResumePost> {
                                         children: [
                                           // 첫 12글자 표시
                                           Text(
-                                            item.title!.length > 14
-                                                ? item.title!.substring(0, 14)
+                                            item.title!.length > 16
+                                                ? item.title!.substring(0, 16)
                                                 : item.title!,
                                             style:
                                                 const TextStyle(fontSize: 21),
@@ -454,9 +454,9 @@ class _ResumePostState extends State<ResumePost> {
                                         ],
                                       ),
                                       // 12글자를 초과하는 경우 나머지 텍스트 표시
-                                      if (item.title!.length > 14)
+                                      if (item.title!.length > 16)
                                         Text(
-                                          item.title!.substring(14),
+                                          item.title!.substring(16),
                                           style: const TextStyle(fontSize: 21),
                                         ),
                                       const SizedBox(
@@ -552,7 +552,7 @@ class _ResumePostState extends State<ResumePost> {
                                         email: email,
                                         photoURL: photoURL),
                                   )));
-                      print('없다 ${email} 이다');
+                      print('없다 $email 이다');
                     }
                     return '';
                   },

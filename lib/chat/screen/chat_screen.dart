@@ -65,16 +65,8 @@ class ChatScreenState extends State<ChatScreen> {
               elevation: 0,
               title: Text(
                 widget.other.name,
-                //여기에 상대방 이름
                 style: const TextStyle(color: Colors.white),
               ),
-              // leading: IconButton(
-              //   icon:
-              //       const Icon(Icons.arrow_back_ios_sharp, color: Colors.white),
-              //   onPressed: () {
-              //     Navigator.of(context).pop();
-              //   },
-              // ),
             ),
             backgroundColor: Colors.white,
             extendBodyBehindAppBar: false,
@@ -184,25 +176,27 @@ class ChatScreenState extends State<ChatScreen> {
       ]));
 
   onSendMessage() {
-    final Message message = Message(
-        content: newMessage,
-        sender: userId,
-        createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
+    if (newMessage.trim().isNotEmpty) {
+      final Message message = Message(
+          content: newMessage,
+          sender: userId,
+          createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
 
-    if (widget.isNew && !isSended) {
-      setState(() {
-        isSended = true;
-      });
+      if (widget.isNew && !isSended) {
+        setState(() {
+          isSended = true;
+        });
 
-      newChatroom();
-    } else {
-      ChatService().sendMessage(
-        widget.chatroomId,
-        message,
-      );
+        newChatroom();
+      } else {
+        ChatService().sendMessage(
+          widget.chatroomId,
+          message,
+        );
+      }
+      _controller.text = '';
+      FocusScope.of(context).unfocus();
     }
-    _controller.text = '';
-    FocusScope.of(context).unfocus();
   }
 
   newChatroom() async {
@@ -212,24 +206,28 @@ class ChatScreenState extends State<ChatScreen> {
     final userRole = user.displayName!;
     final userUrl = user.photoURL! ??
         'https://identitylessimgserver.s3.ap-northeast-2.amazonaws.com/member/base_profile.png';
-    final message = Message(
-        content: newMessage,
-        sender: userId,
-        createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
-    final chatroom = ChatRoom(
-        chatRoomId: widget.chatroomId,
-        user1: ChatMember(
-            nickname: widget.other.name,
-            email: widget.other.email,
-            photoUrl: widget.other.photoURL,
-            role: widget.other.role ?? ''),
-        user2: ChatMember(
-            nickname: userName,
-            email: userId,
-            role: userRole,
-            photoUrl: userUrl),
-        messages: [message]);
-    ChatService().newChatRoom(chatroom, message);
+    //여기 if문 넣음.
+    if (newMessage.trim().isNotEmpty) {
+      final message = Message(
+          content: newMessage,
+          sender: userId,
+          createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
+
+      final chatroom = ChatRoom(
+          chatRoomId: widget.chatroomId,
+          user1: ChatMember(
+              nickname: widget.other.name,
+              email: widget.other.email,
+              photoUrl: widget.other.photoURL,
+              role: widget.other.role ?? ''),
+          user2: ChatMember(
+              nickname: userName,
+              email: userId,
+              role: userRole,
+              photoUrl: userUrl),
+          messages: [message]);
+      ChatService().newChatRoom(chatroom, message);
+    }
   }
 
   onSendImagePressed() async {

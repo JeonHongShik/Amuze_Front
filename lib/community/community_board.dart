@@ -170,7 +170,7 @@ class _CommunityBoardState extends State<CommunityBoard> {
                             ],
                           );
                         } else {
-                          var realIndex = index - (index ~/ 6);
+                          var realIndex = index - (index ~/ 11);
                           var reverseIndex =
                               snapshot.data!.length - 1 - realIndex;
                           var data = snapshot.data![reverseIndex];

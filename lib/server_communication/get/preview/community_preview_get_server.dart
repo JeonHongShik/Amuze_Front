@@ -22,13 +22,14 @@ class CommunityPreviewServerData {
   factory CommunityPreviewServerData.fromJson(Map<String, dynamic> json) {
     try {
       return CommunityPreviewServerData(
-          id: json['id'],
-          // author: json['author'],
-          title: json['title'],
-          content: json['content'],
-          createdat: json['created_at'],
-          likescount: json['likes_count'],
-          commentscount: json['comments_count']);
+        id: json['id'],
+        // author: json['author'],
+        title: json['title'],
+        content: json['content'],
+        createdat: json['created_at'],
+        likescount: json['likes_count'],
+        commentscount: json['comments_count'],
+      );
     } catch (e) {
       print("Error during JSON parsing: $e");
       rethrow;

@@ -5,12 +5,18 @@ class MyCommunityServerData {
   // String? author;
   String? title;
   String? content;
+  String? createdat;
+  int? likescount;
+  int? commentscount;
 
   MyCommunityServerData({
     required this.id,
     // required this.author,
     required this.title,
     required this.content,
+    required this.createdat,
+    required this.likescount,
+    required this.commentscount,
   });
 
   factory MyCommunityServerData.fromJson(Map<String, dynamic> json) {
@@ -20,6 +26,9 @@ class MyCommunityServerData {
         // author: json['author'],
         title: json['title'],
         content: json['content'],
+        createdat: json['created_at'],
+        likescount: json['likes_count'],
+        commentscount: json['comments_count'],
       );
     } catch (e) {
       print("Error during JSON parsing: $e");
